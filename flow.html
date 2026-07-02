@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="he" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Live Tickets — Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="flow.css" />
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+/* ============================================================
+   Live Tickets — flow app (ported from the imported prototype,
+   restyled to the homepage design system). page: 1=Category,
+   2=Lobby, 3=Event.  Structure / IA / copy preserved.
+   ============================================================ */
+const IMG = 'assets/cards/';
+const state = {
+  page: 0,
+  faqHome: 0,
+  headerSolid: false,
+  acctOpen:false, drawerOpen:false, drawerSection:null, drawerMusicGroup:null, mSport:null, mComp:null,
+  srOpen:false, openSheet:null,
+  srQuery:'', srPhase:'idle', srSortBy:'best', srFilterSheet:false, srHearts:{},
+  srRecent:['קולדפליי','ריאל מדריד','טיילור סוויפט'],
+  p1LastMinute:false, p1GenreSelected:null, p1CitySelected:null, p1DateLabel:null,
+  p1SpotifyConnected:false, playing:false, playIdx:0, plCurrent:0,
+  // shared calendar date-picker
+  dpYear:2026, dpMonth:6, dpStart:null, dpEnd:null, dpFlex:'exact',
+  hearts:{}, faqOpen:0,
+  // P2 (lobby)
+  following:false, setlistOpen:false, tourExpanded:false, bioExpanded:false, faqP2Open:0,
+  p2DateSel:null, p2CitySel:null, p2QtySel:null, p2Together:false,
+  // P3 (event)
+  heroCollapsed:false, selectedSection:null, sortBy:'best', highlightListing:null,
+  p3f:{together:false, front:false, view:false, access:false}, p3Qty:null, p3Min:'', p3Max:'',
+  setlistP3Open:false, faqP3Open:0,
+};
+
+/* ---------- data (exact copy from the prototype) ---------- */
+const D = {
+  topArtists:[
+    {name:'קולדפליי', price:'₪520', img:'artist1.jpg', hot:true},
+    {name:'הארי סטיילס', price:'₪560', img:'artist6.jpg'},
+    {name:'אד שירן', price:'₪410', img:'artist3.jpg'},
+    {name:'BTS', price:'₪690', img:'artist5.jpg', hot:true},
+  ],
+  popArtists:[
+    {id:'cold', name:'קולדפליי', sub:'פופ · רוק · 6 הופעות', price:'₪520', img:'artist1.jpg', hot:true},
+    {id:'harry',name:'הארי סטיילס', sub:'פופ · 3 הופעות', price:'₪560', img:'artist6.jpg'},
+    {id:'dua',  name:'דואה ליפה', sub:'פופ · 4 הופעות', price:'₪460', img:'artist4.jpg'},
+    {id:'bruno',name:'ברונו מארס', sub:'פופ · R&B · 2 הופעות', price:'₪480', img:'artist2.jpg'},
+    {id:'sabr', name:'סאברינה קרפנטר', sub:'פופ · 5 הופעות', price:'₪520', img:'artist7.jpg'},
+  ],
+  playlist:[
+    {n:1, t:'As It Was — Harry Styles'},
+    {n:2, t:'Levitating — Dua Lipa'},
+    {n:3, t:'Flowers — Miley Cyrus'},
+  ],
+  tiktok:[
+    {n:'קולדפליי לונדון 🎤', l:'87K ❤', img:'tiktok4.jpg'},
+    {n:'Yellow פריז 🗼', l:'124K ❤', img:'tiktok3.jpg'},
+    {n:'LED ומבלי ✨', l:'210K ❤', img:'tiktok2.jpg'},
+    {n:'BTS טוקיו 🎤', l:'445K ❤', img:'tiktok1.jpg'},
+    {n:'ברצלונה 🌴', l:'98K ❤', img:'dest-spain.jpg'},
+  ],
+  genres:[
+    {n:'רוק',img:'artist1.jpg'},{n:'היפ-הופ',img:'artist2.jpg'},{n:'לטין',img:'artist4.jpg'},
+    {n:'קלאסי',img:'artist3.jpg'},{n:'ג׳אז',img:'artist6.jpg'},{n:'R&B',img:'artist8.jpg'},{n:'מחזמר',img:'tiktok3.jpg'},
+  ],
+  faqP1:[
+    {q:'איך זה עובד?', a:'רכשו כרטיסים ישירות בלחיצה אחת. כל הכרטיסים מאומתים ומגיעים לאימייל תוך דקות.'},
+    {q:'האם המחיר כולל עמלות?', a:'כן! כל המחירים המוצגים הם מחיר all-in כולל עמלות. אין הפתעות בקופה.'},
+  ],
+  musicGenres:['פופ','רוק','היפ-הופ','לטין','קלאסי','כל ההופעות'],
+  cities:['לונדון','ברצלונה','מדריד','פריז','מילאנו','מינכן','אמסטרדם','רומא'],
+  accountGroups:[
+    {e:'🎟️',n:'הכרטיסים שלי'},{e:'🔔',n:'התראות והעדפות'},{e:'⚙️',n:'הגדרות'},
+    {e:'❤️',n:'מועדפים / Wishlist'},{e:'⭐',n:'VIP / קבוצות'},
+  ],
+  srPopular:['מונדיאל 2026','טיילור סוויפט','קולדפליי','ריאל מדריד'],
+  // ---- Search corpus (from the prototype) ----
+  SR_PERF:[
+    {key:'coldplay',name:'קולדפליי',type:'performer',tags:['cold','קולד','coldplay'],meta:'להקה · פופ רוק',icon:'🎵'},
+    {key:'real',name:'ריאל מדריד',type:'team',tags:['ריאל','real','מדריד'],meta:'כדורגל · ספרד',icon:'⚽'},
+    {key:'taylor',name:'טיילור סוויפט',type:'performer',tags:['טיילור','taylor','swift'],meta:'אמנית · פופ',icon:'🎤'},
+    {key:'bts',name:'BTS',type:'performer',tags:['bts','בי טי'],meta:'להקה · K-Pop',icon:'🎤'},
+    {key:'harry',name:'הארי סטיילס',type:'performer',tags:['הארי','harry','styles'],meta:'אמן · פופ',icon:'🎵'},
+    {key:'dua',name:'דואה ליפה',type:'performer',tags:['דואה','dua','ליפה'],meta:'אמנית · פופ',icon:'🎤'},
+    {key:'manchester',name:'מנצ׳סטר סיטי',type:'team',tags:['מנצ','manc','סיטי'],meta:'כדורגל · אנגליה',icon:'⚽'},
+    {key:'formula1',name:'פורמולה 1',type:'category',tags:['פורמולה','formula','f1'],meta:'קטגוריה · ספורט',icon:'🏎️'},
+    {key:'worldcup',name:'מונדיאל 2026',type:'event',tags:['מונדיאל','world','cup','2026'],meta:'כדורגל · 2026',icon:'🏆'},
+  ],
+  SR_EVENTS:[
+    {id:'e1',name:'קולדפליי · ומבלי',date:'4 יולי 2026',venue:'ומבלי, לונדון',price:'₪520',perfKey:'coldplay',city:'לונדון',cat:'performer'},
+    {id:'e2',name:'קולדפליי · פריז',date:'12 יולי 2026',venue:'סטאד דה פראנס, פריז',price:'₪610',perfKey:'coldplay',city:'פריז',cat:'performer'},
+    {id:'e3',name:'ריאל מדריד vs. ברצלונה',date:'28 יולי 2026',venue:'ברנבאו, מדריד',price:'₪740',perfKey:'real',city:'מדריד',cat:'team'},
+    {id:'e4',name:'טיילור סוויפט · אמסטרדם',date:'5 אוג׳ 2026',venue:'יוהאן קרויף, אמסטרדם',price:'₪820',perfKey:'taylor',city:'אמסטרדם',cat:'performer'},
+    {id:'e5',name:'BTS · טוקיו',date:'22 אוג׳',venue:'סייטאמה ארנה, טוקיו',price:'₪950',perfKey:'bts',city:'טוקיו',cat:'performer'},
+    {id:'e6',name:'מנצ׳סטר סיטי vs. ארסנל',date:'14 ספט׳',venue:'אתיחאד, מנצ׳סטר',price:'₪580',perfKey:'manchester',city:'מנצ׳סטר',cat:'team'},
+    {id:'e7',name:'מוניקו GP פורמולה 1',date:'25 מאי 2027',venue:'מעגל מוניקו',price:'₪1,200',perfKey:'formula1',city:'מוניקו',cat:'category'},
+    {id:'e8',name:'הארי סטיילס · O2',date:'19 אוג׳',venue:'O2 Arena, לונדון',price:'₪560',perfKey:'harry',city:'לונדון',cat:'performer'},
+    {id:'e9',name:'Glastonbury Festival',date:'25 יוני 2027',venue:'סומרסט, בריטניה',price:'₪680',perfKey:'festival',city:'לונדון',cat:'festival'},
+  ],
+  SR_CITIES:[
+    {key:'london',name:'לונדון',icon:'🏙️',meta:'United Kingdom'},
+    {key:'paris',name:'פריז',icon:'🗼',meta:'France'},
+    {key:'madrid',name:'מדריד',icon:'🏟️',meta:'Spain'},
+    {key:'amsterdam',name:'אמסטרדם',icon:'🌷',meta:'Netherlands'},
+  ],
+  srCats:[
+    {key:'concerts',name:'הופעות',icon:'🎤',tags:['הופע','concert','מוזיקה']},
+    {key:'football',name:'כדורגל',icon:'⚽',tags:['כדורגל','football','soccer']},
+    {key:'nba',name:'NBA',icon:'🏀',tags:['nba','כדורסל']},
+    {key:'formula1',name:'פורמולה 1',icon:'🏎️',tags:['פורמולה','formula','f1']},
+    {key:'festival',name:'פסטיבלים',icon:'🎡',tags:['פסטיבל','festival']},
+  ],
+  // ---- P2 (Event Lobby — קולדפליי) ----
+  p2Dates:[
+    {d:'4', dow:'ביולי · ש׳', venue:'אצטדיון ומבלי', city:'לונדון', price:'₪520'},
+    {d:'7', dow:'ביולי · ג׳', venue:'אצטדיון ומבלי', city:'לונדון', price:'₪540'},
+    {d:'12', dow:'ביולי · א׳', venue:'סטאד דה פראנס', city:'פריז', price:'₪610'},
+    {d:'18', dow:'ביולי · ש׳', venue:'אולימפיאשטדיון', city:'מינכן', price:'₪480'},
+  ],
+  setlist:['Yellow','Higher Power','The Scientist','Viva la Vida','Fix You','Clocks','A Sky Full of Stars','My Universe (feat. BTS)'],
+  gallery:['artist1.jpg','tiktok1.jpg','tiktok2.jpg','tiktok3.jpg'],
+  reels:[
+    {n:'קולדפליי לונדון 🎤', l:'87K ❤', img:'tiktok4.jpg'},
+    {n:'Yellow — פריז 🗼', l:'124K ❤', img:'tiktok3.jpg'},
+    {n:'LED צמיד — קסם ✨', l:'210K ❤', img:'tiktok2.jpg'},
+    {n:'Fix You — מינכן 🏟️', l:'63K ❤', img:'tiktok1.jpg'},
+  ],
+  faqP2:[
+    {q:'איך אדע שהמקומות צמודים?', a:'בעמוד הבחירה ניתן לבחור כמות ואנו מבטיחים מקומות צמודים.'},
+    {q:'מה קורה אם נקראתי למילואים?', a:'החזר כספי מלא למי שנקרא למילואים עם הצו הרלוונטי.'},
+    {q:'מתי אקבל את הכרטיסים?', a:'הכרטיסים ישלחו לאימייל מיד לאחר הרכישה — לרוב תוך דקות.'},
+  ],
+  alsoLike:[
+    {name:'אד שירן', price:'₪410', img:'artist3.jpg'},
+    {name:'דה וויקנד', price:'₪580', img:'artist8.jpg'},
+    {name:'BTS', price:'₪690', img:'artist5.jpg'},
+    {name:'ברונו מארס', price:'₪480', img:'artist2.jpg'},
+  ],
+  reviews:[
+    {av:'🙋', name:'מיכל כ.', meta:'לונדון · יולי 2025', stars:5, t:'חוויה שלא תישכח לעולם. הקסם של הצמידים המאירים בחשכה, הקול של קריס מרטין — זה פשוט מושלם. כרטיסים דרך Live Tickets הגיעו מיד ✅'},
+    {av:'👨', name:'יונתן ל.', meta:'פריז · יולי 2025', stars:5, t:'הופעת חיים! הפקה עצומה, סאונד מדהים. המחיר all-in ב-Live Tickets היה הוגן מאוד — ממליץ בחום.'},
+    {av:'👩', name:'תמר ש.', meta:'מינכן · אוגוסט 2025', stars:4, t:'קולדפליי הם פנומן. ישבנו ביציע הצדדי, מבט מצוין. הכרטיסים הגיעו לנייד שעה לפני — שירות מעולה.'},
+  ],
+  // ---- P3 (Event — קולדפליי · ומבלי) ----
+  sections:[
+    {key:'south', label:'יציע דרום', dot:'#1c7a3a'},
+    {key:'west',  label:'מערב',      dot:'#F57E20'},
+    {key:'east',  label:'מזרח',      dot:'#F57E20'},
+    {key:'vip',   label:'VIP',        dot:'#ED1860'},
+  ],
+  sectionLabels:{south:'יציע דרום',['south-c']:'דרום תחתון',vip:'VIP',west:'מערב',east:'מזרח',north:'צפון'},
+  priceMarks:['₪520','₪540','₪1,400','₪640','₪650','₪690','₪890'],
+  seatChars:['כמות','ישיבה יחד','מעבר','שורה ראשונה','ללא הסתרת מבט','נגישות'],
+  listings:[
+    {key:'south',   sec:'יציע דרום',  row:'טור 24', price:'₪520', score:10, val:'ערך מעולה', tog:'עד 4 יחד', left:6, img:'seat1.jpg', pin:{t:82,l:52}},
+    {key:'south-c', sec:'דרום תחתון', row:'טור 12', price:'₪540', score:8,  val:'ערך טוב',   tog:'עד 2 יחד', left:4, img:'seat6.jpg', pin:{t:70,l:33}},
+    {key:'west',    sec:'מערב',       row:'טור 8',  price:'₪640', score:6,  val:'ערך סביר',  tog:'עד 4 יחד', left:8, img:'seat7.jpg', pin:{t:50,l:13}},
+    {key:'east',    sec:'מזרח',       row:'טור 15', price:'₪650', score:7,  val:'ערך טוב',   tog:'עד 6 יחד', left:5, img:'seat1.jpg', pin:{t:50,l:87}},
+    {key:'vip',     sec:'VIP',        row:'שורה 3', price:'₪890', score:9,  val:'ערך מעולה', tog:'עד 2 יחד', left:3, img:'seat6.jpg', pin:{t:40,l:52}},
+    {key:'north',   sec:'יציע צפון',  row:'טור 20', price:'₪690', score:7,  val:'ערך טוב',   tog:'עד 4 יחד', left:7, img:'seat7.jpg', pin:{t:15,l:50}},
+  ],
+  related:[
+    {name:'קולדפליי · פריז', price:'₪610', img:'tiktok3.jpg'},
+    {name:'דה וויקנד · לונדון', price:'₪580', img:'artist8.jpg'},
+    {name:'אד שירן · ומבלי', price:'₪410', img:'artist3.jpg'},
+  ],
+  faqP3:[
+    {q:'מקומות צמודים?', a:'בחרו כמות בעמוד הבחירה — אנחנו מבטיחים מקומות צמודים. מוצג בבירור לפני הרכישה.'},
+  ],
+  // ---- Home (page 0) ----
+  homeRecent:[
+    {name:'קולדפליי',meta:'לונדון · 4 יולי',img:'artist1.jpg',hot:true},
+    {name:'טיילור סוויפט',meta:'פריז · 20 יולי',img:'artist2.jpg'},
+    {name:'אד שירן',meta:'מדריד · 3 אוג׳',img:'artist3.jpg'},
+    {name:'דואה ליפה',meta:'ברצלונה · 15 אוג׳',img:'artist4.jpg',hot:true},
+  ],
+  homeTrending:[
+    {name:'BTS',meta:'טוקיו · 28 אוג׳',img:'artist5.jpg',hot:true},
+    {name:'הארי סטיילס',meta:'אמסטרדם · 18 ספט׳',img:'artist6.jpg'},
+    {name:'בילי אייליש',meta:'רומא · 30 ספט׳',img:'artist7.jpg'},
+    {name:'דה וויקנד',meta:'ברלין · 5 אוק׳',img:'artist8.jpg'},
+  ],
+  homeSuggested:[
+    {name:'קולדפליי',sub:'פופ · רוק · 6 הופעות',price:'₪520',img:'artist1.jpg'},
+    {name:'מטאליקה',sub:'מטאל · רוק · 4 הופעות',price:'₪690',img:'artist2.jpg'},
+    {name:'אדל',sub:'פופ · בלדות · 3 הופעות',price:'₪780',img:'artist3.jpg'},
+    {name:'דרייק',sub:'היפ הופ · 5 הופעות',price:'₪610',img:'artist4.jpg'},
+  ],
+  homeTiktok:[
+    {n:'BTS טוקיו 🎤',l:'445K ❤',img:'tiktok1.jpg'},
+    {n:'LED ומבלי ✨',l:'210K ❤',img:'tiktok2.jpg'},
+    {n:'Yellow פריז 🗼',l:'124K ❤',img:'tiktok3.jpg'},
+    {n:'קולדפליי לונדון 🎤',l:'87K ❤',img:'tiktok4.jpg'},
+  ],
+  homeGenres:[{n:'פופ',img:'artist4.jpg'},{n:'רוק',img:'artist1.jpg'},{n:'היפ-הופ',img:'artist2.jpg'},{n:'לטין',img:'tiktok3.jpg'},{n:'קלאסי',img:'artist3.jpg'},{n:'ג׳אז',img:'artist6.jpg'}],
+  homeTravel:[{n:'ספרד',img:'dest-spain.jpg'},{n:'איטליה',img:'dest-italy.jpg'},{n:'ספורט',img:'sport1.jpg'}],
+  homeTestimonials:[
+    {name:'דנה כהן',event:'קולדפליי · לונדון',color:'#ed1860',quote:'חוויה מטורפת! הזמנתי כרטיסים לקולדפליי והכל היה חלק. ממליצה בחום 🎤'},
+    {name:'יוסי לוי',event:'BTS · טוקיו',color:'#6a3fd1',quote:'הפכתי הופעה בטוקיו לחופשה שלמה. הכרטיסים הגיעו מיד. פשוט מושלם.'},
+    {name:'מאיה אברהם',event:'פסטיבל · ברצלונה',color:'#216ca5',quote:'האתר הכי נוח להזמנת הופעות בחו״ל. השירות זמין וענו על כל שאלה.'},
+  ],
+  homeFaq:[
+    {q:'איך מזמינים כרטיסים?',a:'בוחרים אירוע, לוחצים "הזמנת כרטיסים", ומשלמים בתשלום מאובטח. האישור נשלח מיד למייל.'},
+    {q:'האם המחירים כוללים עמלות?',a:'כן — כל המחירים המוצגים הם מחיר all-in כולל עמלות. אין הפתעות בקופה.'},
+  ],
+  // curated collection for the promoted occasion (see OCCASION config below)
+  occasionEvents:[
+    {name:'משחק הפתיחה',        meta:'מקסיקו סיטי · 11 יוני', price:'₪1,200', img:'sport1.jpg'},
+    {name:'שלב הבתים',          meta:'ניו יורק · 18 יוני',    price:'₪880',   img:'sport2.jpg'},
+    {name:'שמינית גמר',         meta:'לוס אנג׳לס · 29 יוני',  price:'₪980',   img:'sport3.jpg'},
+    {name:'רבע גמר',            meta:'דאלאס · 4 יולי',        price:'₪1,450', img:'sport1.jpg'},
+    {name:'חצי גמר',            meta:'אטלנטה · 14 יולי',      price:'₪1,900', img:'sport2.jpg'},
+    {name:'הגמר הגדול',         meta:'ניו יורק · 19 יולי',    price:'₪2,400', img:'sport3.jpg'},
+  ],
+  drawer:{
+    sports:[
+      {n:'כדורגל',comps:[{n:'ליגת האלופות',teams:['ריאל מדריד','מנצ׳סטר סיטי','באיירן מינכן','אינטר']},{n:'ליגה אנגלית',teams:['ארסנל','ליברפול','מנצ׳סטר יונייטד','צ׳לסי']},{n:'ליגה ספרדית',teams:['ריאל מדריד','ברצלונה','אתלטיקו מדריד','סביליה']},{n:'מונדיאל 2026',teams:['משחק הפתיחה','שלב הבתים','שמינית גמר','הגמר']}]},
+      {n:'כדורסל',comps:[{n:'יורוליג',teams:['מכבי ת״א','פאניתנייקוס','ריאל מדריד','פנרבחצ׳ה']},{n:'NBA',teams:['בוסטון סלטיקס','לייקרס','גולדן סטייט','ניקס']}]},
+      {n:'טניס',comps:[{n:'ווימבלדון',teams:['גמר גברים','גמר נשים','חצי גמר','כרטיס יומי']},{n:'US Open',teams:['גמר גברים','גמר נשים','חצי גמר','כרטיס יומי']}]},
+      {n:'פורמולה 1',comps:[{n:'גרנד פרי בריטניה',teams:['מירוץ ראשי','ספרינט','גרנדסטנד','פאדוק קלאב']},{n:'מונזה',teams:['מירוץ ראשי','דירוג','גרנדסטנד','פאדוק קלאב']}]},
+      {n:'אגרוף / MMA',comps:[{n:'UFC',teams:['Main Event','Co-Main','Prelims','כרטיס ערב']}]},
+    ],
+    music:[
+      {n:'לפי סוג',items:['קונצרטים / הופעות','פסטיבלים','קלאסי ואופרה']},
+      {n:"ז'אנר",items:['פופ','רוק','היפ-הופ','לטין','קלאסי','כל ההופעות']},
+      {n:'אמנים',items:['BTS','אריאנה גרנדה','קולדפליי','דה וויקנד','ברונו מארס','שאקירה']},
+    ],
+    dest:['לונדון','ברצלונה','מדריד','פריז','מילאנו','מינכן','אמסטרדם','רומא'],
+    support:['איך זה עובד','אחריות ומדיניות ביטול','שאלות נפוצות','צור קשר / שירות לקוחות'],
+  },
+};
+
+/* ---------- rotating "promoted occasion" nav slot (config-driven) ---------- */
+const OCCASION = { occasion:'worldcup', label:'מונדיאל 2026', dateRange:'11 יוני – 19 יולי 2026', targetCollection:'worldcup' };
+// Alternates — swap OCCASION above to rotate the slot:
+// const OCCASION = { occasion:'rosh-hashana', label:'אירועי ראש השנה', dateRange:'ספטמבר 2026',        targetCollection:'rosh-hashana' };
+// const OCCASION = { occasion:'summer',       label:'פסטיבלי קיץ',      dateRange:'יולי–אוגוסט 2026',   targetCollection:'summer' };
+// const OCCASION = { occasion:'holidays',     label:'חגים',             dateRange:'ספטמבר–אוקטובר 2026', targetCollection:'holidays' };
+
+/* ---------- svg icons ---------- */
+const ICON = {
+  menu:'<svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8401 4.60999C20.3294 4.099 19.7229 3.69364 19.0555 3.41708C18.388 3.14052 17.6726 2.99817 16.9501 2.99817C16.2276 2.99817 15.5122 3.14052 14.8448 3.41708C13.2599 4.07375 12.7437 5.22501 12.0001 6.66999C10.9132 4.55773 9.71873 2.9987 7.05012 2.9987C5.59109 2.9987 4.19181 3.5783 3.16012 4.60999C2.12843 5.64169 1.54883 7.04096 1.54883 8.49999C1.54883 9.95903 2.12843 11.3583 3.16012 12.39L4.22012 13.45L12.0001 21.23L19.7801 13.45L20.8401 12.39C21.3511 11.8792 21.7565 11.2728 22.033 10.6053C22.3096 9.93789 22.4519 9.22248 22.4519 8.49999C22.4519 7.77751 22.3096 7.0621 22.033 6.39464C21.7565 5.72718 21.3511 5.12075 20.8401 4.60999Z"/></svg>',
+  searchSm:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>',
+  hs:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8401 4.60999C20.3294 4.099 19.7229 3.69364 19.0555 3.41708C18.388 3.14052 17.6726 2.99817 16.9501 2.99817C16.2276 2.99817 15.5122 3.14052 14.8448 3.41708C13.2599 4.07375 12.7437 5.22501 12.0001 6.66999C10.9132 4.55773 9.71873 2.9987 7.05012 2.9987C5.59109 2.9987 4.19181 3.5783 3.16012 4.60999C2.12843 5.64169 1.54883 7.04096 1.54883 8.49999C1.54883 9.95903 2.12843 11.3583 3.16012 12.39L4.22012 13.45L12.0001 21.23L19.7801 13.45L20.8401 12.39C21.3511 11.8792 21.7565 11.2728 22.033 10.6053C22.3096 9.93789 22.4519 9.22248 22.4519 8.49999C22.4519 7.77751 22.3096 7.0621 22.033 6.39464C21.7565 5.72718 21.3511 5.12075 20.8401 4.60999Z"/></svg>',
+  share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z"/><path d="M6 15C7.65685 15 9 13.6569 9 12C9 10.3431 7.65685 9 6 9C4.34315 9 3 10.3431 3 12C3 13.6569 4.34315 15 6 15Z"/><path d="M18 22C19.6569 22 21 20.6569 21 19C21 17.3431 19.6569 16 18 16C16.3431 16 15 17.3431 15 19C15 20.6569 16.3431 22 18 22Z"/><path d="M8.58984 13.51L15.4198 17.49"/><path d="M15.4098 6.51001L8.58984 10.49"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5l11 7-11 7z"/></svg>',
+};
+const esc = s => s;
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = header() + (
+    state.page===0 ? pageHome() :
+    state.page===1 ? pageCategory() :
+    state.page===2 ? pageLobby() :
+    state.page===3 ? pageEvent() :
+    state.page===4 ? pageOccasion() :
+    pageHome()
+  ) + whatsapp() + overlays();
+  wire();
+}
+
+/* ---------- header (shared) ---------- */
+function header(){
+  const floating = (state.page===0 || state.page===2);   // full-bleed hero pages
+  const cls = 'header' + (floating ? ' header--float' + (state.headerSolid?' solid':'') : '');
+  return `
+  <header class="${cls}">
+    <div class="promo-strip"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
+    <nav class="nav">
+      <div class="nav-group">
+        <button class="circle-btn" data-act="drawer">${ICON.menu}</button>
+        <a data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
+      </div>
+      <div class="nav-group">
+        <button class="circle-btn" data-act="search">${ICON.search}</button>
+        <button class="circle-btn" data-act="account">${ICON.user}</button>
+        <button class="circle-btn" data-act="favs">${ICON.heart}<span class="nav-badge">3</span></button>
+      </div>
+    </nav>
+  </header>`;
+}
+
+/* ---------- WhatsApp FAB ---------- */
+function whatsapp(){
+  return `<a class="wa" href="https://wa.me/972500000000" target="_blank" rel="noopener" aria-label="WhatsApp"><img src="assets/icon-whatsapp.svg" alt=""></a>`;
+}
+
+/* ============================================================
+   PAGE 0 — HOME  (מה בא לכם לראות?)
+   Artist cards → Lobby · genres/tiles → Category · search everywhere
+   ============================================================ */
+function pageHome(){
+  const artistCard=a=>`
+    <div class="ecard" data-act="lobby">
+      <div class="media"><img src="${IMG}${a.img}" alt="${a.name}">
+        <div class="top"><button class="heart ${state.hearts['h_'+a.name]?'on':''}" data-heart="h_${a.name}">${ICON.hs}</button>${a.hot?'<span class="badge">🔥 אוזל</span>':'<span></span>'}</div>
+      </div>
+      <div class="meta"><div class="en">${a.name}</div><div class="esub">${a.meta}</div></div>
+    </div>`;
+  return `
+  <section class="home-hero">
+    <p class="eyebrow">✨ החוויות הכי גדולות בעולם — במרחק טיסה אחת</p>
+    <h1>מה בא לכם לראות?</h1>
+    <p class="sub">כרטיסים להופעות, ספורט ופסטיבלים בחו״ל · אחריות 100% · אישור מיידי</p>
+    <div class="hh-search" data-act="search">${ICON.searchSm}<span>חפשו אמן, הופעה, עיר…</span></div>
+  </section>
+
+  <div class="spotify" style="margin-top:14px">
+    <button class="btn btn-spotify" data-act="spotify-home">חיבור</button>
+    <div class="txt"><div class="t">חברו Spotify להמלצות אישיות</div><div class="s">אירועים לפי הטעם המוזיקלי שלכם</div></div>
+    <div class="note">🎵</div>
+  </div>
+
+  <section class="section">
+    <div class="sec-head"><a class="sec-link" data-act="category">לכל המועדפים ›</a><h2 class="sec-title">צפית לאחרונה</h2></div>
+    <div class="hscroll">${D.homeRecent.map(artistCard).join('')}</div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><a class="sec-link" data-act="category">הכל ›</a><h2 class="sec-title">טרנדיים עכשיו</h2></div>
+    <div class="hscroll">${D.homeTrending.map(artistCard).join('')}</div>
+  </section>
+
+  <section class="section">
+    <h2 class="sec-title" style="text-align:center;padding:0 16px">גלו את ההופעות האחרונות דרך ה-TikTok</h2>
+    <div class="hscroll" style="margin-top:12px">${D.homeTiktok.map(t=>`<div class="tt-card" data-act="lobby"><img src="${IMG}${t.img}" alt=""><div class="sc"></div><div class="play">${ICON.play}</div><div class="m"><div class="n">${t.n}</div><div class="l">${t.l}</div></div></div>`).join('')}</div>
+  </section>
+
+  <section class="section" style="padding-left:16px;padding-right:16px">
+    <div class="sec-head" style="padding:0;justify-content:flex-end"><h2 class="sec-title">אמנים שאולי תאהבו</h2></div>
+    <div class="listcards" style="padding:12px 0 0">
+      ${D.homeSuggested.map(a=>`
+        <div class="listcard" data-act="lobby">
+          <span class="lheart ${state.hearts['hs_'+a.name]?'on':''}" data-heart="hs_${a.name}">${ICON.hs}</span>
+          <div class="lbody"><div class="lrow">
+            <div class="lprice"><span class="amt">מ-${a.price}</span><span class="allin">כולל עמלות</span></div>
+            <div class="linfo"><div class="lname">${a.name}</div><div class="lsub">${a.sub}</div></div>
+          </div></div>
+          <img class="lthumb" src="${IMG}${a.img}" alt="${a.name}">
+        </div>`).join('')}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">עיון לפי ז׳אנר</h2></div>
+    <div class="hscroll cat-row">${D.homeGenres.map(g=>`<div class="cat-card" data-act="category"><img class="card-img" src="${IMG}${g.img}" alt=""><span>${g.n}</span></div>`).join('')}</div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">לאן בא לכם לנסוע?</h2></div>
+    <div class="hscroll cat-row">${D.homeTravel.map(t=>`<div class="cat-card" data-act="category"><img class="card-img" src="${IMG}${t.img}" alt=""><span>${t.n}</span></div>`).join('')}</div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><a class="sec-link">כל הביקורות ›</a><h2 class="sec-title">מה אומרים עלינו</h2></div>
+    <div class="hscroll">${D.homeTestimonials.map(t=>`
+      <div class="tcard"><div class="stars">★★★★★</div><p class="tquote">${t.quote}</p>
+        <div class="tperson"><div class="twho"><span class="tn">${t.name}</span><span class="tev">${t.event}</span></div><span class="tav" style="background:${t.color}">${t.name.trim()[0]}</span></div>
+      </div>`).join('')}</div>
+  </section>
+
+  <section class="faq">
+    <h2>שאלות נפוצות</h2>
+    ${D.homeFaq.map((f,i)=>`<div class="faq-item ${state.faqHome===i?'open':''}"><button class="faq-q" data-faqh="${i}"><span class="qt">${f.q}</span><span class="qi"></span></button><div class="faq-a"><p>${f.a}</p></div></div>`).join('')}
+  </section>
+
+  ${footer()}`;
+}
+
+/* ============================================================
+   PAGE 4 — OCCASION COLLECTION  (built on the Category template)
+   ============================================================ */
+function pageOccasion(){
+  return `
+  <nav class="crumbs">
+    <span class="cur">${OCCASION.label}</span><span class="sep">·</span>
+    <a data-act="drawer">ספורט</a><span class="sep">·</span>
+    <a data-act="home">בית</a>
+  </nav>
+  <section class="cat-hero">
+    <div class="hero-big" style="height:46vh;min-height:340px">
+      <img class="hb-img" src="${IMG}sport2.jpg" alt="${OCCASION.label}">
+      <div class="hb-scrim"></div>
+      <span class="hb-badge">✦ אירוע מיוחד</span>
+      <div class="hb-content">
+        <div class="hb-name">${OCCASION.label}</div>
+        <div class="hb-tag">${OCCASION.dateRange} · ארה״ב · קנדה · מקסיקו</div>
+        <div class="hb-actions"><button class="hb-play" data-act="event">▶ לכל הכרטיסים</button><div class="hb-price">מ-₪760 · כולל עמלות</div></div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">אירועים נבחרים</h2></div>
+    <div class="occ-grid">
+      ${D.occasionEvents.map(e=>`
+        <div class="occ-card" data-act="event">
+          <div class="occ-media"><img src="${IMG}${e.img}" alt="${e.name}"><button class="heart ${state.hearts['occ_'+e.name]?'on':''}" data-heart="occ_${e.name}">${ICON.hs}</button></div>
+          <div class="occ-body"><div class="occ-name">${e.name}</div><div class="occ-meta">${e.meta}</div><div class="occ-price">מ-${e.price}<span class="allin"> · כולל עמלות</span></div></div>
+        </div>`).join('')}
+    </div>
+  </section>
+  <div class="trust">
+    <div class="r1"><span class="star">★</span> אחריות 100% · אישור מיידי · ביטול כולל מילואים</div>
+    <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · מאז 2006 · 300,000+ לקוחות</div>
+    <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
+  </div>
+  ${footer()}`;
+}
+
+/* ============================================================
+   PAGE 1 — CATEGORY  (כרטיסים להופעות פופ)
+   ============================================================ */
+function pageCategory(){
+  return `
+  <nav class="crumbs">
+    <span class="cur">הופעות פופ</span><span class="sep">·</span>
+    <a data-act="drawer">מוזיקה</a><span class="sep">·</span>
+    <a data-act="home">בית</a>
+  </nav>
+
+  <section class="cat-hero">
+    <h1>כרטיסים להופעות פופ</h1>
+    <p class="lede">הופעות הפופ הגדולות ברחבי העולם · מחירים all-in</p>
+    <div class="hero-big" data-act="lobby">
+      <img class="hb-img" src="${IMG}artist1.jpg" alt="קולדפליי">
+      <div class="hb-scrim"></div>
+      <button class="follow-pill ${state.following?'on':''}" data-act="follow">${state.following?'עוקבים ♥':'עקבו ♡'}</button>
+      <span class="hb-badge">🔥 אוזלים מהר</span>
+      <div class="hb-content">
+        <div class="hb-name">קולדפליי</div>
+        <div class="hb-tag">פופ · רוק · לונדון · פריז · מינכן</div>
+        <div class="hb-actions">
+          <button class="hb-play" data-act="lobby">▶ לכרטיסים</button>
+          <div class="hb-price">מ-₪520 · כולל עמלות</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="filterbar">
+    <button class="chip ${state.p1CitySelected?'active':''}" data-sheet="city">${state.p1CitySelected||'עיר'} ▾</button>
+    <button class="chip ${state.p1DateLabel?'active':''}" data-sheet="date">${state.p1DateLabel||'תאריך'} ▾</button>
+    <button class="chip ${state.p1LastMinute?'active':''}" data-act="lastminute">דקה 90</button>
+  </div>
+
+  <!-- אמנים מובילים -->
+  <section class="section">
+    <div class="sec-head"><a class="sec-link" data-act="lobby">הכל ›</a><h2 class="sec-title">אמנים מובילים</h2></div>
+    <div class="hscroll">
+      ${D.topArtists.map((a,i)=>`
+        <div class="ecard" data-act="lobby">
+          <div class="media">
+            <img src="${IMG}${a.img}" alt="${a.name}">
+            <div class="top">
+              <button class="heart ${state.hearts['t'+i]?'on':''}" data-heart="t${i}">${ICON.hs}</button>
+              ${a.hot?'<span class="badge">🔥 אוזל</span>':'<span></span>'}
+            </div>
+          </div>
+          <div class="meta"><div class="en">${a.name}</div><div class="ep">מ-${a.price}<span class="allin"> · כולל עמלות</span></div></div>
+        </div>`).join('')}
+    </div>
+  </section>
+
+  <!-- אמני פופ -->
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">אמני פופ</h2></div>
+    <div class="listcards">
+      ${D.popArtists.map(a=>`
+        <div class="listcard" data-act="lobby">
+          <button class="lheart ${state.hearts[a.id]?'on':''}" data-heart="${a.id}">${ICON.hs}</button>
+          <div class="lbody">
+            <div class="lrow">
+              <div class="lprice"><span class="amt">מ-${a.price}</span><span class="allin">כולל עמלות</span></div>
+              <div class="linfo">
+                <div class="lname">${a.name}${a.hot?' <span class="badge">🔥 אוזל</span>':''}</div>
+                <div class="lsub">${a.sub}</div>
+              </div>
+            </div>
+          </div>
+          <img class="lthumb" src="${IMG}${a.img}" alt="${a.name}">
+        </div>`).join('')}
+    </div>
+  </section>
+
+  <!-- הפלייליסט של פופ -->
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">הפלייליסט של פופ</h2></div>
+    <div class="playlist">
+      <div class="ph">
+        <button class="pl-play" data-act="pl-play" aria-label="נגן">${state.playing?'⏸':'▶'}</button>
+        <div class="pt"><div class="t">להיטי פופ 2026</div><div class="s">Spotify · 50 שירים</div></div>
+        <div class="pico">🎵</div>
+      </div>
+      <ol>${D.playlist.map((s,i)=>`<li><span>${s.t}</span><span class="num">${s.n}</span></li>`).join('')}</ol>
+    </div>
+    ${state.p1SpotifyConnected ? `
+      <div class="spotify on">
+        <button class="disc" data-act="spotify">נתק</button>
+        <div class="okwrap"><div class="t">Spotify מחובר ✓</div><div class="s">ממליצים לפי: Coldplay, BTS, Harry Styles…</div></div>
+        <div class="note">🎵</div>
+      </div>` : `
+      <div class="spotify">
+        <button class="btn btn-spotify connect" data-act="spotify">חיבור</button>
+        <div class="txt"><div class="t">חברו Spotify להמלצות אישיות</div><div class="s">אירועים לפי הטעם המוזיקלי שלכם</div></div>
+        <div class="note">🎵</div>
+      </div>`}
+  </section>
+
+  <!-- TikTok מהקהל -->
+  <section class="section">
+    <div class="sec-head"><a class="sec-link">הכל ›</a><h2 class="sec-title">TikTok <small>מהקהל</small></h2></div>
+    <div class="hscroll">
+      ${D.tiktok.map(t=>`
+        <div class="tt-card">
+          <img src="${IMG}${t.img}" alt=""><div class="sc"></div>
+          <div class="play">${ICON.play}</div>
+          <div class="m"><div class="n">${t.n}</div><div class="l">${t.l}</div></div>
+        </div>`).join('')}
+    </div>
+  </section>
+
+  <!-- עוד ז׳אנרים -->
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">עוד ז׳אנרים</h2></div>
+    <div class="hscroll cat-row">
+      ${D.genres.map(g=>`<div class="cat-card" data-act="category"><img class="card-img" src="${IMG}${g.img}" alt=""><span>${g.n}</span></div>`).join('')}
+    </div>
+  </section>
+
+  <!-- Trust banner -->
+  <div class="trust">
+    <div class="r1"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
+    <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · מאז 2006 · 300,000+ לקוחות</div>
+    <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
+  </div>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <h2>שאלות נפוצות — כרטיסים להופעות פופ</h2>
+    ${D.faqP1.map((f,i)=>`
+      <div class="faq-item ${state.faqOpen===i?'open':''}">
+        <button class="faq-q" data-faq="${i}"><span class="qt">${f.q}</span><span class="qi"></span></button>
+        <div class="faq-a"><p>${f.a}</p></div>
+      </div>`).join('')}
+  </section>
+
+  <div class="seo">
+    <h3>כרטיסים להופעות פופ</h3>
+    <p>מצאו כרטיסים להופעות הפופ הגדולות באירופה: הארי סטיילס, דואה ליפה, קולדפליי. כל המחירים כוללים עמלות, עם אחריות 100%.</p>
+  </div>
+
+  ${footer()}`;
+}
+
+function footer(){
+  return `
+  <footer class="footer">
+    <div class="news">
+      <div class="t">הישארו מעודכנים</div>
+      <div class="s">קבלו עדכונים על אירועים, מבצעים וכרטיסים לפני כולם</div>
+      <div class="row"><input type="email" placeholder="האימייל שלכם"><button>→</button></div>
+    </div>
+    <div class="cols">
+      <div class="col"><h4>חברה</h4><a>מי אנחנו</a><a>אמנים בהסכמה</a><a>קריירה</a></div>
+      <div class="col"><h4>עזרה ותמיכה</h4><a>שאלות נפוצות</a><a>תנאי ביטול</a><a>יצירת קשר</a></div>
+      <div class="col"><h4>ניווט מהיר</h4><a>הופעות</a><a>ספורט</a><a>ערים</a></div>
+      <div class="col"><h4>משפטי</h4><a>תנאי שימוש</a><a>פרטיות</a><a>נגישות</a></div>
+    </div>
+  </footer>`;
+}
+
+/* ============================================================
+   PAGE 2 — EVENT LOBBY  (קולדפליי — עמוד הטור)
+   ============================================================ */
+function pageLobby(){
+  const st=s=>'★★★★★☆☆☆☆☆'.slice(5-s,10-s);
+  return `
+  <!-- Video hero (option A) — full-bleed behind the floating nav -->
+  <section class="lobby-hero">
+    <img class="lh-img" src="${IMG}artist1.jpg" alt="קולדפליי">
+    <div class="lh-scrim"></div>
+    <nav class="lh-crumbs">
+      <span class="cur">קולדפליי</span><span class="sep">·</span>
+      <a data-act="drawer">מוזיקה</a><span class="sep">·</span>
+      <a data-act="home">בית</a>
+    </nav>
+    <div class="lh-top">
+      <button class="lh-share" data-act="share">${ICON.share} שתפו</button>
+      <button class="lh-follow ${state.following?'on':''}" data-act="follow">${state.following?'עוקבים ♥':'עקבו ♡'}</button>
+    </div>
+    <button class="lh-play" data-act="watch"><span>▶</span> צפו בטור</button>
+    <div class="lh-info">
+      <h1>קולדפליי</h1>
+      <div class="lh-sub">טור עולמי 2026</div>
+      <div class="lh-trust"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
+    </div>
+  </section>
+  <div class="live-now">👁 7,802 צפו בקולדפליי בשעה האחרונה</div>
+
+  <!-- Filters -->
+  <div class="filterbar">
+    <span class="fb-label">סינון:</span>
+    <button class="chip ${state.p2DateSel?'active':''}" data-sheet="p2-date">${state.p2DateSel||'תאריך'} ▾</button>
+    <button class="chip ${state.p2CitySel?'active':''}" data-sheet="p2-city">${state.p2CitySel||'עיר'} ▾</button>
+    <button class="chip ${state.p2QtySel?'active':''}" data-sheet="p2-qty">${state.p2QtySel?state.p2QtySel+' כרטיסים':'כמות'} ▾</button>
+    <button class="chip ${state.p2Together?'active':''}" data-act="together">ישיבה יחד${state.p2Together?' ✓':''}</button>
+  </div>
+  <p class="allin-note">כל המחירים כוללים עמלות — אין הפתעות</p>
+
+  <!-- Date list -->
+  <div class="datelist">
+    ${D.p2Dates.map(e=>`
+      <button class="drow-ev" data-act="event">
+        <span class="chev">‹</span>
+        <div class="d-price"><span class="from">מ-</span><span class="amt">${e.price}</span><span class="im">אישור מיידי</span></div>
+        <div class="d-info"><div class="d-city">${e.city}</div><div class="d-venue">${e.venue}</div></div>
+        <div class="d-date"><div class="dd">${e.d}</div><div class="dm">${e.dow}</div></div>
+      </button>`).join('')}
+  </div>
+
+  <!-- Trip bar -->
+  <div class="tripbar">
+    <button class="btn btn-orange" data-act="package">גלו עוד</button>
+    <div class="trip-txt">
+      <div class="t">הפכו את זה לטיול</div>
+      <div class="s">רכשו כרטיס להופעה וקבלו הנחות והטבות אצל השותפים שלנו — American Express / El Al</div>
+    </div>
+    <div class="trip-ico">✈️</div>
+  </div>
+
+  <!-- קצת יותר על הטור -->
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">קצת יותר על הטור</h2></div>
+
+    <!-- Spotify — integrated, expandable, in-page playable track list -->
+    <div class="playlist ${state.setlistOpen?'open':''}" style="margin-top:0">
+      <button class="ph ph-toggle" data-act="lobby-setlist">
+        <span class="pl-caret">${state.setlistOpen?'▴':'▾'}</span>
+        <div class="pt"><div class="t">פלייליסט הטור — קולדפליי 2026</div><div class="s">8 שירים · Spotify</div></div>
+        <div class="pico">🎵</div>
+      </button>
+      <div class="pl-tracks">
+        <ol>${D.setlist.map((sName,i)=>`<li data-act="pl-track" data-i="${i}" class="${state.playing&&state.plCurrent===i?'playing':''}"><span class="pl-row-play">${state.playing&&state.plCurrent===i?'⏸':'▶'}</span><span class="pl-t">${sName}</span><span class="num">${i+1}</span></li>`).join('')}</ol>
+      </div>
+    </div>
+
+    <!-- Bio -->
+    <div class="bio">
+      <div class="bio-h">אודות קולדפליי</div>
+      <p class="bio-t">אחת הלהקות המפורסמות ביותר בעולם, עם להיטים כמו "Yellow", "Viva la Vida" ו-"Fix You".${state.bioExpanded?' הרכב הרוק הבריטי, בהובלת כריס מרטין, ידוע במופעי הענק שלו ובאסתטיקה הצבעונית שהפכה לסימן היכר.':''}</p>
+      <button class="link-btn" data-act="bio">${state.bioExpanded?'קרא פחות ▴':'קרא עוד ▾'}</button>
+      <div class="bio-stats"><div class="bstat"><b>35M</b><span>מאזינים חודשיים</span></div><div class="bstat"><b>9</b><span>אלבומים</span></div><div class="bstat"><b>4</b><span>הופעות בטור</span></div></div>
+    </div>
+
+    <!-- Gallery -->
+    <div class="sub-h">גלריית תמונות</div>
+    <div class="hscroll gallery">${D.gallery.map(g=>`<img class="gimg" src="${IMG}${g}" alt="">`).join('')}</div>
+
+    <!-- Tour text -->
+    <div class="tourtext">
+      <div class="sub-h" style="padding:0">על הטור</div>
+      <p>טור עולמי 2026 מביא את קולדפליי לאירופה — לונדון, פריז, מינכן, מילאנו וברצלונה — עם הפקה חדשה ורשימת שירים מורחבת.${state.tourExpanded?' הטור, שנפתח ביולי 2026, מאפשר לאוהדים מכל העולם לחוות את קולדפליי בפלטפורמות מעוצבות במיוחד, כולל במה סביבתית, צמידי LED ייחודיים ועוצמה מוזיקלית אדירה.':''}</p>
+      <button class="link-btn" data-act="tour">${state.tourExpanded?'הצג פחות ▴':'קרא עוד ▾'}</button>
+    </div>
+
+    <!-- TikTok reels -->
+    <div class="sub-h">TikTok Reels מהטור</div>
+    <div class="hscroll">
+      ${D.reels.map(t=>`<div class="tt-card"><img src="${IMG}${t.img}" alt=""><div class="sc"></div><div class="play">${ICON.play}</div><div class="m"><div class="n">${t.n}</div><div class="l">${t.l}</div></div></div>`).join('')}
+    </div>
+  </section>
+
+  <!-- Trust banner -->
+  <div class="trust">
+    <div class="r1"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
+    <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · מאז 2006 · 300,000+ לקוחות</div>
+    <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
+  </div>
+
+  <!-- FAQ P2 -->
+  <section class="faq">
+    <h2>שאלות נפוצות — כרטיסים לקולדפליי</h2>
+    ${D.faqP2.map((f,i)=>`
+      <div class="faq-item ${state.faqP2Open===i?'open':''}">
+        <button class="faq-q" data-faq2="${i}"><span class="qt">${f.q}</span><span class="qi"></span></button>
+        <div class="faq-a"><p>${f.a}</p></div>
+      </div>`).join('')}
+  </section>
+
+  <!-- Testimonials — moved above "מעריצים אוהבים גם", renamed -->
+  <section class="section">
+    <div class="sec-head"><a class="sec-link">כל 847 הביקורות ›</a><h2 class="sec-title">איך היה בהופעה?</h2></div>
+    <div class="reviews">
+      ${D.reviews.map(r=>`
+        <div class="rev">
+          <div class="rev-head">
+            <div class="rev-stars">${st(r.stars)}</div>
+            <div class="rev-who"><div class="rn">${r.name}</div><div class="rm">${r.meta}</div></div>
+            <div class="rev-av">${r.av}</div>
+          </div>
+          <p class="rev-t">${r.t}</p>
+        </div>`).join('')}
+    </div>
+  </section>
+
+  <!-- מעריצים אוהבים גם -->
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">מעריצים אוהבים גם</h2></div>
+    <div class="hscroll">
+      ${D.alsoLike.map((a,i)=>`
+        <div class="ecard" data-act="lobby">
+          <div class="media"><img src="${IMG}${a.img}" alt="${a.name}"><div class="top"><button class="heart ${state.hearts['al'+i]?'on':''}" data-heart="al${i}">${ICON.hs}</button><span></span></div></div>
+          <div class="meta"><div class="en">${a.name}</div><div class="ep">מ-${a.price}<span class="allin"> · כולל עמלות</span></div></div>
+        </div>`).join('')}
+    </div>
+  </section>
+
+  ${footer()}`;
+}
+
+/* ============================================================
+   PAGE 3 — EVENT  (קולדפליי · ומבלי — seat map + listings)
+   ============================================================ */
+function seatMapSVG(){
+  const dim = k => state.highlightListing && state.highlightListing!==k ? '.45' : '1';
+  return `
+  <svg viewBox="0 0 300 210" class="stadium">
+    <rect x="8" y="8" width="284" height="194" rx="26" fill="#efeff3"/>
+    <rect x="96" y="70" width="108" height="70" rx="8" fill="#cfe9d6"/>
+    <rect x="112" y="52" width="76" height="16" rx="4" fill="#2a2a30"/>
+    <text x="150" y="64" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">STAGE</text>
+    <g data-locate="north" style="cursor:pointer;opacity:${dim('north')}"><rect x="70" y="18" width="160" height="26" rx="8" fill="#ED1860"/><text x="150" y="35" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">N</text></g>
+    <g data-locate="south" style="cursor:pointer;opacity:${dim('south')}"><rect x="70" y="166" width="160" height="26" rx="8" fill="#1c7a3a"/><text x="150" y="183" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">S</text></g>
+    <g data-locate="west" style="cursor:pointer;opacity:${dim('west')}"><rect x="20" y="60" width="26" height="90" rx="8" fill="#F57E20"/><text x="33" y="109" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">W</text></g>
+    <g data-locate="east" style="cursor:pointer;opacity:${dim('east')}"><rect x="254" y="60" width="26" height="90" rx="8" fill="#F57E20"/><text x="267" y="109" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">E</text></g>
+    <g data-locate="vip" style="cursor:pointer;opacity:${dim('vip')}"><rect x="112" y="142" width="76" height="16" rx="4" fill="#ED1860"/><text x="150" y="154" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">VIP</text></g>
+  </svg>`;
+}
+function seatMapViz(){
+  const pin = l => {
+    const tier = l.score>=9?'best':l.score>=7?'good':'fair';
+    const on = state.highlightListing===l.key ? 'on' : (state.highlightListing?'dim':'');
+    return `<button class="pin ${tier} ${on}" style="top:${l.pin.t}%;left:${l.pin.l}%" data-locate="${l.key}">${l.price}</button>`;
+  };
+  return `<div class="mapwrap">${seatMapSVG()}${D.listings.map(pin).join('')}</div>`;
+}
+function pageEvent(){
+  const shown = state.selectedSection ? D.listings.filter(l=>l.key===state.selectedSection || (state.selectedSection==='south'&&l.key==='south-c')) : D.listings;
+  const list = shown.length?shown:D.listings;
+  const secLabel = state.selectedSection ? (D.sectionLabels[state.selectedSection]||'')+' ✓' : 'לחצו על אזור';
+  const sortBtn=(k,l)=>`<button class="sort-btn ${state.sortBy===k?'on':''}" data-sort="${k}">${l}</button>`;
+  const activeCount = p3ActiveCount();
+  return `
+  <!-- FULL HERO -->
+  <section class="ev-hero ${state.heroCollapsed?'hide':''}">
+    <img class="eh-img" src="${IMG}artist1.jpg" alt="">
+    <div class="eh-scrim"></div>
+    <div class="eh-top">
+      <div class="eh-actions"><button class="eh-ic" data-act="share">${ICON.share} שתפו</button><button class="eh-ic" data-act="follow">עקבו ♡</button></div>
+      <button class="eh-back" data-act="back-lobby">‹ חזרה</button>
+    </div>
+    <div class="eh-info">
+      <h1>קולדפליי</h1>
+      <div class="eh-venue">📍 אצטדיון ומבלי, לונדון</div>
+      <div class="eh-date">📅 4 ביולי 2026 · 20:00</div>
+      <div class="eh-pricebar">
+        <span class="eh-price">מ-₪520 <small>כולל עמלות</small></span>
+        <span class="eh-stats">🔥 נותרו 8 · 140 צופים עכשיו</span>
+      </div>
+    </div>
+  </section>
+  <!-- SLIM HERO (on scroll) -->
+  <div class="ev-slim ${state.heroCollapsed?'show':''}">
+    <button class="es-back" data-act="back-lobby">‹</button>
+    <div class="es-info"><div class="es-t">קולדפליי · ומבלי</div><div class="es-d">4 ביולי · 20:00</div></div>
+    <div class="es-price">מ-₪520 →</div>
+  </div>
+
+  <div class="ev-trust"><span class="star">★</span> אחריות 100% · אישור מיידי · <b>ביטול כולל מילואים</b> · <span class="star">★</span> 4.8 Google</div>
+
+  <!-- STICKY SEAT MAP -->
+  <div class="seatmap">
+    <div class="sm-head"><div class="sm-t">מפת המקומות</div><div class="sm-s">לחצו על מחיר כדי לראות את המושב ברשימה</div></div>
+    ${seatMapViz()}
+    <div class="sm-legend"><span><i style="background:#1c7a3a"></i>כלכלי</span><span><i style="background:#F57E20"></i>ביניים</span><span><i style="background:#ED1860"></i>VIP</span></div>
+  </div>
+
+  <!-- LISTINGS (pull-up over map) -->
+  <div class="listings">
+    <div class="lst-bar">
+      <div class="lst-sort"><span>מיין:</span>${sortBtn('best','הכי משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div>
+      <button class="sm-filter" data-act="p3filter"><span class="cnt">${activeCount||''}</span> סינון</button>
+    </div>
+    ${state.selectedSection ? `<div class="lst-active"><button class="lst-clear" data-act="p3clear">✕</button><span class="lst-sel on">מסונן: ${secLabel.replace(' ✓','')}</span></div>` : ''}
+    <div class="lst-cards">
+      ${list.map(l=>{const tier=l.score>=9?'best':l.score>=7?'good':'fair'; return `
+        <div class="lcard ${state.highlightListing===l.key?'hl':''}" data-lkey="${l.key}">
+          <div class="lc-price"><span class="amt">${l.price}</span><span class="fees">כולל עמלות</span></div>
+          <div class="lc-mid">
+            <div class="lc-sec">${l.sec}</div>
+            <div class="lc-row">${l.row}</div>
+            <div class="lc-badge ${tier}"><span class="lbl">${l.val}</span><span class="box">${l.score}</span></div>
+            <div class="lc-info">${l.tog} · אישור מיידי · 🔥 נותרו ${l.left}</div>
+          </div>
+          <img class="lc-thumb" src="${IMG}${l.img}" alt="מבט מהמקום">
+        </div>`;}).join('')}
+    </div>
+  </div>
+
+  <!-- לפני ההופעה -->
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">לפני ההופעה</h2></div>
+    <div class="playlist" style="margin-top:0">
+      <div class="ph"><div class="pt"><div class="t">פלייליסט הטור · 20 שירים</div><div class="s">Spotify</div></div><div class="pico">🎵</div></div>
+    </div>
+    <div class="collapse ${state.setlistP3Open?'open':''}">
+      <button class="col-head" data-act="setlist3"><span class="ch">${state.setlistP3Open?'▲':'▼'}</span><span class="ct">רשימת השירים בהופעה</span></button>
+      <div class="col-body"><p style="padding:0 14px 14px;font-size:13px;color:#555;text-align:right;line-height:1.7">${D.setlist.join(' · ')}</p></div>
+    </div>
+  </section>
+
+  <!-- אירועים קשורים -->
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">אירועים קשורים</h2></div>
+    <div class="hscroll">
+      ${D.related.map((r,i)=>`
+        <div class="ecard" data-act="event">
+          <div class="media"><img src="${IMG}${r.img}" alt="${r.name}"><div class="top"><button class="heart ${state.hearts['rel'+i]?'on':''}" data-heart="rel${i}">${ICON.hs}</button><span></span></div></div>
+          <div class="meta"><div class="en">${r.name}</div><div class="ep">מ-${r.price}<span class="allin"> · כולל עמלות</span></div></div>
+        </div>`).join('')}
+    </div>
+  </section>
+
+  <div class="trust">
+    <div class="r1"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
+    <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · מאז 2006 · 300,000+ לקוחות</div>
+    <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
+  </div>
+
+  <section class="faq">
+    <h2>שאלות נפוצות</h2>
+    ${D.faqP3.map((f,i)=>`
+      <div class="faq-item ${state.faqP3Open===i?'open':''}">
+        <button class="faq-q" data-faq3="${i}"><span class="qt">${f.q}</span><span class="qi"></span></button>
+        <div class="faq-a"><p>${f.a}</p></div>
+      </div>`).join('')}
+  </section>
+
+  ${footer()}`;
+}
+
+function pagePlaceholder(tag,title,note){
+  return `<div style="padding:40px 20px;text-align:center;min-height:400px;display:flex;flex-direction:column;justify-content:center;gap:10px">
+    <div style="font-size:12px;color:var(--muted)">${tag}</div>
+    <h1 style="font-size:26px;font-weight:700">${title}</h1>
+    <p style="font-size:13px;color:var(--muted)">${note}</p>
+    <div style="margin-top:16px"><button class="btn btn-pink" data-act="back-cat">‹ חזרה לקטגוריה</button></div>
+  </div>`;
+}
+
+/* ============================================================
+   OVERLAYS: filter sheets, account + categories drawers, search
+   ============================================================ */
+function overlays(){
+  return sheet() + accountDrawer() + categoriesDrawer() + searchOverlay();
+}
+
+function p3ActiveCount(){
+  const f=state.p3f;
+  return [state.selectedSection, state.p3Qty, f.together, f.front, f.view, f.access, state.p3Min, state.p3Max].filter(Boolean).length;
+}
+function p3FilterSheet(){
+  const f=state.p3f;
+  const cnt=p3ActiveCount();
+  const resultCount = cnt===0 ? '3' : '1';
+  const secBtn=s=>`<button class="ff-sec ${state.selectedSection===s.key?'on':''}" data-fsec="${s.key}" style="--dot:${s.dot}"><i style="background:${s.dot}"></i>${s.label}</button>`;
+  const qtyBtn=n=>`<button class="ff-qty ${state.p3Qty===n?'on':''}" data-fqty="${n}">${n}</button>`;
+  const chk=(k,l)=>`<button class="ff-check" data-fchar="${k}"><span class="box ${f[k]?'on':''}">${f[k]?'✓':''}</span>${l}</button>`;
+  return `
+  <div class="sheet-backdrop open" data-act="close-sheet"></div>
+  <div class="sheet open filter-sheet">
+    <div class="grab"></div>
+    <div class="sh-head"><button class="ff-clear" data-act="p3clear">נקה</button><h3>כל הסינונים</h3><button class="x" data-act="close-sheet">×</button></div>
+    <div class="sh-body">
+      <div class="ff-label">קטע</div>
+      <div class="ff-secs">${D.sections.map(secBtn).join('')}</div>
+      <div class="ff-label">כמות</div>
+      <div class="ff-qtys">${[1,2,3,4,5,6].map(qtyBtn).join('')}</div>
+      <div class="ff-label">מחיר לכרטיס</div>
+      <div class="ff-price">
+        <label>מקסימום <span>₪</span><input type="number" inputmode="numeric" data-fprice="max" value="${state.p3Max}"></label>
+        <label>מינימום <span>₪</span><input type="number" inputmode="numeric" data-fprice="min" value="${state.p3Min}"></label>
+      </div>
+      <div class="ff-note">הצג מחירים כולל עמלות</div>
+      <div class="ff-label">אפשרויות</div>
+      <div class="ff-checks">${chk('together','ישיבה יחד')}${chk('view','ללא הסתרת מבט')}${chk('front','שורה ראשונה')}${chk('access','נגישות')}</div>
+    </div>
+    <div class="sh-cta"><button class="btn btn-pink" style="width:100%" data-act="close-sheet">הציגו ${resultCount} כרטיסים</button></div>
+  </div>`;
+}
+/* ---- shared calendar date-picker (used by every date filter) ---- */
+const MONTHS_HE=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const MONTHS_SHORT=['ינו','פבר','מרץ','אפר','מאי','יונ','יול','אוג','ספט','אוק','נוב','דצמ'];
+const DOW_HE=['א','ב','ג','ד','ה','ו','ש'];
+function dpFmt(ts){ const d=new Date(ts); return d.getDate()+' '+MONTHS_SHORT[d.getMonth()]; }
+function dpLabel(){
+  if(!state.dpStart) return null;
+  let l = state.dpEnd ? dpFmt(state.dpStart)+'–'+dpFmt(state.dpEnd) : dpFmt(state.dpStart);
+  if(state.dpFlex!=='exact') l += ' ±'+state.dpFlex;
+  return l;
+}
+function dateSheet(target){
+  const y=state.dpYear, m=state.dpMonth;
+  const first=new Date(y,m,1).getDay();
+  const total=new Date(y,m+1,0).getDate();
+  let cells='';
+  for(let i=0;i<first;i++) cells+='<span class="cal-cell empty"></span>';
+  for(let d=1;d<=total;d++){
+    const ts=new Date(y,m,d).getTime();
+    const sel = ts===state.dpStart || ts===state.dpEnd;
+    const inRange = state.dpStart&&state.dpEnd&&ts>Math.min(state.dpStart,state.dpEnd)&&ts<Math.max(state.dpStart,state.dpEnd);
+    cells+=`<button class="cal-cell${inRange?' inrange':''}" data-day="${d}"><span class="cal-num${sel?' sel':''}">${d}</span></button>`;
+  }
+  const flex=[['exact','תאריכים מדויקים'],['1','± יום'],['2','± יומיים'],['3','± 3 ימים']];
+  return `
+  <div class="sheet-backdrop open" data-act="close-sheet"></div>
+  <div class="sheet open date-sheet">
+    <div class="grab"></div>
+    <div class="sh-head"><h3>מתי?</h3><button class="x" data-act="close-sheet">×</button></div>
+    <div class="sh-body">
+      <div class="cal-nav"><button data-act="cal-prev" aria-label="חודש קודם">›</button><span>${MONTHS_HE[m]} ${y}</span><button data-act="cal-next" aria-label="חודש הבא">‹</button></div>
+      <div class="cal-dow">${DOW_HE.map(d=>`<span>${d}</span>`).join('')}</div>
+      <div class="cal-grid">${cells}</div>
+      <div class="cal-flex">${flex.map(([k,l])=>`<button class="chip ${state.dpFlex===k?'active':''}" data-flex="${k}">${l}</button>`).join('')}</div>
+    </div>
+    <div class="sh-cta"><button class="btn btn-pink" style="width:100%" data-act="date-apply">${dpLabel()?'החל · '+dpLabel():'בחרו תאריך'}</button></div>
+  </div>`;
+}
+function sheet(){
+  const s = state.openSheet;
+  if(!s) return `<div class="sheet-backdrop" data-act="close-sheet"></div><div class="sheet"></div>`;
+  if(s==='p3-filter') return p3FilterSheet();
+  if(s==='date' || s==='p2-date') return dateSheet(s==='date'?'p1':'p2');
+  let title='', body='';
+  if(s==='genre'){ title="ז'אנר";
+    body = D.musicGenres.map(g=>`<button class="opt ${state.p1GenreSelected===g?'sel':''}" data-pick="genre:${g}">${g}<span>${state.p1GenreSelected===g?'✓':''}</span></button>`).join('');
+  } else if(s==='city'){ title='עיר';
+    body = D.cities.map(c=>`<button class="opt ${state.p1CitySelected===c?'sel':''}" data-pick="city:${c}">${c}<span>${state.p1CitySelected===c?'✓':''}</span></button>`).join('');
+  } else if(s==='date'){ title='תאריך';
+    const opts=['סוף השבוע','השבוע','החודש','חודש הבא','כל התאריכים'];
+    body = opts.map(o=>`<button class="opt ${state.p1DateLabel===o?'sel':''}" data-pick="date:${o}">${o}<span>${state.p1DateLabel===o?'✓':''}</span></button>`).join('');
+  } else if(s==='p2-date'){ title='תאריך';
+    body = D.p2Dates.map(e=>{const lbl=`${e.d} ${e.dow} · ${e.city}`; return `<button class="opt ${state.p2DateSel===lbl?'sel':''}" data-pick="p2date:${lbl}">${lbl}<span>${state.p2DateSel===lbl?'✓':''}</span></button>`;}).join('');
+  } else if(s==='p2-city'){ title='עיר';
+    body = ['לונדון','פריז','מינכן'].map(c=>`<button class="opt ${state.p2CitySel===c?'sel':''}" data-pick="p2city:${c}">${c}<span>${state.p2CitySel===c?'✓':''}</span></button>`).join('');
+  } else if(s==='p2-qty'){ title='כמות כרטיסים';
+    body = ['1','2','3','4','5','6'].map(q=>`<button class="opt ${state.p2QtySel===q?'sel':''}" data-pick="p2qty:${q}">${q}<span>${state.p2QtySel===q?'✓':''}</span></button>`).join('');
+  }
+  return `
+  <div class="sheet-backdrop open" data-act="close-sheet"></div>
+  <div class="sheet open">
+    <div class="grab"></div>
+    <div class="sh-head"><h3>${title}</h3><button class="x" data-act="close-sheet">×</button></div>
+    <div class="sh-body">${body}</div>
+  </div>`;
+}
+
+function accountDrawer(){
+  const open = state.acctOpen;
+  return `
+  <div class="drawer-backdrop ${open?'open':''}" data-act="close-drawer"></div>
+  <aside class="drawer ${open?'open':''}">
+    <div class="dh"><div class="t">האזור האישי</div><div class="s">התחברו כדי לראות הזמנות והעדפות</div></div>
+    <div class="db">
+      ${D.accountGroups.map(g=>`<button class="drow">${g.n}<span>${g.e}</span></button>`).join('')}
+    </div>
+    <div class="dcta"><button class="btn btn-pink" style="flex:1" data-act="close-drawer">התחברות</button><button class="btn" style="flex:1;background:#f0f0f2;color:#1a1a1a" data-act="close-drawer">הרשמה</button></div>
+  </aside>`;
+}
+
+function categoriesDrawer(){
+  const open = state.drawerOpen;
+  const sec = state.drawerSection;
+  const row=(name,sign,act)=>`<button class="drow" data-act="${act}">${name}<span class="sign">${sign}</span></button>`;
+  let secHtml='';
+  const secDef=[['sports','ספורט'],['music','מוזיקה והופעות'],['dest','יעדים'],['support','עזרה ותמיכה']];
+  secDef.forEach(([k,name])=>{
+    const isOpen = sec===k;
+    secHtml += row(name, isOpen?'−':'+', 'dsec:'+k);
+    if(isOpen){
+      let sub='';
+      if(k==='music'){
+        D.drawer.music.forEach((g,gi)=>{
+          const go = state.drawerMusicGroup===('m'+gi);
+          sub += `<button class="drow" data-act="dmg:m${gi}" style="font-weight:${go?600:400};color:${go?'#ED1860':'#1A1A1A'}">${g.n}<span class="sign">${go?'−':'+'}</span></button>`;
+          // artists (gi===2) → the artist's Lobby; genres / types → the Category page
+          if(go) sub += g.items.map(it=>`<button class="drow" data-act="${gi===2?'lobby':'category'}" style="font-size:13px;padding-right:32px;color:#555">${it}</button>`).join('');
+        });
+      } else if(k==='sports'){
+        D.drawer.sports.forEach((sp,si)=>{
+          const so = state.mSport===('s'+si);
+          sub += `<button class="drow" data-act="dsp:s${si}" style="font-weight:${so?600:400};color:${so?'#ED1860':'#1A1A1A'}">${sp.n}<span class="sign">${so?'−':'+'}</span></button>`;
+          if(so) sp.comps.forEach((c,ci)=>{
+            const co = state.mComp===('s'+si+'c'+ci);
+            sub += `<button class="drow" data-act="dcp:s${si}c${ci}" style="font-size:13px;padding-right:32px;color:${co?'#ED1860':'#333'}">${c.n}<span class="sign">${co?'−':'+'}</span></button>`;
+            if(co) sub += c.teams.map(t=>`<button class="drow" data-act="lobby" style="font-size:12px;padding-right:48px;color:#666">${t}</button>`).join('');
+          });
+        });
+      } else if(k==='dest'){
+        sub += `<div style="padding:4px 16px 10px;color:#888;font-size:11px;text-align:right">ערים</div>`;
+        sub += D.drawer.dest.map(c=>`<button class="drow" data-act="lobby" style="font-size:13px;padding-right:28px;color:#555">${c}</button>`).join('');
+      } else if(k==='support'){
+        sub += D.drawer.support.map(t=>`<button class="drow" style="font-size:13px;padding-right:28px;color:#555">${t}</button>`).join('');
+      }
+      secHtml += `<div class="sub">${sub}</div>`;
+    }
+  });
+  return `
+  <div class="drawer-backdrop ${open?'open':''}" data-act="close-drawer"></div>
+  <aside class="drawer ${open?'open':''}">
+    <div class="dh"><div class="t">קטגוריות</div></div>
+    <div class="db">
+      <button class="drow drow-occasion" data-act="occasion"><span class="occ-date">${OCCASION.dateRange}</span><span class="occ-lbl">✦ ${OCCASION.label}</span></button>
+      ${secHtml}</div>
+    <div class="dcta"><button class="btn btn-pink" style="flex:1" data-act="close-drawer">התחברות</button><button class="btn" style="flex:1;background:#f0f0f2;color:#1a1a1a" data-act="close-drawer">הרשמה</button></div>
+  </aside>`;
+}
+
+/* ---- Search intent engine (ported from the prototype) ---- */
+function srDetectIntent(q){
+  if(!q) return 'idle';
+  const ql=q.toLowerCase();
+  const city=D.SR_CITIES.find(c=>c.name.includes(q)||ql.includes(c.name.toLowerCase()));
+  const cat=D.srCats.find(c=>c.tags.some(t=>ql.includes(t)));
+  const perf=D.SR_PERF.find(p=>p.tags.some(t=>ql.includes(t)));
+  if(perf) return 'performer';
+  if(city) return 'location';
+  if(cat) return 'category';
+  return 'performer';
+}
+function srTypeahead(q){
+  if(!q.trim()) return [];
+  const ql=q.toLowerCase(), intent=srDetectIntent(q), rows=[];
+  const topPerf=D.SR_PERF.find(p=>p.tags.some(t=>ql.includes(t)));
+  const topCity=D.SR_CITIES.find(c=>c.name.includes(q)||ql.includes(c.name.toLowerCase()));
+  const topCat=D.srCats.find(c=>c.tags.some(t=>ql.includes(t)));
+  const topEvt=D.SR_EVENTS.find(e=>e.name.toLowerCase().includes(ql));
+  const top=topPerf||topCity||topCat||topEvt;
+  if(top) rows.push({kind:'top',label:top.name||'',sub:top.meta||top.date||'',icon:top.icon||'🔍'});
+  if(intent==='performer'&&topPerf){
+    D.SR_EVENTS.filter(e=>e.perfKey===topPerf.key).slice(0,3).forEach(e=>rows.push({kind:'event',label:e.name,sub:e.date+' · '+e.venue+' · '+e.price,icon:'🎫'}));
+    D.SR_PERF.filter(p=>p.type===topPerf.type&&p.key!==topPerf.key).slice(0,2).forEach(p=>rows.push({kind:'performer',label:p.name,sub:p.meta,icon:p.icon}));
+  } else if(intent==='location'&&topCity){
+    D.SR_EVENTS.filter(e=>e.city===topCity.name).slice(0,3).forEach(e=>rows.push({kind:'event',label:e.name,sub:e.date+' · '+e.price,icon:'🎫'}));
+  } else if(intent==='category'&&topCat){
+    D.srCats.filter(c=>c.key!==topCat.key).slice(0,2).forEach(c=>rows.push({kind:'category',label:c.name,sub:'',icon:c.icon}));
+    D.SR_EVENTS.filter(e=>e.cat==='category'||(topCat.key==='football'&&e.cat==='team')).slice(0,3).forEach(e=>rows.push({kind:'event',label:e.name,sub:e.date+' · '+e.price,icon:'🎫'}));
+  }
+  rows.push({kind:'all',label:'כל התוצאות עבור "'+q+'"',sub:'',icon:'🔍'});
+  return rows.slice(0,8);
+}
+function srResults(q){
+  if(!q.trim()) return {topMatch:null,events:[],performers:[],cities:[],categories:[]};
+  const ql=q.toLowerCase(), intent=srDetectIntent(q);
+  const topPerf=D.SR_PERF.find(p=>p.tags.some(t=>ql.includes(t)));
+  const topCity=D.SR_CITIES.find(c=>c.name.includes(q)||ql.includes(c.name.toLowerCase()));
+  const topCat=D.srCats.find(c=>c.tags.some(t=>ql.includes(t)));
+  let events=[],performers=[],cities=[],categories=[];
+  if(intent==='performer'&&topPerf){
+    events=D.SR_EVENTS.filter(e=>e.perfKey===topPerf.key);
+    performers=D.SR_PERF.filter(p=>p.type===topPerf.type&&p.key!==topPerf.key).slice(0,4);
+    cities=D.SR_CITIES.slice(0,3);
+  } else if(intent==='location'&&topCity){
+    events=D.SR_EVENTS.filter(e=>e.city===topCity.name);
+    performers=D.SR_PERF.slice(0,4);
+    cities=D.SR_CITIES.filter(c=>c.key!==topCity.key).slice(0,3);
+  } else if(intent==='category'&&topCat){
+    events=D.SR_EVENTS.filter(e=>e.cat==='team'||e.cat==='category').slice(0,5);
+    categories=D.srCats; performers=D.SR_PERF.filter(p=>p.type==='team').slice(0,4);
+  } else {
+    events=D.SR_EVENTS.filter(e=>e.name.toLowerCase().includes(ql)).slice(0,5);
+    performers=D.SR_PERF.filter(p=>p.name.includes(q)).slice(0,4);
+  }
+  return {topMatch:topPerf||topCity||topCat,events,performers,cities,categories};
+}
+const srSortLabel={best:'הכי משתלם',price:'מחיר',date:'תאריך'};
+const SR_EVENT_IMG={coldplay:'artist1.jpg',real:'sport1.jpg',taylor:'artist2.jpg',bts:'artist5.jpg',manchester:'sport2.jpg',formula1:'sport3.jpg',harry:'artist6.jpg',festival:'tiktok3.jpg'};
+
+function searchOverlay(){
+  const open=state.srOpen, q=state.srQuery;
+  const phase = !q.trim() ? 'idle' : (state.srPhase==='results' ? 'results' : 'typing');
+  let body='';
+  if(phase==='idle'){
+    body=`
+      <div class="ov-sec"><h4>חיפושים אחרונים</h4>${state.srRecent.length?'<button class="ov-clear" data-act="sr-clear-recent">נקה</button>':''}</div>
+      ${state.srRecent.map(t=>`<div class="ov-row" data-act="sr-setq" data-q="${t}"><div class="ic">🕘</div><div class="tx"><div class="n">${t}</div></div></div>`).join('')}
+      <h4>עיון לפי קטגוריה</h4>
+      <div class="ov-chips">${D.srCats.map(c=>`<button class="chip" data-act="sr-setq" data-q="${c.name}">${c.icon} ${c.name}</button>`).join('')}</div>
+      <h4>פופולריים</h4>
+      ${D.srPopular.map(t=>`<div class="ov-row" data-act="sr-setq" data-q="${t}"><div class="ic">🔥</div><div class="tx"><div class="n">${t}</div></div></div>`).join('')}`;
+  } else if(phase==='typing'){
+    const tagColor={event:'#1c7a3a',top:'#ed1860',performer:'#216ca5',category:'#216ca5'};
+    const tagLabel={event:'אירוע',top:'התאמה',performer:'אמן',category:'קטגוריה'};
+    const act=r=> r.kind==='all'?'sr-all': r.kind==='event'?'sr-event': (r.kind==='performer'||r.kind==='top')?'sr-perf':'sr-setq';
+    body=srTypeahead(q).map(r=>`
+      <div class="ta-row" data-act="${act(r)}" data-q="${r.label}">
+        <div class="ic">${r.icon}</div>
+        <div class="tx"><div class="n">${r.label}</div>${r.sub?`<div class="s">${r.sub}</div>`:''}</div>
+        ${tagLabel[r.kind]?`<span class="ta-tag" style="color:${tagColor[r.kind]};background:${tagColor[r.kind]}1a">${tagLabel[r.kind]}</span>`:''}
+      </div>`).join('');
+  } else {
+    const r=srResults(q);
+    const sec=(t)=>`<h4 class="res-h">${t}</h4>`;
+    let out=`
+      <div class="res-bar">
+        <button class="sm-filter" data-act="sr-filter">סינון</button>
+        <div class="res-sort">${['best','price','date'].map(k=>`<button class="sort-btn ${state.srSortBy===k?'on':''}" data-srsort="${k}">${srSortLabel[k]}</button>`).join('')}</div>
+        <div class="res-title">תוצאות עבור "${q}"</div>
+      </div>`;
+    if(r.topMatch) out+=`
+      <div class="res-top" data-act="sr-perf">
+        <div class="ic">${r.topMatch.icon}</div>
+        <div class="tx"><div class="n">${r.topMatch.name}</div><div class="s">${r.topMatch.meta||''}</div></div>
+        <span class="res-cta">לאמן ›</span>
+      </div>`;
+    if(r.events.length){ out+=sec('אירועים')+`<div class="res-evs">`+r.events.map(e=>`
+      <div class="res-ev" data-act="sr-event">
+        <button class="ev-heart ${state.srHearts[e.id]?'on':''}" data-heart="sr_${e.id}">${ICON.hs}</button>
+        <div class="ev-body">
+          <div class="ev-name">${e.name}</div>
+          <div class="ev-sub">${e.date} · ${e.venue}</div>
+          <div class="ev-pricerow"><span class="amt">מ-${e.price}</span><span class="fees"> · כולל עמלות</span><span class="ok"> · אישור מיידי</span></div>
+        </div>
+        <img class="ev-thumb" src="${IMG}${SR_EVENT_IMG[e.perfKey]||'artist3.jpg'}" alt="">
+      </div>`).join('')+`</div>`; }
+    if(r.performers.length){ out+=sec('אמנים')+`<div class="ov-chips">`+r.performers.map(p=>`<button class="res-chip" data-act="sr-perf">${p.icon} ${p.name}</button>`).join('')+`</div>`; }
+    if(r.cities.length){ out+=sec('מיקומים')+r.cities.map(c=>`<div class="ov-row" data-act="sr-setq" data-q="${c.name}"><div class="ic">${c.icon}</div><div class="tx"><div class="n">${c.name}</div><div class="s">${c.meta}</div></div></div>`).join(''); }
+    if(r.categories.length){ out+=sec('קטגוריות')+`<div class="ov-chips">`+r.categories.map(c=>`<button class="res-chip" data-act="sr-cat-nav">${c.icon} ${c.name}</button>`).join('')+`</div>`; }
+    body=out;
+  }
+  return `
+  <div class="overlay ${open?'open':''}">
+    <div class="ov-head">
+      <div class="field">${ICON.searchSm}<input id="srInput" data-srinput placeholder="חפשו אמן, קבוצה, עיר, ז׳אנר…" value="${q.replace(/"/g,'&quot;')}" autocomplete="off">${q?'<button class="ov-x" data-act="sr-clear">✕</button>':''}</div>
+      <button class="ov-close" data-act="close-search">סגירה</button>
+    </div>
+    <div class="ov-body">${body}</div>
+    ${searchFilterSheet()}
+  </div>`;
+}
+function searchFilterSheet(){
+  const open=state.srFilterSheet;
+  return `
+  <div class="sheet-backdrop ${open?'open':''}" data-act="sr-filter-close"></div>
+  <div class="sheet ${open?'open':''}">
+    <div class="grab"></div>
+    <div class="sh-head"><h3>סינון</h3><button class="x" data-act="sr-filter-close">×</button></div>
+    <div class="sh-body">
+      <div class="ff-label">תאריך</div>
+      <div class="ov-chips">${['כל התאריכים','סוף שבוע','החודש'].map(d=>`<button class="chip">${d}</button>`).join('')}</div>
+      <div class="ff-label">עיר</div>
+      <div class="ov-chips">${['לונדון','פריז','מדריד'].map(c=>`<button class="chip">${c}</button>`).join('')}</div>
+    </div>
+    <div class="sh-cta"><button class="btn btn-pink" style="width:100%" data-act="sr-filter-close">החל סינון</button></div>
+  </div>`;
+}
+
+/* ============================================================
+   BEHAVIOUR
+   ============================================================ */
+function set(patch){ Object.assign(state, patch); render(); }
+function go(page){ stopPlaylistAudio(); state.playing=false; window.scrollTo(0,0); set({page, openSheet:null, srOpen:false, drawerOpen:false, acctOpen:false}); }
+
+/* ---- Spotify playlist: real in-page audio (Web Audio API) ---- */
+let audioCtx=null, audioTimer=null;
+const PL_NOTES=[523.25,659.25,783.99,659.25,587.33,698.46,880.0,698.46];
+function playlistToggle(){
+  state.playing=!state.playing;
+  if(state.playing) startPlaylistAudio(); else stopPlaylistAudio();
+  render();
+}
+function startPlaylistAudio(){
+  try{ audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); }
+  catch(_){ return; }
+  state.playIdx=0;
+  const step=()=>{
+    if(!audioCtx) return;
+    const t=audioCtx.currentTime;
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type='triangle'; o.frequency.value=PL_NOTES[state.playIdx%PL_NOTES.length];
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.16,t+0.03); g.gain.exponentialRampToValueAtTime(0.0008,t+0.42);
+    o.connect(g).connect(audioCtx.destination); o.start(t); o.stop(t+0.45);
+    state.playIdx++;
+  };
+  step(); audioTimer=setInterval(step, 420);
+}
+function stopPlaylistAudio(){ if(audioTimer){clearInterval(audioTimer);audioTimer=null;} }
+// seat map: tap a price pin (or zone) → highlight the matching listing & scroll to it
+function locate(key){
+  state.highlightListing = key;
+  state.selectedSection = null;   // clear any active filter so the card is in the list
+  render();
+  // scroll the window manually (the .app frame is overflow:hidden, so
+  // scrollIntoView can't move it). Center the card, clearing the sticky map.
+  requestAnimationFrame(()=>{
+    const el = document.querySelector('.lcard.hl');
+    if(!el) return;
+    const r = el.getBoundingClientRect();
+    const target = window.scrollY + r.top - (window.innerHeight/2 - r.height/2);
+    window.scrollTo({top: Math.max(0, target), behavior:'smooth'});
+  });
+}
+
+function wire(){
+  // rails: drag + wheel
+  document.querySelectorAll('.hscroll').forEach(enableDrag);
+  // inputs: price fields (no re-render) + live search (re-render + refocus)
+  document.getElementById('app').oninput = (e)=>{
+    const fp = e.target.closest('[data-fprice]');
+    if(fp){ if(fp.getAttribute('data-fprice')==='min') state.p3Min=fp.value; else state.p3Max=fp.value; return; }
+    const si = e.target.closest('[data-srinput]');
+    if(si){
+      state.srQuery = si.value;
+      state.srPhase = si.value.trim() ? 'typing' : 'idle';
+      render();
+      const inp=document.getElementById('srInput');
+      if(inp){ inp.focus(); const n=inp.value.length; try{inp.setSelectionRange(n,n);}catch(_){} }
+    }
+  };
+  document.getElementById('app').onkeydown = (e)=>{
+    if(e.key==='Enter' && e.target.closest('[data-srinput]') && state.srQuery.trim()){ set({srPhase:'results'}); }
+  };
+  // focus the search field when the overlay opens (don't steal focus mid-typing)
+  if(state.srOpen){ const i=document.getElementById('srInput'); if(i && document.activeElement!==i){ i.focus(); const n=i.value.length; try{i.setSelectionRange(n,n);}catch(_){} } }
+
+  document.getElementById('app').onclick = (e)=>{
+    const heart = e.target.closest('[data-heart]');
+    if(heart){ const k=heart.getAttribute('data-heart');
+      if(k.startsWith('sr_')){ const id=k.slice(3); state.srHearts[id]=!state.srHearts[id]; }
+      else state.hearts[k]=!state.hearts[k];
+      render(); return; }
+    const srsort = e.target.closest('[data-srsort]');
+    if(srsort){ set({srSortBy: srsort.getAttribute('data-srsort')}); return; }
+    const faq = e.target.closest('[data-faq]');
+    if(faq){ const i=+faq.getAttribute('data-faq'); set({faqOpen: state.faqOpen===i?-1:i}); return; }
+    const faq2 = e.target.closest('[data-faq2]');
+    if(faq2){ const i=+faq2.getAttribute('data-faq2'); set({faqP2Open: state.faqP2Open===i?-1:i}); return; }
+    const faq3 = e.target.closest('[data-faq3]');
+    if(faq3){ const i=+faq3.getAttribute('data-faq3'); set({faqP3Open: state.faqP3Open===i?-1:i}); return; }
+    const faqh = e.target.closest('[data-faqh]');
+    if(faqh){ const i=+faqh.getAttribute('data-faqh'); set({faqHome: state.faqHome===i?-1:i}); return; }
+    const loc = e.target.closest('[data-locate]');
+    if(loc){ locate(loc.getAttribute('data-locate')); return; }
+    const sortEl = e.target.closest('[data-sort]');
+    if(sortEl){ set({sortBy: sortEl.getAttribute('data-sort')}); return; }
+    const fsec = e.target.closest('[data-fsec]');
+    if(fsec){ const k=fsec.getAttribute('data-fsec'); set({selectedSection: state.selectedSection===k?null:k}); return; }
+    const fqty = e.target.closest('[data-fqty]');
+    if(fqty){ const n=+fqty.getAttribute('data-fqty'); set({p3Qty: state.p3Qty===n?null:n}); return; }
+    const fchar = e.target.closest('[data-fchar]');
+    if(fchar){ const k=fchar.getAttribute('data-fchar'); state.p3f[k]=!state.p3f[k]; render(); return; }
+    const dayEl = e.target.closest('[data-day]');
+    if(dayEl){
+      const d=+dayEl.getAttribute('data-day'); const ts=new Date(state.dpYear,state.dpMonth,d).getTime();
+      if(!state.dpStart || state.dpEnd) set({dpStart:ts, dpEnd:null});
+      else if(ts===state.dpStart) set({dpStart:null, dpEnd:null});
+      else if(ts<state.dpStart) set({dpStart:ts, dpEnd:state.dpStart});
+      else set({dpEnd:ts});
+      return;
+    }
+    const flexEl = e.target.closest('[data-flex]');
+    if(flexEl){ set({dpFlex:flexEl.getAttribute('data-flex')}); return; }
+    const sh = e.target.closest('[data-sheet]');
+    if(sh){ set({openSheet: sh.getAttribute('data-sheet')}); return; }
+    const pick = e.target.closest('[data-pick]');
+    if(pick){
+      const [k,v]=pick.getAttribute('data-pick').split(':');
+      if(k==='genre') set({p1GenreSelected:v, openSheet:null});
+      else if(k==='city') set({p1CitySelected:v, openSheet:null});
+      else if(k==='date') set({p1DateLabel:v, openSheet:null});
+      else if(k==='p2date') set({p2DateSel:v, openSheet:null});
+      else if(k==='p2city') set({p2CitySel:v, openSheet:null});
+      else if(k==='p2qty') set({p2QtySel:v, openSheet:null});
+      return;
+    }
+    const a = e.target.closest('[data-act]'); if(!a) return;
+    const act = a.getAttribute('data-act');
+    switch(true){
+      case act==='drawer': set({drawerOpen:true, acctOpen:false}); break;
+      case act==='account': set({acctOpen:true, drawerOpen:false}); break;
+      case act==='favs': set({page:1}); break;
+      case act==='search': set({srOpen:true, srQuery:'', srPhase:'idle'}); break;
+      case act==='close-search': set({srOpen:false, srFilterSheet:false}); break;
+      case act==='sr-clear': set({srQuery:'', srPhase:'idle'}); break;
+      case act==='sr-clear-recent': set({srRecent:[]}); break;
+      case act==='sr-all': set({srPhase:'results'}); break;
+      case act==='sr-setq': set({srQuery: a.getAttribute('data-q')||'', srPhase:'results'}); break;
+      case act==='sr-event': state.srQuery=''; state.srPhase='idle'; state.srFilterSheet=false; go(3); break;
+      case act==='sr-perf': state.srQuery=''; state.srPhase='idle'; state.srFilterSheet=false; go(2); break;
+      case act==='sr-cat-nav': state.srQuery=''; state.srPhase='idle'; state.srFilterSheet=false; go(1); break;
+      case act==='sr-filter': set({srFilterSheet:true}); break;
+      case act==='sr-filter-close': set({srFilterSheet:false}); break;
+      case act==='close-drawer': set({drawerOpen:false, acctOpen:false, drawerSection:null, drawerMusicGroup:null, mSport:null, mComp:null}); break;
+      case act==='close-sheet': set({openSheet:null}); break;
+      case act==='lastminute': set({p1LastMinute:!state.p1LastMinute}); break;
+      case act==='spotify': set({p1SpotifyConnected:!state.p1SpotifyConnected}); break;
+      case act==='home': go(0); break;
+      case act==='category': go(1); break;
+      case act==='lobby': go(2); break;
+      case act==='event': go(3); break;
+      case act==='occasion': go(4); break;
+      case act==='spotify-home': break;
+      case act==='pl-play': playlistToggle(); break;
+      case act==='cal-prev': { let mm=state.dpMonth-1, yy=state.dpYear; if(mm<0){mm=11;yy--;} set({dpMonth:mm,dpYear:yy}); break; }
+      case act==='cal-next': { let mm=state.dpMonth+1, yy=state.dpYear; if(mm>11){mm=0;yy++;} set({dpMonth:mm,dpYear:yy}); break; }
+      case act==='date-apply': {
+        const label=dpLabel();
+        if(state.openSheet==='date') set({p1DateLabel:label, openSheet:null});
+        else set({p2DateSel:label, openSheet:null});
+        break;
+      }
+      case act==='back-cat': go(1); break;
+      case act==='back-lobby': go(2); break;
+      case act==='setlist3': set({setlistP3Open:!state.setlistP3Open}); break;
+      case act==='p3filter': set({openSheet:'p3-filter'}); break;
+      case act==='p3clear': set({selectedSection:null, p3Qty:null, p3Min:'', p3Max:'', p3f:{together:false,front:false,view:false,access:false}}); break;
+      case act==='fav-feature': state.hearts.feature=!state.hearts.feature; render(); break;
+      case act==='follow': set({following:!state.following}); break;
+      case act==='together': set({p2Together:!state.p2Together}); break;
+      case act==='setlist': set({setlistOpen:!state.setlistOpen}); break;
+      case act==='lobby-setlist': set({setlistOpen:!state.setlistOpen}); break;
+      case act==='pl-track': {
+        const i=+a.getAttribute('data-i');
+        if(state.playing && state.plCurrent===i){ stopPlaylistAudio(); set({playing:false}); }
+        else { if(!state.playing) startPlaylistAudio(); set({playing:true, plCurrent:i}); }
+        break;
+      }
+      case act==='bio': set({bioExpanded:!state.bioExpanded}); break;
+      case act==='tour': set({tourExpanded:!state.tourExpanded}); break;
+      case act==='share': case act==='watch': case act==='package': break;
+      case act.startsWith('dsec:'): { const k=act.slice(5); set({drawerSection: state.drawerSection===k?null:k, drawerMusicGroup:null, mSport:null, mComp:null}); break; }
+      case act.startsWith('dmg:'): { const k=act.slice(4); set({drawerMusicGroup: state.drawerMusicGroup===k?null:k}); break; }
+      case act.startsWith('dsp:'): { const k=act.slice(4); set({mSport: state.mSport===k?null:k, mComp:null}); break; }
+      case act.startsWith('dcp:'): { const k=act.slice(4); set({mComp: state.mComp===k?null:k}); break; }
+      default: break;
+    }
+  };
+}
+
+function enableDrag(el){
+  let down=false,x0=0,l0=0,moved=false;
+  el.addEventListener('pointerdown',e=>{ if(e.pointerType==='touch')return; down=true;moved=false;x0=e.clientX;l0=el.scrollLeft;el.classList.add('dragging'); });
+  window.addEventListener('pointermove',e=>{ if(!down)return; const dx=e.clientX-x0; if(Math.abs(dx)>3)moved=true; el.scrollLeft=l0-dx; });
+  const end=()=>{ if(down){down=false;el.classList.remove('dragging');} };
+  window.addEventListener('pointerup',end); window.addEventListener('pointercancel',end);
+  el.addEventListener('click',e=>{ if(moved){e.preventDefault();e.stopPropagation();} },true);
+  const rtl=getComputedStyle(el).direction==='rtl'?-1:1;
+  el.addEventListener('wheel',e=>{ if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){el.scrollLeft+=rtl*e.deltaY;e.preventDefault();} },{passive:false});
+}
+
+// P3 collapsing hero: full → slim strip on scroll.
+// Toggle the class directly (no full re-render) to keep scrolling smooth.
+window.addEventListener('scroll', ()=>{
+  // floating nav (Home + Lobby): transparent → solid dark-slate on scroll
+  if(state.page===0 || state.page===2){
+    const solid = window.scrollY > 40;
+    if(solid !== state.headerSolid){
+      state.headerSolid = solid;
+      const h = document.querySelector('.header--float');
+      if(h) h.classList.toggle('solid', solid);
+    }
+  }
+  if(state.page!==3) return;
+  const c = window.scrollY > 220;
+  if(c!==state.heroCollapsed){
+    state.heroCollapsed = c;
+    const slim = document.querySelector('.ev-slim');
+    if(slim) slim.classList.toggle('show', c);
+  }
+}, {passive:true});
+
+// deep-link routing (#category / #lobby / #event / #search) so the prototype
+// can be entered on any screen and the back button works
+function applyHash(){
+  const h=location.hash;
+  if(h==='#category') state.page=1;
+  else if(h==='#lobby') state.page=2;
+  else if(h==='#event') state.page=3;
+  else if(h==='#search'){ state.page=state.page||0; state.srOpen=true; state.srQuery=''; state.srPhase='idle'; }
+  else state.page=0;
+}
+window.addEventListener('hashchange', ()=>{ applyHash(); render(); });
+applyHash();
+render();
+</script>
+</body>
+</html>

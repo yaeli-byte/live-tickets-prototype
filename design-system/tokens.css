@@ -1,0 +1,142 @@
+/* =====================================================================
+   Live Tickets — Design Tokens
+   Extracted from the homepage (index.html). Single source of truth for
+   colour, type, spacing, radii, shadows, sizing and z-index.
+   Consume via var(--lt-*). Do not hard-code raw values in components.
+   ===================================================================== */
+
+:root {
+  /* ---------------------------------------------------------------
+     COLOUR — brand
+     --------------------------------------------------------------- */
+  --lt-primary:            #ed1860;   /* pink — CTAs, prices, "hot" chip */
+  --lt-primary-ink:        #ffffff;   /* text/icon on primary */
+  --lt-accent:             #f57e20;   /* orange — secondary CTA, rating star */
+  --lt-link:               #216ca5;   /* blue — inline "see all" links */
+  --lt-spotify:            #1db954;   /* green — Spotify integration */
+  --lt-whatsapp:           #25d366;   /* green — WhatsApp */
+
+  /* brand glows (radial accents over dark surfaces) */
+  --lt-glow:               rgba(237, 24, 96, .22);
+  --lt-glow-strong:        rgba(237, 24, 96, .38);
+
+  /* ---------------------------------------------------------------
+     COLOUR — surfaces
+     --------------------------------------------------------------- */
+  --lt-bg-app:             #e9e9ee;   /* canvas behind the phone frame */
+  --lt-bg-page:            #fefefe;   /* page background */
+  --lt-surface:            #ffffff;   /* white cards */
+  --lt-surface-dark:       #16092f;   /* event-card / dark tiles */
+  --lt-surface-darker:     #121212;   /* dark banner (Spotify) */
+  --lt-surface-strip:      #2a2a30;   /* trust strip */
+  --lt-surface-thumb:      #0f081f;   /* small image placeholder */
+  --lt-hero-from:          #0a0a14;   /* hero gradient start */
+  --lt-hero-to:            #1a1030;   /* hero gradient end */
+
+  /* ---------------------------------------------------------------
+     COLOUR — text
+     --------------------------------------------------------------- */
+  --lt-text:               #1a1a1a;   /* primary ink */
+  --lt-text-strong:        #0a0a08;   /* near-black headings */
+  --lt-text-muted:         #888888;   /* secondary */
+  --lt-text-subtle:        #aaaaaa;   /* tertiary / captions */
+  --lt-text-on-dark:       #ffffff;
+  --lt-text-on-dark-80:    rgba(255, 255, 255, .8);
+  --lt-text-on-dark-65:    rgba(255, 255, 255, .65);
+
+  /* ---------------------------------------------------------------
+     COLOUR — lines & overlays
+     --------------------------------------------------------------- */
+  --lt-border:             #dedede;   /* card borders */
+  --lt-border-soft:        #e0e0e0;   /* input borders */
+  --lt-line:               #ebebeb;   /* hairline dividers */
+  --lt-star:               #f5b301;   /* filled rating star */
+  --lt-glass:              rgba(255, 255, 255, .3);  /* frosted icon button */
+  --lt-glass-soft:         rgba(255, 255, 255, .2);
+  --lt-scrim-top:          linear-gradient(to bottom, rgba(10,5,20,.5) 0%, rgba(10,5,20,0) 40%, rgba(10,5,20,.2) 100%);
+  --lt-scrim-bottom:       linear-gradient(to top, rgba(5,2,12,.85) 0%, rgba(5,2,12,.1) 48%, rgba(5,2,12,.5) 100%);
+
+  /* ---------------------------------------------------------------
+     TYPOGRAPHY
+     --------------------------------------------------------------- */
+  --lt-font:               'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --lt-font-alt:           'Inter', 'Rubik', sans-serif;  /* names / category labels */
+
+  --lt-fs-badge:           9px;
+  --lt-fs-2xs:             10px;
+  --lt-fs-xs:              11px;
+  --lt-fs-sm:              12px;
+  --lt-fs-md:              13px;
+  --lt-fs-base:            14px;
+  --lt-fs-lg:              15px;
+  --lt-fs-xl:              16px;
+  --lt-fs-title:           22px;   /* section titles */
+  --lt-fs-h3:              24px;   /* promo headline */
+  --lt-fs-display:         32px;   /* hero */
+
+  --lt-fw-regular:         400;
+  --lt-fw-medium:          500;
+  --lt-fw-semibold:        600;
+  --lt-fw-bold:            700;
+
+  --lt-lh-tight:           1.0;
+  --lt-lh-snug:            1.4;
+  --lt-lh-normal:          1.55;
+  --lt-tracking-wide:      .6px;
+
+  /* ---------------------------------------------------------------
+     SPACING  (base-2 scale; values used across the homepage)
+     --------------------------------------------------------------- */
+  --lt-sp-1:               4px;
+  --lt-sp-2:               8px;
+  --lt-sp-3:               12px;
+  --lt-sp-4:               16px;
+  --lt-sp-5:               18px;
+  --lt-sp-6:               22px;
+  --lt-sp-7:               24px;
+  --lt-sp-8:               28px;
+  --lt-sp-9:               36px;
+
+  --lt-gutter:             16px;   /* default page side padding */
+  --lt-rail-pad:           18px;   /* horizontal rail inset */
+  --lt-section-gap:        36px;   /* space above a section */
+
+  /* ---------------------------------------------------------------
+     RADII
+     --------------------------------------------------------------- */
+  --lt-r-xs:               4px;
+  --lt-r-sm:               5px;
+  --lt-r-md:               8px;
+  --lt-r-lg:               11px;
+  --lt-r-xl:               12px;    /* default card radius */
+  --lt-r-2xl:              14px;
+  --lt-r-pill:             999px;
+  --lt-r-circle:           50%;
+
+  /* ---------------------------------------------------------------
+     SHADOWS
+     --------------------------------------------------------------- */
+  --lt-shadow-sm:          0 2px 6px rgba(0, 0, 0, .12);
+  --lt-shadow-card:        0 4px 16px rgba(0, 0, 0, .05);
+  --lt-shadow-lg:          0 10px 40px rgba(0, 0, 0, .18);
+  --lt-shadow-sheet:       0 -8px 30px rgba(0, 0, 0, .25);
+  --lt-shadow-fab:         0 6px 18px rgba(0, 0, 0, .28);
+
+  /* ---------------------------------------------------------------
+     SIZING
+     --------------------------------------------------------------- */
+  --lt-app-width:          375px;   /* mobile frame */
+  --lt-card:               160px;   /* event card width/height */
+  --lt-card-tall:          230px;   /* featured (text-inside) card */
+  --lt-row-width:          343px;   /* full-bleed row card (gutter*2 in) */
+  --lt-icon-btn:           34.4px;  /* header circle button */
+  --lt-fab:                56px;    /* floating action button */
+
+  /* ---------------------------------------------------------------
+     Z-INDEX
+     --------------------------------------------------------------- */
+  --lt-z-header:           20;
+  --lt-z-fab:              60;
+  --lt-z-scrim:            90;
+  --lt-z-sheet:            100;
+}

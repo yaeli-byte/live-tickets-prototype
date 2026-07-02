@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="he" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Live Tickets — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Inter:wght@600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+<link rel="stylesheet" href="components.css" />
+<style>
+  /* ---- style-guide page chrome (not part of the system) ---- */
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#f4f4f6;color:var(--lt-text);font-family:var(--lt-font);padding:32px 20px 120px;}
+  .wrap{max-width:960px;margin:0 auto;}
+  .lead{margin-bottom:40px;}
+  .lead h1{font-size:34px;font-weight:700;letter-spacing:-.5px;}
+  .lead p{color:#666;margin-top:8px;max-width:620px;line-height:1.5;}
+  h2.sg{font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#9a9aa5;
+        margin:44px 0 16px;padding-bottom:8px;border-bottom:1px solid #e4e4ea;}
+  .grid{display:grid;gap:14px;}
+  .cols-4{grid-template-columns:repeat(4,1fr);}
+  .cols-2{grid-template-columns:repeat(2,1fr);}
+  @media(max-width:720px){.cols-4{grid-template-columns:repeat(2,1fr);}}
+  .card{background:#fff;border:1px solid #e7e7ee;border-radius:12px;padding:16px;}
+  .demo{background:#fff;border:1px solid #e7e7ee;border-radius:14px;padding:22px;overflow:hidden;}
+  .demo + .demo{margin-top:14px;}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;}
+  .tag{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8a8a95;}
+  /* swatch */
+  .sw-chip{height:56px;border-radius:10px 10px 0 0;border:1px solid rgba(0,0,0,.06);border-bottom:none;}
+  .sw-meta{background:#fff;border:1px solid #e7e7ee;border-top:none;border-radius:0 0 10px 10px;padding:8px 10px;}
+  .sw-name{font-size:12px;font-weight:600;}
+  .sw-val{font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#8a8a95;}
+  /* spacing + radius bars */
+  .sp-bar{background:var(--lt-primary);height:14px;border-radius:3px;}
+  .rad-box{width:80px;height:56px;background:#efe6ee;border:2px solid var(--lt-primary);}
+  .sh-box{width:100%;height:56px;background:#fff;border-radius:12px;}
+  .dark-stage{background:linear-gradient(165deg,var(--lt-hero-from),var(--lt-hero-to));border-radius:14px;}
+  /* phone frame demo for fixed elements */
+  .frame{position:relative;width:320px;height:230px;border-radius:18px;overflow:hidden;
+         background:linear-gradient(165deg,var(--lt-hero-from),var(--lt-hero-to));border:1px solid #e7e7ee;}
+</style>
+</head>
+<body class="lt-root">
+<div class="wrap">
+
+  <header class="lead">
+    <h1>Live Tickets — Design System</h1>
+    <p>Tokens (<span class="tag">tokens.css</span>) + reusable components (<span class="tag">components.css</span>)
+       extracted from the homepage. Every value below is a CSS variable; every component is a <span class="tag">.lt-</span> class.</p>
+  </header>
+
+  <!-- ============ COLOR ============ -->
+  <h2 class="sg">Color</h2>
+  <div class="grid cols-4" id="swatches"></div>
+
+  <!-- ============ TYPOGRAPHY ============ -->
+  <h2 class="sg">Typography — Rubik / Inter</h2>
+  <div class="demo">
+    <div style="font-size:var(--lt-fs-display);font-weight:700;line-height:1;">מה בא לכם לראות? <span class="tag">display · 32 / 700</span></div>
+    <div style="font-size:var(--lt-fs-h3);font-weight:700;margin-top:14px;">הפכו את ההופעה לטיול <span class="tag">h3 · 24 / 700</span></div>
+    <div style="font-size:var(--lt-fs-title);font-weight:500;margin-top:14px;">טרנדיים עכשיו <span class="tag">title · 22 / 500</span></div>
+    <div style="font-size:var(--lt-fs-xl);font-weight:600;margin-top:14px;font-family:var(--lt-font-alt);">שם האמן <span class="tag">card title · 16 / 600 · Inter</span></div>
+    <div style="font-size:var(--lt-fs-base);margin-top:14px;">חברו את Spotify וקבלו המלצות אישית <span class="tag">body · 14 / 400</span></div>
+    <div style="font-size:var(--lt-fs-sm);color:var(--lt-link);margin-top:14px;">לכל המועדפים › <span class="tag">link · 12 / 500</span></div>
+    <div style="font-size:var(--lt-fs-xs);color:var(--lt-text-muted);margin-top:14px;">לונדון · 4 יולי <span class="tag">caption · 11 / 400</span></div>
+  </div>
+
+  <!-- ============ SPACING ============ -->
+  <h2 class="sg">Spacing</h2>
+  <div class="demo grid" id="spacing" style="gap:12px;"></div>
+
+  <!-- ============ RADII ============ -->
+  <h2 class="sg">Radii</h2>
+  <div class="demo row" id="radii" style="gap:22px;"></div>
+
+  <!-- ============ SHADOWS ============ -->
+  <h2 class="sg">Shadows</h2>
+  <div class="grid cols-4" id="shadows"></div>
+
+  <!-- ============ COMPONENTS ============ -->
+  <h2 class="sg">Trust strip</h2>
+  <div class="demo" style="padding:0;">
+    <div class="lt-trust-strip"><span class="lt-trust-strip__star">★</span> אחריות 100% • אישור מיידי • תשלום מאובטח</div>
+  </div>
+
+  <h2 class="sg">Header</h2>
+  <div class="demo dark-stage" style="padding:0;">
+    <nav class="lt-nav">
+      <div class="lt-nav__group">
+        <button class="lt-icon-btn"><img src="../assets/icon-list.svg" alt="תפריט"></button>
+        <img class="lt-logo" src="../assets/logo.png" alt="Live Tickets">
+      </div>
+      <div class="lt-nav__group lt-nav__group--icons">
+        <button class="lt-icon-btn"><img src="../assets/icon-search-nav.svg" alt="חיפוש"></button>
+        <button class="lt-icon-btn"><img src="../assets/icon-user.svg" alt="משתמש"></button>
+        <button class="lt-icon-btn"><img src="../assets/heart-straight-nav.svg" alt="מועדפים"></button>
+      </div>
+    </nav>
+  </div>
+
+  <h2 class="sg">Buttons</h2>
+  <div class="demo row">
+    <button class="lt-btn lt-btn--primary">קנו כרטיסים</button>
+    <button class="lt-btn lt-btn--accent">בנו חבילה!</button>
+    <button class="lt-btn lt-btn--spotify">חיבור</button>
+    <button class="lt-btn lt-btn--ghost">הכל</button>
+  </div>
+
+  <h2 class="sg">Search</h2>
+  <div class="demo">
+    <div class="lt-search" style="max-width:300px;">
+      <input class="lt-search__input" dir="rtl" placeholder="חפשו אמן, הופעה, עיר…">
+      <img class="lt-search__icon" src="../assets/icon-search.svg" alt="">
+    </div>
+  </div>
+
+  <h2 class="sg">Chips &amp; favourite</h2>
+  <div class="demo row">
+    <span class="lt-chip lt-chip--hot">🔥 אוזל</span>
+    <span class="lt-chip lt-chip--lg">מ-₪520</span>
+    <span class="lt-chip lt-chip--neutral lt-chip--pill">פופ</span>
+    <span class="lt-chip lt-chip--ghost lt-chip--pill">רוק</span>
+    <span class="lt-heart"><img src="../assets/heart-straight-list.svg" alt="favourite"></span>
+  </div>
+
+  <h2 class="sg">Section header + Rail + Event cards</h2>
+  <div class="demo" style="padding-left:0;padding-right:0;">
+    <div class="lt-section__head" style="margin-bottom:12px;">
+      <a class="lt-section__link">הכל ›</a>
+      <h3 class="lt-section__title">טרנדיים עכשיו</h3>
+    </div>
+    <div class="lt-rail">
+      <div class="lt-event-card">
+        <div class="lt-event-card__media">
+          <img src="../assets/cards/artist1.jpg" alt="">
+          <div class="lt-event-card__top">
+            <span class="lt-heart"><img src="../assets/heart-straight.svg" alt=""></span>
+            <span class="lt-chip lt-chip--hot">🔥 אוזל</span>
+          </div>
+        </div>
+        <div class="lt-event-card__meta">
+          <span class="lt-event-card__title">שם האמן</span>
+          <span class="lt-event-card__sub">לונדון · 4 יולי</span>
+        </div>
+      </div>
+      <div class="lt-event-card lt-event-card--featured">
+        <div class="lt-event-card__media">
+          <img src="../assets/cards/artist5.jpg" alt="">
+          <div class="lt-event-card__top">
+            <span class="lt-heart"><img src="../assets/heart-straight.svg" alt=""></span>
+            <span class="lt-chip lt-chip--hot">🔥 אוזל</span>
+          </div>
+          <div class="lt-event-card__meta">
+            <span class="lt-event-card__title">שם האמן</span>
+            <span class="lt-event-card__sub">לונדון · 4 יולי</span>
+          </div>
+        </div>
+      </div>
+      <div class="lt-event-card">
+        <div class="lt-event-card__media">
+          <img src="../assets/cards/artist3.jpg" alt="">
+          <div class="lt-event-card__top">
+            <span class="lt-heart"><img src="../assets/heart-straight.svg" alt=""></span>
+            <span class="lt-chip lt-chip--hot">🔥 אוזל</span>
+          </div>
+        </div>
+        <div class="lt-event-card__meta">
+          <span class="lt-event-card__title">שם האמן</span>
+          <span class="lt-event-card__sub">לונדון · 4 יולי</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sg">Event row</h2>
+  <div class="demo">
+    <div class="lt-event-row">
+      <div class="lt-event-row__body">
+        <span class="lt-heart"><img src="../assets/heart-straight-list.svg" alt=""></span>
+        <div class="lt-event-row__line">
+          <span class="lt-event-row__price">מ-₪520</span>
+          <div class="lt-event-row__info">
+            <span class="lt-event-row__name">קולדפליי</span>
+            <span class="lt-event-row__sub">פופ · רוק · 6 הופעות</span>
+          </div>
+        </div>
+      </div>
+      <img class="lt-event-row__thumb" src="../assets/cards/artist2.jpg" alt="">
+    </div>
+  </div>
+
+  <h2 class="sg">Category tiles</h2>
+  <div class="demo row">
+    <div class="lt-category"><img src="../assets/cards/dest-spain.jpg" alt=""><span class="lt-category__label">ספרד</span></div>
+    <div class="lt-category"><img src="../assets/cards/dest-italy.jpg" alt=""><span class="lt-category__label">איטליה</span></div>
+  </div>
+
+  <h2 class="sg">Testimonial</h2>
+  <div class="demo row">
+    <div class="lt-testimonial">
+      <div class="lt-testimonial__stars">★★★★★</div>
+      <p class="lt-testimonial__quote">חוויה מטורפת! הזמנתי כרטיסים לקולדפליי והכל היה חלק. ממליצה בחום 🎤</p>
+      <div class="lt-testimonial__person">
+        <div class="lt-testimonial__who">
+          <span class="lt-testimonial__name">דנה כהן</span>
+          <span class="lt-testimonial__event">קולדפליי · לונדון</span>
+        </div>
+        <span class="lt-avatar" style="background:var(--lt-primary)">ד</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sg">Trust banner</h2>
+  <div class="demo" style="padding:0;">
+    <div class="lt-trust-banner">
+      <div class="lt-trust-banner__score">
+        <div class="lt-trust-banner__stars">★★★★★</div>
+        <span class="lt-trust-banner__meta">מבוסס על <b>17K</b> ביקורות · דירוג <b>מצוין</b></span>
+      </div>
+      <span class="lt-trust-banner__provider">Trustpilot</span>
+    </div>
+  </div>
+
+  <h2 class="sg">Divider + Footer</h2>
+  <div class="demo" style="padding:0;">
+    <div class="lt-divider"><span class="lt-divider__line"></span><span class="lt-divider__label">Badges</span><span class="lt-divider__line"></span></div>
+    <div class="lt-footer lt-footer--image" style="--lt-footer-image:url('../assets/footer-trustpilot.png');"></div>
+  </div>
+
+  <!-- ============ Overlays: WhatsApp + Bottom sheet ============ -->
+  <h2 class="sg">WhatsApp FAB &amp; Bottom sheet <span class="tag" style="text-transform:none;letter-spacing:0;">(new — not on the homepage)</span></h2>
+  <div class="demo">
+    <p style="color:#666;font-size:13px;margin-bottom:14px;">Shown inside a phone frame so the <span class="tag">position:fixed</span> overlays pin to the frame (<span class="tag">.lt-scope-frame</span>).</p>
+    <div class="frame lt-scope-frame" id="frame">
+      <button class="lt-whatsapp lt-whatsapp--absolute" aria-label="WhatsApp"><img src="../assets/icon-whatsapp.svg" alt=""></button>
+      <button class="lt-btn lt-btn--primary" style="position:absolute;top:16px;inset-inline-end:16px;" onclick="openSheet()">בחרו מושב</button>
+
+      <div class="lt-sheet-backdrop" id="backdrop" onclick="closeSheet()"></div>
+      <aside class="lt-sheet" id="sheet">
+        <div class="lt-sheet__handle"></div>
+        <div class="lt-sheet__title">בחרו כמות כרטיסים</div>
+        <div class="lt-event-row" style="width:100%;margin-bottom:10px;">
+          <div class="lt-event-row__body">
+            <div class="lt-event-row__line">
+              <span class="lt-event-row__price">מ-₪520</span>
+              <div class="lt-event-row__info">
+                <span class="lt-event-row__name">קולדפליי · לונדון</span>
+                <span class="lt-event-row__sub">4 יולי · O2 Arena</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="lt-btn lt-btn--primary" style="width:100%;" onclick="closeSheet()">המשך לתשלום</button>
+      </aside>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ---- swatches ----
+  const colors = [
+    ['--lt-primary','primary'],['--lt-accent','accent'],['--lt-link','link'],
+    ['--lt-spotify','spotify'],['--lt-whatsapp','whatsapp'],['--lt-star','star'],
+    ['--lt-text','text'],['--lt-text-muted','text-muted'],['--lt-text-subtle','text-subtle'],
+    ['--lt-surface-dark','surface-dark'],['--lt-surface-darker','surface-darker'],['--lt-surface-strip','surface-strip'],
+    ['--lt-hero-from','hero-from'],['--lt-hero-to','hero-to'],['--lt-bg-page','bg-page'],['--lt-border','border'],
+  ];
+  const cs = getComputedStyle(document.documentElement);
+  document.getElementById('swatches').innerHTML = colors.map(([v,n])=>{
+    const val = cs.getPropertyValue(v).trim();
+    return `<div><div class="sw-chip" style="background:${val}"></div>
+      <div class="sw-meta"><div class="sw-name">${n}</div><div class="sw-val">${v} · ${val}</div></div></div>`;
+  }).join('');
+
+  // ---- spacing ----
+  const sp = ['--lt-sp-1','--lt-sp-2','--lt-sp-3','--lt-sp-4','--lt-sp-5','--lt-sp-6','--lt-sp-7','--lt-sp-8','--lt-sp-9'];
+  document.getElementById('spacing').innerHTML = sp.map(v=>{
+    const val = cs.getPropertyValue(v).trim();
+    return `<div class="row" style="gap:12px;"><span class="tag" style="width:80px;">${v}</span>
+      <span class="sp-bar" style="width:${val};"></span><span class="tag">${val}</span></div>`;
+  }).join('');
+
+  // ---- radii ----
+  const rd = ['--lt-r-xs','--lt-r-sm','--lt-r-md','--lt-r-lg','--lt-r-xl','--lt-r-2xl'];
+  document.getElementById('radii').innerHTML = rd.map(v=>{
+    const val = cs.getPropertyValue(v).trim();
+    return `<div style="text-align:center;"><div class="rad-box" style="border-radius:${val};"></div>
+      <div class="tag" style="margin-top:6px;">${val}</div></div>`;
+  }).join('');
+
+  // ---- shadows ----
+  const sh = [['--lt-shadow-sm','sm'],['--lt-shadow-card','card'],['--lt-shadow-lg','lg'],['--lt-shadow-fab','fab']];
+  document.getElementById('shadows').innerHTML = sh.map(([v,n])=>{
+    const val = cs.getPropertyValue(v).trim();
+    return `<div class="card"><div class="sh-box" style="box-shadow:${val};"></div>
+      <div class="sw-name" style="margin-top:10px;">${n}</div><div class="sw-val">${v}</div></div>`;
+  }).join('');
+
+  // ---- bottom sheet ----
+  const sheet = document.getElementById('sheet'), backdrop = document.getElementById('backdrop');
+  window.openSheet  = () => { sheet.classList.add('is-open'); backdrop.classList.add('is-open'); };
+  window.closeSheet = () => { sheet.classList.remove('is-open'); backdrop.classList.remove('is-open'); };
+</script>
+</body>
+</html>

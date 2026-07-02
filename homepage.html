@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="he" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Live Tickets — דף הבית</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Inter:wght@600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --pink:#ed1860;
+    --link:#216ca5;
+    --ink:#1a1a1a;
+    --muted:#888;
+    --page:#fefefe;
+    --card-dark:#16092f;
+    --border:#dedede;
+    --spotify:#1db954;
+    --orange:#f57e20;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Rubik',system-ui,-apple-system,'Segoe UI',sans-serif;
+    background:#e9e9ee;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    display:flex;justify-content:center;
+  }
+  /* phone frame */
+  .app{
+    width:375px;min-height:750px;background:var(--page);position:relative;overflow:hidden;
+    box-shadow:0 10px 40px rgba(0,0,0,.18);
+  }
+  img{display:block;}
+  /* layout is LTR (matches the Figma); each text block resolves its own
+     direction so Hebrew + numbers / Latin / punctuation shape correctly */
+  .app h1,.app h2,.app h3,.app p,.app span,.app a,.app input,.app button{
+    unicode-bidi:plaintext;
+  }
+  .hscroll{
+    display:flex;gap:12px;align-items:center;overflow-x:auto;
+    direction:rtl;padding-inline-start:18px;          /* scroll starts at the right */
+    scrollbar-width:none;
+  }
+  .hscroll > *{direction:ltr;}                        /* card internals stay LTR */
+  .hscroll::-webkit-scrollbar{display:none;}
+
+  /* ============ HEADER (fixed over hero) ============ */
+  .header{position:absolute;top:0;left:0;width:100%;z-index:20;}
+  .promo-strip{
+    height:33px;display:flex;align-items:center;justify-content:center;gap:8px;
+    background:#2a2a30;color:rgba(255,255,255,.92);font-size:12px;font-weight:400;
+  }
+  .promo-strip .star{color:var(--orange);}
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 18px;
+  }
+  .nav-group{display:flex;align-items:center;gap:12px;}
+  .nav-group.icons{gap:11px;}
+  .circle-btn{
+    width:34.4px;height:34.4px;border-radius:50%;background:#fff;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    box-shadow:0 2px 6px rgba(0,0,0,.12);
+  }
+  .circle-btn img{width:20.7px;height:20.7px;}
+  .nav-logo{height:28px;width:auto;}
+
+  /* ============ HERO ============ */
+  .hero{
+    position:relative;display:flex;flex-direction:column;align-items:center;gap:22px;
+    min-height:483px;padding:122px 16px 22px;
+    background:linear-gradient(165deg,#0a0a14 0%,#1a1030 100%);
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(60% 58% at 50% 50%,rgba(237,24,96,.22) 0%,rgba(237,24,96,0) 65%);
+    pointer-events:none;
+  }
+  .hero-inner{display:flex;flex-direction:column;align-items:center;gap:16px;position:relative;z-index:1;}
+  .hero-copy{display:flex;flex-direction:column;align-items:center;gap:4px;width:279px;text-align:center;}
+  .hero-eyebrow{font-size:12px;color:rgba(255,255,255,.8);letter-spacing:.6px;}
+  .hero-title{font-size:32px;font-weight:600;color:#fff;line-height:32.2px;}
+  .hero-sub{font-size:14px;color:rgba(255,255,255,.8);line-height:22.4px;}
+  .search-box{
+    display:flex;align-items:center;gap:8px;height:46px;width:259px;
+    background:var(--page);border:1px solid #e0e0e0;border-radius:12px;padding:0 15px;
+  }
+  .search-box input{
+    flex:1;border:none;outline:none;background:transparent;text-align:right;
+    font-family:inherit;font-size:14px;color:rgba(0,0,0,.9);
+  }
+  .search-box input::placeholder{color:rgba(0,0,0,.55);}
+  .search-box .ico{width:17px;height:17px;flex-shrink:0;}
+
+  /* ============ SPOTIFY BANNER ============ */
+  .spotify-wrap{display:flex;justify-content:center;padding:14px 16px 0;}
+  .spotify{
+    display:flex;align-items:center;gap:11px;width:343px;
+    background:#121212;border-radius:12px;padding:12px 14px;
+  }
+  .spotify .connect{
+    background:var(--spotify);color:#000;font-weight:700;font-size:11px;
+    border:none;border-radius:7px;padding:8px 12px;cursor:pointer;flex-shrink:0;font-family:inherit;
+  }
+  .spotify .txt{flex:1;display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:1px;}
+  .spotify .txt .t{font-size:12px;font-weight:600;color:#fff;}
+  .spotify .txt .s{font-size:10px;color:#aaa;}
+  .spotify .note{
+    width:38px;height:38px;border-radius:50%;background:var(--spotify);
+    display:flex;align-items:center;justify-content:center;font-size:16px;color:#1a1a1a;flex-shrink:0;
+  }
+
+  /* ============ SECTION HEADERS ============ */
+  .section{display:flex;flex-direction:column;gap:12px;padding-top:36px;padding-bottom:4px;}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;padding:0 18px;}
+  .sec-title{font-size:22px;font-weight:500;color:var(--ink);}
+  .sec-link{font-size:12px;font-weight:500;color:var(--link);text-decoration:none;cursor:pointer;}
+  .sec-link.hidden{opacity:0;pointer-events:none;}
+
+  /* ============ ARTIST CARD ============ */
+  .card-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
+  .artist{display:flex;flex-direction:column;gap:8px;flex-shrink:0;width:160px;align-items:flex-end;}
+  .artist-thumb{
+    position:relative;width:160px;height:160px;border-radius:12px;overflow:hidden;
+    background:var(--card-dark);
+  }
+  /* scrim keeps the heart + badge legible over the photo */
+  .artist-thumb::after{
+    content:"";position:absolute;inset:0;z-index:0;
+    background:linear-gradient(to bottom,rgba(10,5,20,.5) 0%,rgba(10,5,20,0) 40%,rgba(10,5,20,.2) 100%);
+  }
+  .thumb-top{
+    position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:12px;
+  }
+  .heart-btn{
+    width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.3);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .heart-btn img{width:12px;height:12px;}
+  .badge{
+    background:var(--pink);color:#fff;font-size:9px;font-weight:600;
+    border-radius:4px;padding:2px 6px 3px;white-space:nowrap;
+  }
+  .artist-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right;}
+  .artist-name{font-family:'Inter','Rubik',sans-serif;font-size:16px;font-weight:600;color:#0a0a08;}
+  .artist-date{font-size:11px;color:var(--muted);}
+
+  /* popular artist — text inside the card */
+  .pop{flex-shrink:0;width:160px;height:230px;}
+  .pop-card{
+    position:relative;width:100%;height:100%;border-radius:12px;overflow:hidden;
+    background:var(--card-dark);display:flex;flex-direction:column;justify-content:space-between;
+    padding:12px;
+  }
+  .pop-card::after{
+    content:"";position:absolute;inset:0;z-index:0;
+    background:linear-gradient(to top,rgba(5,2,12,.85) 0%,rgba(5,2,12,.1) 48%,rgba(5,2,12,.5) 100%);
+  }
+  .pop-card .thumb-top{padding:0;}
+  .pop-card .artist-meta{position:relative;z-index:1;}
+  .pop-card .artist-name{color:#fff;}
+
+  /* ============ TIKTOK ============ */
+  .tiktok-title{padding:0 16px;text-align:center;font-size:22px;font-weight:500;color:var(--ink);}
+  .tiktok-row{display:flex;gap:8px;overflow-x:auto;padding:0 18px;scrollbar-width:none;}
+  .tiktok-row::-webkit-scrollbar{display:none;}
+  .tt-card{
+    position:relative;width:96px;height:171px;border-radius:11px;overflow:hidden;flex-shrink:0;
+  }
+  .tt-card .glow{position:absolute;inset:0;z-index:1;}
+  .tt-card .scrim{position:absolute;inset:0;z-index:1;
+    background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,0) 52%);}
+  .tt-play{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;
+    width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.25);
+    backdrop-filter:blur(2px);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .tt-play img{width:10px;height:10px;}
+  .tt-meta{position:absolute;bottom:7px;left:0;right:0;padding:0 7px;text-align:right;z-index:2;}
+  .tt-name{font-size:9px;font-weight:600;color:#fff;line-height:11.7px;}
+  .tt-likes{font-size:8px;color:rgba(255,255,255,.65);}
+
+  /* ============ LIST CARDS (אמנים שאולי תאהבו) ============ */
+  .listcards{display:flex;flex-direction:column;gap:8px;align-items:center;padding-top:16px;}
+  .listcard{
+    display:flex;align-items:center;gap:11px;width:343px;
+    background:#fff;border:1px solid var(--border);border-radius:12px;padding:13px;
+  }
+  .listcard .body{flex:1;display:flex;flex-direction:column;gap:8px;}
+  .listcard .heart-btn{align-self:flex-start;}
+  .listcard .row{display:flex;align-items:flex-end;justify-content:space-between;}
+  .listcard .price{font-size:12px;font-weight:700;color:var(--pink);}
+  .listcard .info{display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:1px;}
+  .listcard .name{font-size:13px;font-weight:600;color:var(--ink);}
+  .listcard .sub{font-size:11px;color:var(--muted);}
+  .listcard .thumb{width:50px;height:50px;border-radius:8px;background:#0f081f;flex-shrink:0;object-fit:cover;}
+
+  /* ============ CATEGORY CARDS ============ */
+  .cat-card{
+    position:relative;flex-shrink:0;width:167.5px;height:100px;border-radius:5px;overflow:hidden;
+    background:linear-gradient(135deg,#a6cdab 0%,#86b58f 100%);
+    display:flex;align-items:flex-start;justify-content:flex-end;
+    padding:15px 19px;
+  }
+  .cat-card::after{content:"";position:absolute;inset:0;z-index:0;
+    background:linear-gradient(120deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.5) 100%);}
+  .cat-card span{position:relative;z-index:1;font-family:'Inter','Rubik',sans-serif;font-size:16px;font-weight:600;color:#fff;}
+  .cat-row{gap:8px;}
+
+  /* ============ TESTIMONIAL CARDS ============ */
+  .tcard{
+    flex-shrink:0;width:270px;background:#fff;border:1px solid var(--border);
+    border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;
+    text-align:right;box-shadow:0 4px 16px rgba(0,0,0,.05);
+  }
+  .tcard .stars{font-size:13px;letter-spacing:2px;color:#f5b301;line-height:1;}
+  .tcard .quote{font-size:13px;line-height:1.55;color:#333;flex:1;}
+  .tcard .person{display:flex;align-items:center;justify-content:flex-end;gap:10px;}
+  .tcard .who{display:flex;flex-direction:column;align-items:flex-end;gap:1px;}
+  .tcard .who .nm{font-size:13px;font-weight:600;color:var(--ink);}
+  .tcard .who .ev{font-size:11px;color:var(--muted);}
+  .tcard .avatar{
+    width:38px;height:38px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:600;font-size:14px;
+  }
+
+  /* ============ TRAVEL PROMO ============ */
+  .promo{
+    background:var(--page);padding:28px 24px;display:flex;align-items:center;gap:18px;
+  }
+  .promo .photo{
+    width:150px;height:150px;border-radius:14px;flex-shrink:0;object-fit:cover;
+    object-position:center;background:#cfe0d3;
+  }
+  .promo .copy{flex:1;display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:12px;}
+  .promo .copy h3{font-size:24px;font-weight:700;color:var(--ink);}
+  .promo .copy p{font-size:15px;font-weight:400;color:var(--ink);line-height:1.5;}
+  .promo .build{
+    background:var(--orange);color:#fff;font-size:12px;font-weight:700;
+    border:none;border-radius:8px;padding:7px 16px;cursor:pointer;font-family:inherit;
+    align-self:center;
+  }
+
+  /* ============ BADGES DIVIDER ============ */
+  .divider{display:flex;align-items:center;gap:8px;padding:36px 16px 18px;}
+  .divider .line{flex:1;height:1px;background:#ebebeb;}
+  .divider .label{font-size:11px;color:#aaa;}
+
+  /* ============ FOOTER ============ */
+  .footer{
+    height:124px;width:100%;
+    background-image:url('assets/footer-trustpilot.png');
+    background-size:375px auto;background-position:center bottom;background-repeat:no-repeat;
+    background-color:#fff;
+  }
+
+  /* ============ FAQ ============ */
+  .faq{display:flex;flex-direction:column;gap:14px;padding:36px 16px 10px;}
+  .faq > h2{font-size:22px;font-weight:500;color:var(--ink);text-align:right;}
+  .faq-list{display:flex;flex-direction:column;gap:10px;}
+  .faq-item{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .18s ease;}
+  .faq-q{
+    width:100%;display:flex;align-items:center;gap:12px;padding:14px 15px;
+    background:none;border:none;cursor:pointer;font-family:inherit;text-align:right;
+  }
+  .faq-q .qt{flex:1;font-size:14px;font-weight:600;color:var(--ink);text-align:right;transition:color .18s ease;}
+  /* plus icon that becomes a minus when open */
+  .faq-q .qi{flex-shrink:0;width:20px;height:20px;position:relative;color:var(--pink);}
+  .faq-q .qi::before,.faq-q .qi::after{content:"";position:absolute;background:currentColor;border-radius:2px;}
+  .faq-q .qi::before{top:9px;left:3px;right:3px;height:2px;}
+  .faq-q .qi::after{left:9px;top:3px;bottom:3px;width:2px;transition:opacity .25s ease;}
+  .faq-item.open .qi::after{opacity:0;}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+  .faq-a p{padding:0 15px 15px;font-size:13px;color:#555;line-height:1.65;text-align:right;}
+  .faq-q:hover .qt{color:var(--pink);}
+  .faq-item:hover{border-color:#cfcfcf;}
+
+  /* ============ RAILS: drag-to-slide ============ */
+  .hscroll,.tiktok-row{cursor:grab;scroll-behavior:smooth;}
+  .hscroll.dragging,.tiktok-row.dragging{cursor:grabbing;scroll-behavior:auto;user-select:none;}
+  .hscroll img,.tiktok-row img{-webkit-user-drag:none;user-select:none;}
+
+  /* ============ HOVER / FOCUS INTERACTIONS ============ */
+  .artist-thumb,.pop-card,.tt-card,.cat-card,.listcard,.tcard,
+  .circle-btn,.heart-btn,.tt-play,.connect,.build,.sec-link,.search-box{
+    transition:transform .18s ease, box-shadow .18s ease,
+               background .18s ease, border-color .18s ease, filter .18s ease;
+  }
+  .card-img,.listcard .thumb{transition:transform .4s ease;}
+
+  @media (hover:hover){
+    .artist,.pop,.tt-card,.cat-card,.listcard,.circle-btn,.heart-btn,
+    .tt-play,.connect,.build,.sec-link{cursor:pointer;}
+
+    /* media cards: lift + gentle image zoom */
+    .artist:hover .artist-thumb,
+    .pop:hover .pop-card,
+    .tt-card:hover,
+    .cat-card:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(0,0,0,.22);}
+    .artist:hover .card-img,
+    .pop:hover .card-img,
+    .tt-card:hover .card-img,
+    .cat-card:hover .card-img{transform:scale(1.06);}
+
+    /* list + testimonial cards */
+    .listcard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.09);border-color:#cfcfcf;}
+    .listcard:hover .thumb{transform:scale(1.06);}
+    .tcard:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.10);}
+
+    /* controls */
+    .circle-btn:hover{transform:translateY(-1px) scale(1.06);box-shadow:0 4px 12px rgba(0,0,0,.2);}
+    .heart-btn:hover{background:var(--pink);}
+    .tt-play:hover{transform:translate(-50%,-50%) scale(1.12);background:rgba(255,255,255,.42);}
+    .connect:hover,.build:hover{filter:brightness(1.07);transform:translateY(-1px);}
+    .sec-link:hover{text-decoration:underline;}
+    .search-box:hover,.search-box:focus-within{border-color:#bdbdbd;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  }
+
+  /* clearer keyboard focus for interactive controls */
+  .circle-btn:focus-visible,.connect:focus-visible,.build:focus-visible,
+  .heart-btn:focus-visible,.search-box input:focus-visible{
+    outline:2px solid var(--pink);outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="promo-strip"><span class="star">★</span> אחריות 100% • אישור מיידי • תשלום מאובטח</div>
+    <nav class="nav">
+      <div class="nav-group">
+        <span class="circle-btn"><img src="assets/icon-list.svg" alt="תפריט" /></span>
+        <img class="nav-logo" src="assets/logo.png" alt="Live Tickets" />
+      </div>
+      <div class="nav-group icons">
+        <span class="circle-btn"><img src="assets/icon-search-nav.svg" alt="חיפוש" /></span>
+        <span class="circle-btn"><img src="assets/icon-user.svg" alt="משתמש" /></span>
+        <span class="circle-btn"><img src="assets/heart-straight-nav.svg" alt="מועדפים" /></span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <p class="hero-eyebrow">✨ החוויות הכי גדולות בעולם — במרחק טיסה אחת</p>
+        <h1 class="hero-title">מה בא לכם לראות?</h1>
+        <p class="hero-sub">כרטיסים להופעות, ספורט ופסטיבלים בחו״ל · אחריות 100% · אישור מיידי</p>
+      </div>
+      <div class="search-box">
+        <input type="text" dir="rtl" placeholder="חפשו אמן, הופעה, עיר…" />
+        <img class="ico" src="assets/icon-search.svg" alt="" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SPOTIFY BANNER ===== -->
+  <div class="spotify-wrap">
+    <div class="spotify">
+      <button class="connect">חיבור</button>
+      <div class="txt">
+        <span class="t">חברו Spotify להמלצות אישיות</span>
+        <span class="s">אירועים לפי הטעם המוזיקלי שלכם</span>
+      </div>
+      <div class="note">🎵</div>
+    </div>
+  </div>
+
+  <!-- ===== צפית לאחרונה ===== -->
+  <section class="section">
+    <div class="sec-head">
+      <a class="sec-link">לכל המועדפים›</a>
+      <h2 class="sec-title">צפית לאחרונה</h2>
+    </div>
+    <div class="hscroll" id="recent"></div>
+  </section>
+
+  <!-- ===== טרנדיים עכשיו ===== -->
+  <section class="section">
+    <div class="sec-head">
+      <a class="sec-link">הכל ›</a>
+      <h2 class="sec-title">טרנדיים עכשיו</h2>
+    </div>
+    <div class="hscroll" id="trending"></div>
+  </section>
+
+  <!-- ===== TikTok ===== -->
+  <section class="section">
+    <h2 class="tiktok-title">גלו את ההופעות האחרונות דרך ה-TikTok</h2>
+    <div class="tiktok-row" id="tiktok"></div>
+  </section>
+
+  <!-- ===== אמנים שאולי תאהבו ===== -->
+  <section class="section" style="padding-left:16px;padding-right:16px;gap:16px;">
+    <div class="sec-head" style="padding:0;justify-content:flex-end;">
+      <h2 class="sec-title">אמנים שאולי תאהבו</h2>
+    </div>
+    <div class="listcards" id="suggested" style="padding-top:0;"></div>
+  </section>
+
+  <!-- ===== לאן בא לכם לנסוע? ===== -->
+  <section class="section">
+    <div class="sec-head">
+      <a class="sec-link hidden">לכל המועדפים›</a>
+      <h2 class="sec-title">לאן בא לכם לנסוע?</h2>
+    </div>
+    <div class="hscroll cat-row">
+      <div class="cat-card"><img class="card-img" src="assets/cards/dest-spain.jpg" alt=""><span>ספרד</span></div>
+      <div class="cat-card"><img class="card-img" src="assets/cards/dest-italy.jpg" alt=""><span>איטליה</span></div>
+      <div class="cat-card"><img class="card-img" src="assets/cards/sport1.jpg" alt=""><span>ספורט</span></div>
+    </div>
+  </section>
+
+  <!-- ===== TRAVEL PROMO ===== -->
+  <section class="promo">
+    <img class="photo" src="assets/promo-photo.png" alt="הפכו את ההופעה לטיול" />
+    <div class="copy">
+      <h3>הפכו את ההופעה לטיול</h3>
+      <p>טיסה + מלון | הטבות לאל על ואמריקן אקספרס. טקסט על שיתוף הפעולה בין לייב טיקטס וחברות נוספות, מאפשרת לנו להציע לך חבילה</p>
+      <button class="build">בנו חבילה!</button>
+    </div>
+  </section>
+
+  <!-- ===== Testimonials ===== -->
+  <section class="section">
+    <div class="sec-head">
+      <a class="sec-link">כל הביקורות ›</a>
+      <h2 class="sec-title">מה אומרים עלינו</h2>
+    </div>
+    <div class="hscroll" id="testimonials"></div>
+  </section>
+
+  <!-- ===== הופעות מקודמות ===== -->
+  <section class="section">
+    <div class="sec-head">
+      <a class="sec-link">לכל המועדפים›</a>
+      <h2 class="sec-title">הופעות מקודמות</h2>
+    </div>
+    <div class="hscroll" id="promoted-shows"></div>
+  </section>
+
+  <!-- ===== ספורט מקודם ===== -->
+  <section class="section">
+    <div class="sec-head">
+      <a class="sec-link">הכל ›</a>
+      <h2 class="sec-title">ספורט מקודם</h2>
+    </div>
+    <div class="hscroll" id="promoted-sport"></div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="faq">
+    <h2>שאלות נפוצות</h2>
+    <div class="faq-list" id="faq"></div>
+  </section>
+
+  <!-- ===== Badges divider ===== -->
+  <div class="divider">
+    <div class="line"></div>
+    <span class="label">Badges</span>
+    <div class="line"></div>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer"></footer>
+
+</div>
+
+<script>
+  const CARDS = 'assets/cards/';
+  const concert = n => `${CARDS}artist${n}.jpg`;
+  const sport   = n => `${CARDS}sport${n}.jpg`;
+
+  // ---- artist card (thumb + meta below) ----
+  function artistCard(d){
+    return `
+      <div class="artist">
+        <div class="artist-thumb">
+          <img class="card-img" src="${d.img}" alt="${d.name}" loading="lazy">
+          <div class="thumb-top">
+            <span class="heart-btn"><img src="assets/heart-straight.svg" alt=""></span>
+            <span class="badge">🔥 אוזל</span>
+          </div>
+        </div>
+        <div class="artist-meta">
+          <span class="artist-name">${d.name}</span>
+          <span class="artist-date">${d.meta}</span>
+        </div>
+      </div>`;
+  }
+  // ---- popular card (text inside) ----
+  function popCard(d){
+    return `
+      <div class="pop">
+        <div class="pop-card">
+          <img class="card-img" src="${d.img}" alt="${d.name}" loading="lazy">
+          <div class="thumb-top">
+            <span class="heart-btn"><img src="assets/heart-straight.svg" alt=""></span>
+            <span class="badge">🔥 אוזל</span>
+          </div>
+          <div class="artist-meta">
+            <span class="artist-name">${d.name}</span>
+            <span class="artist-date">${d.meta}</span>
+          </div>
+        </div>
+      </div>`;
+  }
+  function suggestedCard(d){
+    return `
+      <div class="listcard">
+        <div class="body">
+          <span class="heart-btn"><img src="assets/heart-straight-list.svg" alt=""></span>
+          <div class="row">
+            <span class="price">${d.price}</span>
+            <div class="info">
+              <span class="name">${d.name}</span>
+              <span class="sub">${d.sub}</span>
+            </div>
+          </div>
+        </div>
+        <img class="thumb" src="${d.img}" alt="${d.name}" loading="lazy">
+      </div>`;
+  }
+  const tiktoks = [
+    {name:'BTS טוקיו 🎤', likes:'445K ❤', img:CARDS+'tiktok1.jpg', glow:'rgba(150,100,255,.35)'},
+    {name:'LED ומבלי ✨', likes:'210K ❤', img:CARDS+'tiktok2.jpg', glow:'rgba(245,126,32,.35)'},
+    {name:'Yellow פריז 🗼', likes:'124K ❤', img:CARDS+'tiktok3.jpg', glow:'rgba(50,200,200,.3)'},
+    {name:'קולדפליי לונדון 🎤', likes:'87K ❤', img:CARDS+'tiktok4.jpg', glow:'rgba(237,24,96,.4)'},
+  ];
+  function tiktokCard(d){
+    return `
+      <div class="tt-card">
+        <img class="card-img" src="${d.img}" alt="" loading="lazy">
+        <div class="glow" style="background:radial-gradient(60% 40% at 50% 30%,${d.glow} 0%,transparent 70%)"></div>
+        <div class="scrim"></div>
+        <div class="tt-play"><img src="assets/icon-play.svg" alt=""></div>
+        <div class="tt-meta">
+          <div class="tt-name">${d.name}</div>
+          <div class="tt-likes">${d.likes}</div>
+        </div>
+      </div>`;
+  }
+
+  // ---- testimonials ----
+  const testimonials = [
+    {name:'דנה כהן', event:'קולדפליי · לונדון', color:'#ed1860', quote:'חוויה מטורפת! הזמנתי כרטיסים לקולדפליי והכל היה חלק — מהרכישה ועד הכניסה. ממליצה בחום 🎤'},
+    {name:'יוסי לוי', event:'BTS · טוקיו', color:'#6a3fd1', quote:'הפכתי הופעה בטוקיו לחופשה שלמה. הכרטיסים הגיעו מיד והמחיר היה הוגן. פשוט מושלם.'},
+    {name:'מאיה אברהם', event:'פסטיבל · ברצלונה', color:'#216ca5', quote:'האתר הכי נוח שיש להזמנת הופעות בחו״ל. השירות זמין וענו לי על כל שאלה תוך דקות.'},
+    {name:'איתי ברק', event:'ריאל מדריד · מדריד', color:'#f57e20', quote:'אישור מיידי וללא הפתעות. כבר הזמנתי שלוש פעמים וזה תמיד עובד חלק. ממליץ בעיניים עצומות.'},
+  ];
+  const testimonialCard = t => `
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p class="quote">${t.quote}</p>
+        <div class="person">
+          <div class="who">
+            <span class="nm">${t.name}</span>
+            <span class="ev">${t.event}</span>
+          </div>
+          <span class="avatar" style="background:${t.color}">${t.name.trim()[0]}</span>
+        </div>
+      </div>`;
+
+  // ---- card data: popular musicians & sports teams ----
+  const concertData = [
+    {img:concert(1), name:'קולדפליי',      meta:'לונדון · 12 יולי'},
+    {img:concert(2), name:'טיילור סוויפט',  meta:'פריז · 20 יולי'},
+    {img:concert(3), name:'אד שירן',        meta:'מדריד · 3 אוג׳'},
+    {img:concert(4), name:'דואה ליפה',      meta:'ברצלונה · 15 אוג׳'},
+    {img:concert(5), name:'BTS',            meta:'טוקיו · 28 אוג׳'},
+    {img:concert(6), name:'הארי סטיילס',    meta:'אמסטרדם · 18 ספט׳'},
+    {img:concert(7), name:'בילי אייליש',    meta:'רומא · 30 ספט׳'},
+    {img:concert(8), name:'דה וויקנד',      meta:'ברלין · 5 אוק׳'},
+  ];
+  const sportData = [
+    {img:sport(1), name:'ריאל מדריד',        meta:'מדריד · 10 אוג׳'},
+    {img:sport(2), name:'לוס אנג׳לס לייקרס',  meta:'לוס אנג׳לס · 24 אוג׳'},
+    {img:sport(3), name:'ווימבלדון',         meta:'לונדון · 6 ספט׳'},
+    {img:sport(1), name:'ברצלונה',           meta:'ברצלונה · 20 ספט׳'},
+  ];
+  const suggestData = [
+    {img:concert(1), name:'קולדפליי', sub:'פופ · רוק · 6 הופעות',  price:'מ-₪520'},
+    {img:concert(2), name:'מטאליקה',  sub:'מטאל · רוק · 4 הופעות', price:'מ-₪690'},
+    {img:concert(3), name:'אדל',       sub:'פופ · בלדות · 3 הופעות', price:'מ-₪780'},
+    {img:concert(4), name:'דרייק',     sub:'היפ הופ · 5 הופעות',    price:'מ-₪610'},
+  ];
+
+  const fill = (id, html) => document.getElementById(id).innerHTML = html;
+  const each = (items, fn) => items.map(fn).join('');
+  // rows scroll right-to-left, so the first item rendered sits on the right
+  fill('recent', each(concertData.slice(0,4), artistCard));
+  fill('trending', each(concertData.slice(4,7), popCard) + artistCard(concertData[7]));
+  fill('tiktok', tiktoks.map(tiktokCard).join(''));   // LTR row: BTS → Coldplay
+  fill('suggested', each(suggestData, suggestedCard));
+  fill('testimonials', testimonials.map(testimonialCard).join(''));
+  fill('promoted-shows', each([concertData[7],concertData[6],concertData[5],concertData[4]], artistCard));
+  fill('promoted-sport', each(sportData, artistCard));
+
+  // ---- drag / wheel to slide the horizontal rails (desktop) ----
+  function enableDragScroll(el){
+    let down=false, startX=0, startLeft=0, moved=false;
+    el.addEventListener('pointerdown', e=>{
+      if(e.pointerType==='touch') return;          // let native touch scrolling handle it
+      down=true; moved=false; startX=e.clientX; startLeft=el.scrollLeft;
+      el.classList.add('dragging');
+    });
+    window.addEventListener('pointermove', e=>{
+      if(!down) return;
+      const dx=e.clientX-startX;
+      if(Math.abs(dx)>3) moved=true;
+      el.scrollLeft=startLeft-dx;
+    });
+    const end=()=>{ if(down){ down=false; el.classList.remove('dragging'); } };
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+    // swallow the click that follows a drag so it doesn't trigger a card action
+    el.addEventListener('click', e=>{ if(moved){ e.preventDefault(); e.stopPropagation(); } }, true);
+    // vertical wheel → horizontal scroll while hovering a rail
+    // (RTL rails scroll into negative scrollLeft, so flip the sign)
+    const rtl = getComputedStyle(el).direction === 'rtl' ? -1 : 1;
+    el.addEventListener('wheel', e=>{
+      if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){ el.scrollLeft += rtl*e.deltaY; e.preventDefault(); }
+    }, {passive:false});
+  }
+  document.querySelectorAll('.hscroll, .tiktok-row').forEach(enableDragScroll);
+
+  // ---- FAQ accordion ----
+  const faqs = [
+    {q:'איך מזמינים כרטיסים להופעה?', a:'בוחרים אירוע, לוחצים על "הזמנת כרטיסים", בוחרים מושבים וכמות ומשלמים בתשלום מאובטח. אישור ההזמנה נשלח מיד למייל.'},
+    {q:'האם הכרטיסים מקוריים ומאושרים?', a:'כן. כל הכרטיסים מגיעים ממקורות מורשים ומגובים באחריות מלאה של לייב טיקטס — אחרת מקבלים את הכסף בחזרה.'},
+    {q:'מתי אקבל את הכרטיסים שלי?', a:'רוב הכרטיסים דיגיטליים ונשלחים מיד לאחר הרכישה. כרטיסים מסוימים נשלחים סמוך למועד האירוע, ונעדכן אתכם בכל שלב.'},
+    {q:'אפשר לבטל או לשנות הזמנה?', a:'ניתן לבטל עד 14 יום מרגע הרכישה, בכפוף לתנאי האירוע. צוות השירות שלנו זמין לכל שינוי או שאלה.'},
+    {q:'איך עובד חיבור ה-Spotify?', a:'לאחר חיבור חשבון ה-Spotify שלכם נתאים לכם המלצות להופעות לפי האמנים והז\'אנרים שאתם הכי אוהבים. אפשר לנתק בכל רגע.'},
+    {q:'אפשר להפוך את ההופעה לחבילת נופש?', a:'בהחלט! לצד הכרטיסים אפשר להוסיף טיסה ומלון וליהנות מהטבות בלעדיות. פשוט בוחרים "בנו חבילה" בעמוד האירוע.'},
+  ];
+  const faqItem = (f,i) => `
+      <div class="faq-item${i===0?' open':''}">
+        <button class="faq-q" aria-expanded="${i===0}">
+          <span class="qt">${f.q}</span>
+          <span class="qi" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a"><p>${f.a}</p></div>
+      </div>`;
+  fill('faq', faqs.map(faqItem).join(''));
+
+  const faqList = document.getElementById('faq');
+  const setOpen = (item, open) => {
+    const ans = item.querySelector('.faq-a');
+    item.classList.toggle('open', open);
+    item.querySelector('.faq-q').setAttribute('aria-expanded', open);
+    ans.style.maxHeight = open ? ans.scrollHeight + 'px' : null;
+  };
+  faqList.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const willOpen = !item.classList.contains('open');
+      faqList.querySelectorAll('.faq-item').forEach(o => { if(o!==item) setOpen(o, false); });
+      setOpen(item, willOpen);
+    });
+    if(item.classList.contains('open')) setOpen(item, true);   // measure the default-open item
+  });
+</script>
+</body>
+</html>

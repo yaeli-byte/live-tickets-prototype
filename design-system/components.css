@@ -1,0 +1,294 @@
+/* =====================================================================
+   Live Tickets — Components
+   Reusable UI built entirely on the design tokens (tokens.css).
+   Every component is BEM-ish and namespaced with `lt-` so it can be
+   dropped into any page without colliding with existing styles.
+
+   Requires: tokens.css loaded first, and the Rubik/Inter web fonts.
+
+   Layout note (RTL): the system lays out LTR (element ORDER controls
+   left/right) and relies on `unicode-bidi:plaintext` so Hebrew + Latin
+   + numbers shape correctly. Apply `.lt-rtl-text` on text-bearing
+   elements, or scope it with `.lt-root` (see bottom of file).
+   ===================================================================== */
+
+/* ---------- base helpers ---------- */
+.lt-root { font-family: var(--lt-font); color: var(--lt-text); }
+.lt-root :where(h1,h2,h3,p,span,a,input,button,label) { unicode-bidi: plaintext; }
+.lt-rtl-text { unicode-bidi: plaintext; text-align: right; }
+.lt-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* =====================================================================
+   TRUST STRIP  —  slim reassurance bar (top of page)
+   ===================================================================== */
+.lt-trust-strip {
+  display: flex; align-items: center; justify-content: center; gap: var(--lt-sp-2);
+  height: 33px;
+  background: var(--lt-surface-strip);
+  color: var(--lt-text-on-dark);
+  font-size: var(--lt-fs-sm); font-weight: var(--lt-fw-regular);
+}
+.lt-trust-strip__star { color: var(--lt-accent); }
+
+/* =====================================================================
+   HEADER  —  logo + circular icon buttons, sits over the hero
+   ===================================================================== */
+.lt-header { width: 100%; z-index: var(--lt-z-header); }
+.lt-header--overlay { position: absolute; top: 0; left: 0; }        /* float over hero */
+
+.lt-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--lt-sp-4) var(--lt-rail-pad);
+}
+.lt-nav__group { display: flex; align-items: center; gap: var(--lt-sp-3); }
+.lt-nav__group--icons { gap: 11px; }
+.lt-logo { height: 28px; width: auto; display: block; }
+
+.lt-icon-btn {                                        /* white circular icon button */
+  width: var(--lt-icon-btn); height: var(--lt-icon-btn);
+  border-radius: var(--lt-r-circle);
+  background: var(--lt-surface); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: var(--lt-shadow-sm);
+}
+.lt-icon-btn > img, .lt-icon-btn > svg { width: 20.7px; height: 20.7px; display: block; }
+
+/* =====================================================================
+   BUTTONS
+   ===================================================================== */
+.lt-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--lt-sp-2);
+  font-family: inherit; font-size: var(--lt-fs-sm); font-weight: var(--lt-fw-bold);
+  border: none; border-radius: var(--lt-r-md); padding: 8px 16px;
+  cursor: pointer; white-space: nowrap;
+}
+.lt-btn--primary  { background: var(--lt-primary);  color: var(--lt-primary-ink); }
+.lt-btn--accent   { background: var(--lt-accent);   color: #fff; }
+.lt-btn--spotify  { background: var(--lt-spotify);  color: #000; border-radius: var(--lt-r-sm); padding: 8px 12px; font-size: var(--lt-fs-xs); }
+.lt-btn--ghost    { background: transparent; color: var(--lt-text); border: 1px solid var(--lt-border); }
+
+/* =====================================================================
+   SEARCH FIELD
+   ===================================================================== */
+.lt-search {
+  display: flex; align-items: center; gap: var(--lt-sp-2);
+  height: 46px; padding: 0 15px;
+  background: var(--lt-bg-page); border: 1px solid var(--lt-border-soft);
+  border-radius: var(--lt-r-xl);
+}
+.lt-search__input {
+  flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+  font-family: inherit; font-size: var(--lt-fs-base); color: rgba(0,0,0,.9); text-align: right;
+}
+.lt-search__input::placeholder { color: rgba(0,0,0,.55); }
+.lt-search__icon { width: 17px; height: 17px; flex-shrink: 0; }
+
+/* =====================================================================
+   SECTION HEADER  —  title (right) + "see all" link (left)
+   ===================================================================== */
+.lt-section { display: flex; flex-direction: column; gap: var(--lt-sp-3); padding-top: var(--lt-section-gap); }
+.lt-section__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--lt-rail-pad);
+}
+.lt-section__title { font-size: var(--lt-fs-title); font-weight: var(--lt-fw-medium); color: var(--lt-text); }
+.lt-section__link  { font-size: var(--lt-fs-sm); font-weight: var(--lt-fw-medium); color: var(--lt-link); text-decoration: none; cursor: pointer; }
+
+/* =====================================================================
+   RAIL  —  horizontal, RTL-scrolling row of cards
+   ===================================================================== */
+.lt-rail {
+  display: flex; align-items: center; gap: var(--lt-sp-3);
+  overflow-x: auto;
+  direction: rtl;                         /* scroll begins at the right */
+  padding-inline-start: var(--lt-rail-pad);
+  scrollbar-width: none;
+}
+.lt-rail > * { direction: ltr; }          /* card internals stay LTR */
+.lt-rail::-webkit-scrollbar { display: none; }
+.lt-rail--sm { gap: var(--lt-sp-2); }
+
+/* =====================================================================
+   CHIP  —  small pill label (badges, categories, filters)
+   ===================================================================== */
+.lt-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--lt-fs-badge); font-weight: var(--lt-fw-semibold);
+  border-radius: var(--lt-r-xs); padding: 2px 6px 3px; white-space: nowrap;
+  background: var(--lt-primary); color: var(--lt-primary-ink);
+}
+.lt-chip--hot     { background: var(--lt-primary); }                 /* 🔥 אוזל */
+.lt-chip--neutral { background: rgba(0,0,0,.06); color: var(--lt-text); }
+.lt-chip--ghost   { background: var(--lt-glass); color: #fff; }
+.lt-chip--pill    { border-radius: var(--lt-r-pill); padding: 5px 12px; font-size: var(--lt-fs-sm); }
+.lt-chip--lg      { font-size: var(--lt-fs-sm); padding: 4px 10px; }
+
+/* frosted circular "favourite" toggle used on media */
+.lt-heart {
+  width: 20px; height: 20px; border-radius: var(--lt-r-pill);
+  background: var(--lt-glass); border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.lt-heart > img, .lt-heart > svg { width: 12px; height: 12px; }
+
+/* =====================================================================
+   EVENT CARD  —  poster tile for a rail (image + meta below)
+   ===================================================================== */
+.lt-event-card { display: flex; flex-direction: column; gap: var(--lt-sp-2); flex-shrink: 0; width: var(--lt-card); align-items: flex-end; }
+.lt-event-card__media {
+  position: relative; width: var(--lt-card); height: var(--lt-card);
+  border-radius: var(--lt-r-xl); overflow: hidden; background: var(--lt-surface-dark);
+}
+.lt-event-card__media > img {                          /* cover photo */
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
+}
+.lt-event-card__media::after {                         /* legibility scrim */
+  content: ""; position: absolute; inset: 0; z-index: 0; background: var(--lt-scrim-top);
+}
+.lt-event-card__top {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between; padding: var(--lt-sp-3);
+}
+.lt-event-card__meta { display: flex; flex-direction: column; align-items: flex-end; gap: var(--lt-sp-1) 0; gap: 6px; text-align: right; }
+.lt-event-card__title { font-family: var(--lt-font-alt); font-size: var(--lt-fs-xl); font-weight: var(--lt-fw-semibold); color: var(--lt-text-strong); }
+.lt-event-card__sub   { font-size: var(--lt-fs-xs); color: var(--lt-text-muted); }
+
+/* Featured variant — taller, artwork full-bleed, meta sits INSIDE at the bottom */
+.lt-event-card--featured { width: var(--lt-card); height: var(--lt-card-tall); }
+.lt-event-card--featured .lt-event-card__media {
+  width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: var(--lt-sp-3);
+}
+.lt-event-card--featured .lt-event-card__media::after { background: var(--lt-scrim-bottom); }
+.lt-event-card--featured .lt-event-card__top { padding: 0; }
+.lt-event-card--featured .lt-event-card__meta { position: relative; z-index: 1; }
+.lt-event-card--featured .lt-event-card__title { color: #fff; }
+
+/* =====================================================================
+   EVENT ROW  —  full-width list card (thumb + price + info)
+   ===================================================================== */
+.lt-event-row {
+  display: flex; align-items: center; gap: 11px; width: var(--lt-row-width);
+  background: var(--lt-surface); border: 1px solid var(--lt-border);
+  border-radius: var(--lt-r-xl); padding: 13px;
+}
+.lt-event-row__body { flex: 1; display: flex; flex-direction: column; gap: var(--lt-sp-2); }
+.lt-event-row__body > .lt-heart { align-self: flex-start; }
+.lt-event-row__line { display: flex; align-items: flex-end; justify-content: space-between; }
+.lt-event-row__price { font-size: var(--lt-fs-sm); font-weight: var(--lt-fw-bold); color: var(--lt-primary); }
+.lt-event-row__info { display: flex; flex-direction: column; align-items: flex-end; text-align: right; gap: 1px; }
+.lt-event-row__name { font-size: var(--lt-fs-md); font-weight: var(--lt-fw-semibold); color: var(--lt-text); }
+.lt-event-row__sub  { font-size: var(--lt-fs-xs); color: var(--lt-text-muted); }
+.lt-event-row__thumb { width: 50px; height: 50px; border-radius: var(--lt-r-md); background: var(--lt-surface-thumb); object-fit: cover; flex-shrink: 0; }
+
+/* =====================================================================
+   CATEGORY TILE  —  image tile with an overlaid label
+   ===================================================================== */
+.lt-category {
+  position: relative; flex-shrink: 0; width: 167.5px; height: 100px;
+  border-radius: var(--lt-r-sm); overflow: hidden;
+  display: flex; align-items: flex-start; justify-content: flex-end; padding: 15px 19px;
+  background: linear-gradient(135deg, #a6cdab 0%, #86b58f 100%);
+}
+.lt-category > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.lt-category::after { content: ""; position: absolute; inset: 0; z-index: 0; background: linear-gradient(120deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.5) 100%); }
+.lt-category__label { position: relative; z-index: 1; font-family: var(--lt-font-alt); font-size: var(--lt-fs-xl); font-weight: var(--lt-fw-semibold); color: #fff; }
+
+/* =====================================================================
+   AVATAR  —  initial bubble
+   ===================================================================== */
+.lt-avatar {
+  width: 38px; height: 38px; border-radius: var(--lt-r-circle); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: var(--lt-fw-semibold); font-size: var(--lt-fs-base);
+  background: var(--lt-primary);
+}
+
+/* =====================================================================
+   TESTIMONIAL CARD
+   ===================================================================== */
+.lt-testimonial {
+  flex-shrink: 0; width: 270px;
+  background: var(--lt-surface); border: 1px solid var(--lt-border);
+  border-radius: var(--lt-r-2xl); padding: var(--lt-sp-4);
+  display: flex; flex-direction: column; gap: var(--lt-sp-2) var(--lt-sp-3); gap: 10px;
+  text-align: right; box-shadow: var(--lt-shadow-card);
+}
+.lt-testimonial__stars { font-size: var(--lt-fs-md); letter-spacing: 2px; color: var(--lt-star); line-height: var(--lt-lh-tight); }
+.lt-testimonial__quote { font-size: var(--lt-fs-md); line-height: var(--lt-lh-normal); color: #333; flex: 1; }
+.lt-testimonial__person { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.lt-testimonial__who { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.lt-testimonial__name { font-size: var(--lt-fs-md); font-weight: var(--lt-fw-semibold); color: var(--lt-text); }
+.lt-testimonial__event { font-size: var(--lt-fs-xs); color: var(--lt-text-muted); }
+
+/* =====================================================================
+   TRUST BANNER  —  rating + review count + provider
+   ===================================================================== */
+.lt-trust-banner {
+  display: flex; align-items: center; justify-content: center; gap: var(--lt-sp-4);
+  padding: var(--lt-sp-6) var(--lt-gutter); background: var(--lt-surface);
+}
+.lt-trust-banner__score { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.lt-trust-banner__stars { font-size: var(--lt-fs-title); letter-spacing: 3px; color: var(--lt-star); line-height: var(--lt-lh-tight); }
+.lt-trust-banner__meta  { font-size: var(--lt-fs-sm); color: var(--lt-text-muted); }
+.lt-trust-banner__meta b { color: var(--lt-text); }
+.lt-trust-banner__provider { font-size: var(--lt-fs-title); font-weight: var(--lt-fw-bold); color: var(--lt-text); }
+
+/* =====================================================================
+   DIVIDER  —  labelled hairline
+   ===================================================================== */
+.lt-divider { display: flex; align-items: center; gap: var(--lt-sp-2); padding: var(--lt-section-gap) var(--lt-gutter) var(--lt-sp-5); }
+.lt-divider__line { flex: 1; height: 1px; background: var(--lt-line); }
+.lt-divider__label { font-size: var(--lt-fs-xs); color: var(--lt-text-subtle); }
+
+/* =====================================================================
+   FOOTER
+   ===================================================================== */
+.lt-footer { width: 100%; background: var(--lt-surface); padding: var(--lt-sp-6) var(--lt-gutter); }
+.lt-footer--image {                                    /* screenshot-style footer used on the homepage */
+  height: 124px; padding: 0;
+  background-image: var(--lt-footer-image, none);
+  background-size: var(--lt-app-width) auto; background-position: center bottom; background-repeat: no-repeat;
+}
+
+/* =====================================================================
+   WHATSAPP  —  floating contact button
+   ===================================================================== */
+.lt-whatsapp {
+  position: fixed; bottom: 18px; inset-inline-start: 18px; z-index: var(--lt-z-fab);
+  width: var(--lt-fab); height: var(--lt-fab); border-radius: var(--lt-r-circle);
+  background: var(--lt-whatsapp); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--lt-shadow-fab);
+}
+.lt-whatsapp--end { inset-inline-start: auto; inset-inline-end: 18px; }
+.lt-whatsapp > img, .lt-whatsapp > svg { width: 32px; height: 32px; }
+.lt-whatsapp--absolute { position: absolute; }        /* when scoped inside the phone frame */
+
+/* =====================================================================
+   BOTTOM SHEET  —  mobile modal that rises from the bottom
+   ===================================================================== */
+.lt-sheet-backdrop {
+  position: fixed; inset: 0; z-index: var(--lt-z-scrim);
+  background: rgba(0, 0, 0, .5);
+  opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s ease;
+}
+.lt-sheet {
+  position: fixed; inset-inline: 0; bottom: 0; z-index: var(--lt-z-sheet);
+  background: var(--lt-surface);
+  border-radius: var(--lt-r-2xl) var(--lt-r-2xl) 0 0;
+  box-shadow: var(--lt-shadow-sheet);
+  padding: var(--lt-sp-3) var(--lt-gutter) calc(var(--lt-sp-7) + env(safe-area-inset-bottom, 0px));
+  max-height: 85%; overflow-y: auto;
+  transform: translateY(100%); transition: transform .28s cubic-bezier(.32,.72,0,1);
+}
+.lt-sheet__handle { width: 40px; height: 4px; border-radius: var(--lt-r-pill); background: #d5d5db; margin: 0 auto var(--lt-sp-4); }
+.lt-sheet__title { font-size: var(--lt-fs-xl); font-weight: var(--lt-fw-semibold); color: var(--lt-text); text-align: right; margin-bottom: var(--lt-sp-3); }
+
+/* open state — toggle `.is-open` on a shared wrapper (or on each element) */
+.lt-sheet.is-open { transform: translateY(0); }
+.lt-sheet-backdrop.is-open { opacity: 1; visibility: visible; }
+
+/* when previewing inside the fixed phone frame, pin to the frame instead of the viewport */
+.lt-scope-frame .lt-sheet,
+.lt-scope-frame .lt-sheet-backdrop,
+.lt-scope-frame .lt-whatsapp { position: absolute; }

@@ -1,0 +1,15 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 20.736 20.736" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="MagnifyingGlass">
+<g clip-path="url(#clip0_0_231)">
+<g id="Vector">
+</g>
+<path id="Vector_2" d="M9.07206 15.552C12.6509 15.552 15.5521 12.6508 15.5521 9.07203C15.5521 5.49322 12.6509 2.59203 9.07206 2.59203C5.49326 2.59203 2.59206 5.49322 2.59206 9.07203C2.59206 12.6508 5.49326 15.552 9.07206 15.552Z" stroke="var(--stroke-0, black)" stroke-width="1.296" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M13.654 13.6542L18.1438 18.144" stroke="var(--stroke-0, black)" stroke-width="1.296" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_231">
+<rect width="20.736" height="20.736" rx="10.368" fill="white"/>
+</clipPath>
+</defs>
+</svg>
