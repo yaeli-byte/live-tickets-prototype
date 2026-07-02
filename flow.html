@@ -986,7 +986,7 @@ function accountDrawer(){
   return `
   <div class="drawer-backdrop ${open?'open':''}" data-act="close-drawer"></div>
   <aside class="drawer ${open?'open':''}">
-    <div class="dh"><div class="t">האזור האישי</div><div class="s">התחברו כדי לראות הזמנות והעדפות</div></div>
+    <div class="dh"><button class="dh-x" data-act="close-drawer" aria-label="סגירה">×</button><div class="dtxt"><div class="t">האזור האישי</div><div class="s">התחברו כדי לראות הזמנות והעדפות</div></div></div>
     <div class="db">
       ${D.accountGroups.map(g=>`<button class="drow">${g.n}<span>${g.e}</span></button>`).join('')}
     </div>
@@ -1034,7 +1034,7 @@ function categoriesDrawer(){
   return `
   <div class="drawer-backdrop ${open?'open':''}" data-act="close-drawer"></div>
   <aside class="drawer ${open?'open':''}">
-    <div class="dh"><div class="t">קטגוריות</div></div>
+    <div class="dh"><button class="dh-x" data-act="close-drawer" aria-label="סגירה">×</button><div class="t">קטגוריות</div></div>
     <div class="db">
       <button class="drow drow-occasion" data-act="occasion"><span class="occ-date">${OCCASION.dateRange}</span><span class="occ-lbl">✦ ${OCCASION.label}</span></button>
       ${secHtml}</div>
