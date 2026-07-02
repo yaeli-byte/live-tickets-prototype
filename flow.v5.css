@@ -128,6 +128,142 @@ img{display:block;}
 .hero-big .hb-play:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.3);}
 .hero-big .hb-price{font-size:13px;color:rgba(255,255,255,.9);font-weight:600;}
 
+/* ============ SPORTS PAGES (Football / NBA / Team) ============ */
+/* featured promoted card — solid gradient, no photo; SAME height as the pop hero (.hero-big) */
+.hero-big.hb--feat{padding:18px;}
+.hb--green{background:linear-gradient(150deg,#1e3a2b 0%,#0f2019 60%,#0a1712 100%);}
+.hb--purple{background:linear-gradient(150deg,#3a2454 0%,#241436 60%,#160c22 100%);}
+.hb--navy{background:linear-gradient(150deg,#22304f 0%,#141d33 60%,#0c1120 100%);}
+.hb-stripes{position:absolute;inset:0;opacity:.5;
+  background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 22px);}
+.hero-big .hb-badge.promo{background:var(--pink);display:flex;align-items:center;gap:4px;}
+
+/* קבוצות מובילות — 2-col team grid */
+.teamgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 16px 0;}
+.teamcard{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);
+  border-radius:12px;padding:10px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;}
+.teamcard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08);border-color:#cfcfcf;}
+.teamcard .lheart{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:#fff;
+  display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;cursor:pointer;transition:.15s;}
+.teamcard .lheart svg{width:14px;height:14px;}
+.teamcard .lheart.on{background:var(--pink);border-color:var(--pink);color:#fff;}
+.teamcard .tc-info{flex:1;text-align:right;min-width:0;}
+.teamcard .tc-name{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.teamcard .tc-price{font-size:11px;font-weight:700;color:var(--pink);margin-top:2px;}
+.teamcard .tc-thumb{width:40px;height:40px;border-radius:8px;background:#e9e9ee;flex-shrink:0;}
+
+/* game/match list — date box · info · price */
+.gamelist{display:flex;flex-direction:column;gap:8px;padding:14px 16px 0;}
+.gamecard{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--border);
+  border-radius:12px;padding:12px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;}
+.gamecard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08);border-color:#cfcfcf;}
+.gamecard .gc-date{flex-shrink:0;width:40px;text-align:center;line-height:1.05;}
+.gamecard .gc-date .d{display:block;font-size:20px;font-weight:700;color:var(--ink);}
+.gamecard .gc-date .mo{display:block;font-size:11px;color:var(--muted);}
+.gamecard .gc-info{flex:1;text-align:right;min-width:0;}
+.gamecard .gc-name{font-size:14px;font-weight:600;color:var(--ink);}
+.gamecard .gc-venue{font-size:11px;color:var(--muted);margin-top:1px;}
+.gamecard .gc-ok{display:inline-block;margin-top:6px;font-size:10px;font-weight:600;color:#128a4b;background:#e7f6ee;border-radius:5px;padding:2px 7px;}
+.gamecard .gc-price{flex-shrink:0;text-align:left;}
+.gamecard .gc-price .amt{font-size:14px;font-weight:700;color:var(--pink);white-space:nowrap;}
+.gamecard .gc-price .badge{display:block;margin-top:4px;font-size:9px;font-weight:600;color:var(--orange);}
+
+/* דרבי ומשחקי יריבות — big dark cards */
+.derbyrow{padding-inline-start:16px;}
+.derbycard{position:relative;flex-shrink:0;width:230px;height:150px;border-radius:14px;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;padding:14px;cursor:pointer;
+  transition:transform .15s,box-shadow .15s;}
+.derbycard:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.18);}
+.derbycard .derby-badge{position:absolute;top:12px;right:12px;z-index:1;background:var(--pink);color:#fff;
+  font-size:10px;font-weight:600;border-radius:6px;padding:3px 9px;}
+.derbycard .derby-body{position:relative;z-index:1;color:#fff;text-align:right;}
+.derbycard .derby-name{font-size:17px;font-weight:700;line-height:1.15;}
+.derbycard .derby-info{font-size:11px;color:rgba(255,255,255,.8);margin-top:4px;}
+.derbycard .derby-price{font-size:12px;font-weight:700;color:#fff;margin-top:6px;}
+
+/* sport tabs (NBA) */
+.sporttabs{display:flex;gap:4px;overflow-x:auto;direction:rtl;padding:16px 16px 0;scrollbar-width:none;
+  border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--page);z-index:5;}
+.sporttabs::-webkit-scrollbar{display:none;}
+.stab{flex-shrink:0;background:none;border:none;font-family:inherit;font-size:14px;color:var(--muted);
+  padding:8px 14px 12px;cursor:pointer;position:relative;transition:color .15s;}
+.stab.on{color:var(--pink);font-weight:600;}
+.stab.on::after{content:"";position:absolute;bottom:-1px;left:8px;right:8px;height:2.5px;background:var(--pink);border-radius:2px;}
+
+/* followed teams chips */
+.followrow{display:flex;gap:8px;overflow-x:auto;direction:rtl;padding:14px 16px 0;scrollbar-width:none;}
+.followrow::-webkit-scrollbar{display:none;}
+.follow-chip{flex-shrink:0;background:#fff;border:1.5px solid var(--pink);color:var(--pink);border-radius:18px;
+  font-family:inherit;font-size:13px;font-weight:600;padding:8px 14px;cursor:pointer;transition:.15s;}
+.follow-chip.on{background:var(--pink);color:#fff;}
+.follow-chip.add{border-style:dashed;border-color:var(--border);color:var(--muted);}
+
+/* standings table */
+.standings{margin:14px 16px 0;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.conf-head{background:#f6f6f8;font-size:11px;font-weight:700;color:var(--muted);padding:8px 14px;text-align:right;}
+.strow{display:flex;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid var(--line);cursor:pointer;transition:background .15s;}
+.strow:hover{background:#fafafa;}
+.standings .st-rank{width:20px;text-align:center;font-size:13px;font-weight:700;color:var(--muted);order:3;}
+.standings .st-name{flex:1;text-align:right;font-size:14px;font-weight:600;color:var(--ink);order:2;}
+.standings .st-w{font-size:12px;color:var(--muted);order:1;text-align:left;}
+.leaders{display:flex;gap:8px;padding:12px 14px;background:#faf7ff;border-top:1px solid var(--line);}
+.leader{flex:1;text-align:center;}
+.leader .ll{font-size:10px;color:var(--muted);}
+.leader .lv{font-size:12px;font-weight:700;color:var(--ink);margin-top:3px;}
+
+/* player cards (שחקני על) */
+.playerrow{padding-inline-start:16px;}
+.playercard{flex-shrink:0;width:120px;background:#fff;border:1px solid var(--border);border-radius:14px;
+  padding:14px 10px;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.playercard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08);}
+.pc-avatar{width:56px;height:56px;border-radius:50%;background:#e9e9ee;margin:0 auto 8px;}
+.pc-name{font-size:13px;font-weight:600;color:var(--ink);}
+.pc-team{font-size:11px;color:var(--muted);margin-top:2px;}
+.pc-follow{margin-top:9px;width:100%;background:#fff;border:1.5px solid var(--pink);color:var(--pink);
+  border-radius:16px;font-family:inherit;font-size:11px;font-weight:600;padding:6px 0;cursor:pointer;transition:.15s;}
+.pc-follow.on{background:var(--pink);color:#fff;}
+.sec-note{padding:10px 16px 0;font-size:11px;color:var(--muted);text-align:left;}
+
+/* video highlights block */
+.videoblock{position:relative;margin:14px 16px 0;height:170px;border-radius:14px;background:#e9e9ee;
+  display:flex;align-items:center;justify-content:center;}
+.vb-play{width:56px;height:56px;border-radius:50%;background:var(--pink);color:#fff;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;}
+.vb-play svg{width:22px;height:22px;margin-inline-start:3px;}
+.vb-cap{position:absolute;bottom:12px;right:14px;font-size:12px;color:#555;}
+.videothumbs{display:flex;gap:8px;padding:8px 16px 0;}
+.videothumbs span{flex:1;height:64px;border-radius:10px;background:#eeeef1;}
+
+/* player stats table */
+.stattable{margin:14px 16px 0;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.stattable .strow{display:grid;grid-template-columns:44px 44px 1fr 1fr 1.2fr;align-items:center;gap:6px;
+  padding:11px 12px;font-size:12px;color:var(--ink);text-align:center;}
+.stattable .sthead{background:#f6f6f8;font-size:10px;font-weight:700;color:var(--muted);border-top:none;}
+.stattable .st-pl{text-align:right;font-weight:600;}
+.stattable .st-pts{font-weight:700;color:var(--pink);}
+.stattable .mini-heart{background:none;border:none;color:var(--border);font-size:15px;cursor:pointer;transition:color .15s;}
+.stattable .mini-heart.on{color:var(--pink);}
+
+/* ===== Team lobby (Page C) ===== */
+.lobby-hero.team-hero{background:linear-gradient(160deg,#2a3c5e 0%,#1a2540 55%,#0f1626 100%);}
+/* standings — highlighted "me" row + recent-form column */
+.standings .strow.me{background:#fdeef4;}
+.standings .strow.me .st-name{color:var(--pink);}
+.standings .st-pts{font-size:12px;font-weight:700;color:var(--ink);order:1;text-align:left;white-space:nowrap;}
+.standings .strow.me .st-pts{color:var(--pink);}
+.standings .st-form{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:1px;order:0;text-align:left;min-width:64px;}
+/* head-to-head */
+.h2h{display:flex;gap:8px;margin:0 16px;}
+.h2h-cell{flex:1;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;}
+.h2h-cell .hv{font-size:24px;font-weight:700;color:var(--ink);}
+.h2h-cell .hl{font-size:11px;color:var(--muted);margin-top:3px;}
+/* squad avatars */
+.squadrow{padding-inline-start:16px;gap:14px;}
+.squad{flex-shrink:0;text-align:center;cursor:pointer;width:64px;}
+.squad-av{width:60px;height:60px;border-radius:50%;background:#e9e9ee;margin:0 auto 6px;transition:transform .15s;}
+.squad:hover .squad-av{transform:translateY(-2px);}
+.squad-name{font-size:11px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
 /* playlist play button + now-playing highlight */
 .playlist .ph{display:flex;align-items:center;gap:11px;}
 .pl-play{width:42px;height:42px;border-radius:50%;background:var(--spotify);color:#062b12;border:none;
