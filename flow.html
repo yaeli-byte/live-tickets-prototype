@@ -28,7 +28,7 @@ const state = {
   srQuery:'', srPhase:'idle', srSortBy:'best', srFilterSheet:false, srHearts:{},
   srRecent:['קולדפליי','ריאל מדריד','טיילור סוויפט'],
   p1LastMinute:false, p1GenreSelected:null, p1CitySelected:null, p1DateLabel:null,
-  p1SpotifyConnected:false, playing:false, playIdx:0, plCurrent:0,
+  p1SpotifyConnected:false, playing:false, playIdx:0, plCurrent:0, plPopOpen:false,
   // shared calendar date-picker
   dpYear:2026, dpMonth:6, dpStart:null, dpEnd:null, dpFlex:'exact',
   hearts:{}, faqOpen:0,
@@ -36,7 +36,8 @@ const state = {
   following:false, setlistOpen:false, tourExpanded:false, bioExpanded:false, faqP2Open:0,
   p2DateSel:null, p2CitySel:null, p2QtySel:null, p2Together:false,
   // P3 (event)
-  heroCollapsed:false, selectedSection:null, sortBy:'best', highlightListing:null,
+  heroCollapsed:false, selectedSection:null, sortBy:'best', highlightListing:null, eventKey:'coldplay',
+  evTitle:'', evVenue:'', evDate:'', evPrice:'', evImg:'',
   p3f:{together:false, front:false, view:false, access:false}, p3Qty:null, p3Min:'', p3Max:'',
   setlistP3Open:false, faqP3Open:0,
   // ---- sports pages (A=football / B=nba / C=team lobby) ----
@@ -182,21 +183,26 @@ const D = {
   // ---- Home (page 0) ----
   homeRecent:[
     {name:'קולדפליי',meta:'לונדון · 4 יולי',img:'artist1.jpg',hot:true},
+    {name:'ריאל מדריד',meta:'לה ליגה · נצפה',img:'team-realmadrid.jpg',act:'team',team:'real'},
     {name:'טיילור סוויפט',meta:'פריז · 20 יולי',img:'artist2.jpg'},
+    {name:'לייקרס נגד סלטיקס',meta:'NBA · נצפה',img:'nba.jpg',act:'event'},
     {name:'אד שירן',meta:'מדריד · 3 אוג׳',img:'artist3.jpg'},
     {name:'דואה ליפה',meta:'ברצלונה · 15 אוג׳',img:'artist4.jpg',hot:true},
   ],
   homeTrending:[
+    {name:'לייקרס נגד סלטיקס',meta:'NBA · 14 יולי · Crypto.com',img:'nba.jpg',act:'event',badge:'🔥 דרבי'},
+    {name:'אל קלאסיקו',meta:'ריאל נגד ברצלונה · 14 יול',img:'team-realmadrid.jpg',act:'event',badge:'🔖 מקודם',event:'clasico'},
     {name:'BTS',meta:'טוקיו · 28 אוג׳',img:'artist5.jpg',hot:true},
     {name:'הארי סטיילס',meta:'אמסטרדם · 18 ספט׳',img:'artist6.jpg'},
-    {name:'בילי אייליש',meta:'רומא · 30 ספט׳',img:'artist7.jpg'},
+    {name:'מנצ׳סטר דרבי',meta:'סיטי נגד יונייטד · 27 יול',img:'sport3.jpg',act:'event'},
     {name:'דה וויקנד',meta:'ברלין · 5 אוק׳',img:'artist8.jpg'},
   ],
   homeSuggested:[
+    {name:'ריאל מדריד',sub:'לה ליגה · עוקבים 5,410',price:'₪690',img:'team-realmadrid.jpg',act:'team',team:'real'},
     {name:'קולדפליי',sub:'פופ · רוק · 6 הופעות',price:'₪520',img:'artist1.jpg'},
+    {name:'לוס אנג׳לס לייקרס',sub:'NBA · מובילי המערב',price:'₪320',img:'nba.jpg',act:'team',team:'lakers'},
     {name:'מטאליקה',sub:'מטאל · רוק · 4 הופעות',price:'₪690',img:'artist2.jpg'},
     {name:'אדל',sub:'פופ · בלדות · 3 הופעות',price:'₪780',img:'artist3.jpg'},
-    {name:'דרייק',sub:'היפ הופ · 5 הופעות',price:'₪610',img:'artist4.jpg'},
   ],
   homeTiktok:[
     {n:'BTS טוקיו 🎤',l:'445K ❤',img:'tiktok1.jpg'},
@@ -205,7 +211,7 @@ const D = {
     {n:'קולדפליי לונדון 🎤',l:'87K ❤',img:'tiktok4.jpg'},
   ],
   homeGenres:[{n:'פופ',img:'artist4.jpg'},{n:'רוק',img:'artist1.jpg'},{n:'היפ-הופ',img:'artist2.jpg'},{n:'לטין',img:'tiktok3.jpg'},{n:'קלאסי',img:'artist3.jpg'},{n:'ג׳אז',img:'artist6.jpg'}],
-  homeTravel:[{n:'ספרד',img:'dest-spain.jpg'},{n:'איטליה',img:'dest-italy.jpg'},{n:'ספורט',img:'sport1.jpg'}],
+  homeTravel:[{n:'מדריד',img:'dest-spain.jpg'},{n:'לונדון',img:'sport1.jpg'},{n:'לאס וגאס',img:'sport3.jpg'},{n:'ספרד',img:'dest-spain.jpg'},{n:'איטליה',img:'dest-italy.jpg'}],
   homeTestimonials:[
     {name:'דנה כהן',event:'קולדפליי · לונדון',color:'#ed1860',quote:'חוויה מטורפת! הזמנתי כרטיסים לקולדפליי והכל היה חלק. ממליצה בחום 🎤'},
     {name:'יוסי לוי',event:'BTS · טוקיו',color:'#6a3fd1',quote:'הפכתי הופעה בטוקיו לחופשה שלמה. הכרטיסים הגיעו מיד. פשוט מושלם.'},
@@ -255,10 +261,10 @@ const FOOTBALL = {
   title:'כרטיסים לכדורגל',
   lede:'משחקי הכדורגל הגדולים בעולם · מחירים all-in',
   hue:'green',
-  featured:{ name:'אל קלאסיקו · ריאל נגד ברצלונה', tag:'לה ליגה · אצטדיון ברנבאו · מדריד · 14 יולי', price:'₪690' },
+  featured:{ name:'אל קלאסיקו · ריאל נגד ברצלונה', tag:'לה ליגה · אצטדיון ברנבאו · מדריד · 14 יולי', price:'₪690', event:'clasico' },
   leagues:[
-    {n:'ליגת האלופות',img:'artist5.jpg'},{n:'פרמייר ליג',img:'artist6.jpg'},
-    {n:'לה ליגה',img:'dest-spain.jpg'},{n:'מונדיאל 2026',img:'artist1.jpg'},
+    {n:'ליגת האלופות',img:'ucl.jpg'},{n:'פרמייר ליג',img:'sport1.jpg'},
+    {n:'לה ליגה',img:'laliga.jpg'},{n:'מונדיאל 2026',img:'sport2.jpg'},
   ],
   teams:[
     {n:'ריאל מדריד',p:'₪690',key:'real'},{n:'ברצלונה',p:'₪640',key:'barca'},
@@ -271,7 +277,7 @@ const FOOTBALL = {
   ],
   derbies:[
     {badge:'דרבי',name:'מנצ׳סטר דרבי',info:'27 יול · אתיחאד',price:'₪620'},
-    {badge:'🔖 קלאסיקו',name:'ריאל נגד ברצלונה',info:'14 יול · ברנבאו',price:'₪690'},
+    {badge:'🔖 קלאסיקו',name:'ריאל נגד ברצלונה',info:'14 יול · ברנבאו',price:'₪690',event:'clasico'},
   ],
   faq:[
     {q:'האם אפשר 4 מקומות צמודים?',a:'כן. בבחירת הכמות סמנו "ישיבה יחד" ונשריין לכם מושבים צמודים באותו אזור, בכפוף לזמינות.'},
@@ -327,7 +333,7 @@ const REAL = {
   name:'ריאל מדריד', sub:'לה ליגה · ליגת האלופות',
   followers:'5,410', watching:'2,180',
   fixtures:[
-    {d:'14',dow:"יול · ש׳",opp:'נגד ברצלונה',info:'אל קלאסיקו · אצטדיון ברנבאו',price:'₪690'},
+    {d:'14',dow:"יול · ש׳",opp:'נגד ברצלונה',info:'אל קלאסיקו · אצטדיון ברנבאו',price:'₪690',ev:'clasico'},
     {d:'21',dow:"יול · ב׳",opp:'נגד אתלטיקו מדריד',info:'דרבי מדריד · ברנבאו',price:'₪620'},
     {d:'5',dow:"מאי · ג׳",opp:'נגד מנצ׳סטר סיטי',info:'חצי גמר ליגת האלופות · ברנבאו',price:'₪1,200'},
   ],
@@ -352,6 +358,33 @@ const REAL = {
     {n:'מנצ׳סטר סיטי',key:'city'},{n:'באיירן מינכן',key:'bayern'},
   ],
 };
+
+/* ---------- event pages (concert / match) — pageEvent renders by state.eventKey ---------- */
+const EVENTS = {
+  coldplay:{ img:'artist1.jpg', h1:'קולדפליי', venue:'📍 אצטדיון ומבלי, לונדון', date:'📅 4 ביולי 2026 · 20:00',
+    price:'₪520', stats:'🔥 נותרו 8 · 140 צופים עכשיו', slimT:'קולדפליי · ומבלי', slimD:'4 ביולי · 20:00', type:'concert', back:2 },
+  clasico:{ img:'team-realmadrid.jpg', h1:'אל קלאסיקו · ריאל נגד ברצלונה', venue:'📍 אצטדיון סנטיאגו ברנבאו, מדריד', date:'📅 14 ביולי 2026 · 22:00',
+    price:'₪690', stats:'🔥 נותרו 12 · 320 צופים עכשיו', slimT:'אל קלאסיקו · ברנבאו', slimD:'14 ביולי · 22:00', type:'match', back:7 },
+  // generic match — title/venue/date/price come from the clicked card (data-ev-*)
+  match:{ img:'sport1.jpg', dynamic:true, venue:'📍 אצטדיון', date:'📅 מועד המשחק', price:'₪—', stats:'🔥 כרטיסים אחרונים · מבוקש', type:'match', back:0 },
+};
+
+/* ---------- team directory (♡-followed teams feed the home rails) ---------- */
+const TEAM_DIR = {
+  real:{name:'ריאל מדריד',sub:'לה ליגה · עוקבים 5,410',meta:'לה ליגה · עוקבים',price:'₪690',img:'team-realmadrid.jpg',act:'team',team:'real'},
+  lakers:{name:'לוס אנג׳לס לייקרס',sub:'NBA · מובילי המערב',meta:'NBA · עוקבים',price:'₪320',img:'nba.jpg',act:'team',team:'lakers'},
+  celtics:{name:'בוסטון סלטיקס',sub:'NBA · אלופי המזרח',meta:'NBA · עוקבים',price:'₪340',img:'nba.jpg',act:'team',team:'celtics'},
+  nuggets:{name:'דנבר נאגטס',sub:'NBA · מובילי המערב',meta:'NBA · עוקבים',price:'₪300',img:'nba.jpg',act:'team',team:'nuggets'},
+  barca:{name:'ברצלונה',sub:'לה ליגה · עוקבים',meta:'לה ליגה · עוקבים',price:'₪640',img:'team-barcelona.jpg',act:'team',team:'barca'},
+  city:{name:'מנצ׳סטר סיטי',sub:'פרמייר ליג · עוקבים',meta:'פרמייר ליג · עוקבים',price:'₪540',img:'sport3.jpg',act:'team',team:'city'},
+};
+
+/* ---------- promoted-sport band (mirrors "הופעות מקודמות") ---------- */
+const PROMOTED_SPORT = [
+  {badge:'🔖 קלאסיקו',name:'ריאל נגד ברצלונה',info:'14 יול · ברנבאו · מדריד',price:'₪690',hue:'green',event:'clasico'},
+  {badge:'דרבי',name:'לייקרס נגד סלטיקס',info:'14 יול · Crypto.com · LA',price:'₪320',hue:'purple'},
+  {badge:'🔥 ביג מאץ׳',name:'מנצ׳סטר דרבי',info:'27 יול · אתיחאד',price:'₪620',hue:'green'},
+];
 
 /* ---------- svg icons ---------- */
 const ICON = {
@@ -395,13 +428,13 @@ function header(){
     <div class="promo-strip"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
     <nav class="nav">
       <div class="nav-group">
-        <button class="circle-btn" data-act="drawer">${ICON.menu}</button>
-        <a data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
+        <button class="circle-btn" data-act="favs">${ICON.heart}<span class="nav-badge">${state.favCount}</span></button>
+        <button class="circle-btn" data-act="account">${ICON.user}</button>
+        <button class="circle-btn" data-act="search">${ICON.search}</button>
       </div>
       <div class="nav-group">
-        <button class="circle-btn" data-act="search">${ICON.search}</button>
-        <button class="circle-btn" data-act="account">${ICON.user}</button>
-        <button class="circle-btn" data-act="favs">${ICON.heart}<span class="nav-badge">${state.favCount}</span></button>
+        <a data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
+        <button class="circle-btn" data-act="drawer">${ICON.menu}</button>
       </div>
     </nav>
   </header>`;
@@ -412,23 +445,88 @@ function whatsapp(){
   return `<a class="wa" href="https://wa.me/972500000000" target="_blank" rel="noopener" aria-label="WhatsApp"><img src="assets/icon-whatsapp.svg" alt=""></a>`;
 }
 
+/* ---------- shared Spotify playlist component (expandable, in-page playable) ---------- */
+function spotifyPlaylist(title, meta, tracks, open, toggleAct){
+  return `
+  <div class="playlist ${open?'open':''}" style="margin-top:0">
+    <button class="ph ph-toggle" data-act="${toggleAct}">
+      <span class="pl-caret">${open?'▴':'▾'}</span>
+      <div class="pt"><div class="t">${title}</div><div class="s">${meta}</div></div>
+      <div class="pico">🎵</div>
+    </button>
+    <div class="pl-tracks">
+      <ol>${tracks.map((t,i)=>`<li data-act="pl-track" data-i="${i}" class="${state.playing&&state.plCurrent===i?'playing':''}"><span class="pl-row-play">${state.playing&&state.plCurrent===i?'⏸':'▶'}</span><span class="pl-t">${t}</span><span class="num">${i+1}</span></li>`).join('')}</ol>
+    </div>
+  </div>`;
+}
+
 /* ============================================================
    PAGE 0 — HOME  (מה בא לכם לראות?)
    Artist cards → Lobby · genres/tiles → Category · search everywhere
    ============================================================ */
 function pageHome(){
-  const artistCard=a=>`
-    <div class="ecard" data-act="lobby">
-      <div class="media"><img src="${IMG}${a.img}" alt="${a.name}">
-        <div class="top"><button class="heart ${state.hearts['h_'+a.name]?'on':''}" data-heart="h_${a.name}">${ICON.hs}</button>${a.hot?'<span class="badge">🔥 אוזל</span>':'<span></span>'}</div>
+  // content-type-agnostic card: routes by act (lobby/team/event); teams follow via ♡
+  const eCard=x=>{
+    const team = x.act==='team';
+    const hOn  = team ? state.followed[x.team] : state.hearts['h_'+x.name];
+    const hAttr= team ? `data-follow-team="${x.team}"` : `data-heart="h_${x.name}"`;
+    const badge= x.hot?'<span class="badge">🔥 אוזל</span>':(x.badge?`<span class="badge">${x.badge}</span>`:'<span></span>');
+    return `
+    <div class="ecard" data-act="${x.act||'lobby'}"${x.team?` data-team="${x.team}"`:''}${x.title?` data-title="${x.title}"`:''}${x.event?` data-event="${x.event}"`:(x.act==='event'?` data-event="match" data-ev-title="${x.name}" data-ev-venue="${x.meta}" data-ev-img="${x.img}"`:'')}>
+      <div class="media"><img src="${IMG}${x.img}" alt="${x.name}">
+        <div class="top"><button class="heart ${hOn?'on':''}" ${hAttr}>${ICON.hs}</button>${badge}</div>
       </div>
-      <div class="meta"><div class="en">${a.name}</div><div class="esub">${a.meta}</div></div>
+      <div class="meta"><div class="en">${x.name}</div><div class="esub">${x.meta}</div></div>
     </div>`;
+  };
+  const lCard=a=>{
+    const team = a.act==='team';
+    const hOn  = team ? state.followed[a.team] : state.hearts['hs_'+a.name];
+    const hAttr= team ? `data-follow-team="${a.team}"` : `data-heart="hs_${a.name}"`;
+    return `
+      <div class="listcard" data-act="${a.act||'lobby'}"${a.team?` data-team="${a.team}"`:''}>
+        <span class="lheart ${hOn?'on':''}" ${hAttr}>${ICON.hs}</span>
+        <div class="lbody"><div class="lrow">
+          <div class="lprice"><span class="amt">מ-${a.price}</span><span class="allin">כולל עמלות</span></div>
+          <div class="linfo"><div class="lname">${a.name}</div><div class="lsub">${a.sub}</div></div>
+        </div></div>
+        <img class="lthumb" src="${IMG}${a.img}" alt="${a.name}">
+      </div>`;
+  };
+  const tile=x=>`<div class="cat-card" data-act="${x.act||'category'}"${x.title?` data-title="${x.title}"`:''}${x.team?` data-team="${x.team}"`:''}><img class="card-img" src="${IMG}${x.img}" alt=""><span>${x.n}</span></div>`;
+  const derby=d=>`
+    <div class="derbycard hb--${d.hue}" data-act="event" data-event="${d.event||'match'}" data-ev-title="${d.name}" data-ev-venue="${d.info}" data-ev-price="${d.price}">
+      <div class="hb-stripes"></div>
+      <span class="derby-badge">${d.badge}</span>
+      <div class="derby-body"><div class="derby-name">${d.name}</div><div class="derby-info">${d.info}</div><div class="derby-price">מ-${d.price}</div></div>
+    </div>`;
+  // vertical 160×230 poster card (trending) — cover image, heart, badge, name+sub
+  const pCard=x=>{
+    const team = x.act==='team';
+    const hOn  = team ? state.followed[x.team] : state.hearts['p_'+x.name];
+    const hAttr= team ? `data-follow-team="${x.team}"` : `data-heart="p_${x.name}"`;
+    const badge= x.hot?'🔥 אוזל':(x.badge||'');
+    const evAttr = x.event?` data-event="${x.event}"`:(x.act==='event'?` data-event="match" data-ev-title="${x.name}" data-ev-venue="${x.meta}" data-ev-img="${x.img}"`:'');
+    return `
+    <div class="pcard" data-act="${x.act||'lobby'}"${x.team?` data-team="${x.team}"`:''}${evAttr}>
+      <img class="pc-img" src="${IMG}${x.img}" alt="${x.name}">
+      <div class="pc-glow"></div><div class="pc-scrim"></div>
+      <button class="pc-heart ${hOn?'on':''}" ${hAttr}>${ICON.hs}</button>
+      ${badge?`<span class="pc-badge">${badge}</span>`:''}
+      <div class="pc-meta"><div class="pc-name">${x.name}</div><div class="pc-sub">${x.meta}</div></div>
+    </div>`;
+  };
+  // ♡-followed teams feed "בשבילך" (personalized) — prepended, then music suggestions
+  const followedKeys = Object.keys(state.followed).filter(k=>state.followed[k] && TEAM_DIR[k]);
+  const forYou = [...followedKeys.map(k=>TEAM_DIR[k]), ...D.homeSuggested.filter(a=>!(a.team && followedKeys.includes(a.team)))];
   return `
   <section class="home-hero">
+    <div class="hero-slide" style="background-image:url('assets/hero-1.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('assets/hero-2.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('assets/hero-3.jpg')"></div>
     <p class="eyebrow">✨ החוויות הכי גדולות בעולם — במרחק טיסה אחת</p>
     <h1>מה בא לכם לראות?</h1>
-    <p class="sub">כרטיסים להופעות, ספורט ופסטיבלים בחו״ל · אחריות 100% · אישור מיידי</p>
+    <p class="sub">חברו את Spotify וקבלו המלצות מותאמות אישית לפי המוזיקה שאתם אוהבים</p>
     <div class="hh-search" data-act="search">${ICON.searchSm}<span>חפשו אמן, הופעה, עיר…</span></div>
   </section>
 
@@ -439,13 +537,19 @@ function pageHome(){
   </div>
 
   <section class="section">
-    <div class="sec-head"><a class="sec-link" data-act="category">לכל המועדפים ›</a><h2 class="sec-title">צפית לאחרונה</h2></div>
-    <div class="hscroll">${D.homeRecent.map(artistCard).join('')}</div>
+    <div class="sec-head"><a class="sec-link" data-act="soon" data-title="המועדפים שלי">לכל המועדפים ›</a><h2 class="sec-title">צפית לאחרונה</h2></div>
+    <div class="hscroll">${D.homeRecent.map(eCard).join('')}</div>
   </section>
 
   <section class="section">
-    <div class="sec-head"><a class="sec-link" data-act="category">הכל ›</a><h2 class="sec-title">טרנדיים עכשיו</h2></div>
-    <div class="hscroll">${D.homeTrending.map(artistCard).join('')}</div>
+    <div class="sec-head"><a class="sec-link" data-act="soon" data-title="טרנדיים עכשיו">הכל ›</a><h2 class="sec-title">טרנדיים עכשיו</h2></div>
+    <div class="hscroll">${D.homeTrending.map(pCard).join('')}</div>
+  </section>
+
+  <!-- ===== ספורט מקודם ===== (above TikTok) -->
+  <section class="section">
+    <div class="sec-head"><a class="sec-link" data-act="football">הכל ›</a><h2 class="sec-title">ספורט מקודם</h2></div>
+    <div class="hscroll derbyrow">${PROMOTED_SPORT.map(derby).join('')}</div>
   </section>
 
   <section class="section">
@@ -454,36 +558,27 @@ function pageHome(){
   </section>
 
   <section class="section" style="padding-left:16px;padding-right:16px">
-    <div class="sec-head" style="padding:0;justify-content:flex-end"><h2 class="sec-title">אמנים שאולי תאהבו</h2></div>
-    <div class="listcards" style="padding:12px 0 0">
-      ${D.homeSuggested.map(a=>`
-        <div class="listcard" data-act="lobby">
-          <span class="lheart ${state.hearts['hs_'+a.name]?'on':''}" data-heart="hs_${a.name}">${ICON.hs}</span>
-          <div class="lbody"><div class="lrow">
-            <div class="lprice"><span class="amt">מ-${a.price}</span><span class="allin">כולל עמלות</span></div>
-            <div class="linfo"><div class="lname">${a.name}</div><div class="lsub">${a.sub}</div></div>
-          </div></div>
-          <img class="lthumb" src="${IMG}${a.img}" alt="${a.name}">
-        </div>`).join('')}
-    </div>
+    <div class="sec-head" style="padding:0;justify-content:flex-end"><h2 class="sec-title">בשבילך</h2></div>
+    <div class="listcards" style="padding:12px 0 0">${forYou.map(lCard).join('')}</div>
   </section>
 
+  <!-- ===== testimonials (above genres) ===== -->
   <section class="section">
-    <div class="sec-head"><span></span><h2 class="sec-title">עיון לפי ז׳אנר</h2></div>
-    <div class="hscroll cat-row">${D.homeGenres.map(g=>`<div class="cat-card" data-act="category"><img class="card-img" src="${IMG}${g.img}" alt=""><span>${g.n}</span></div>`).join('')}</div>
-  </section>
-
-  <section class="section">
-    <div class="sec-head"><span></span><h2 class="sec-title">לאן בא לכם לנסוע?</h2></div>
-    <div class="hscroll cat-row">${D.homeTravel.map(t=>`<div class="cat-card" data-act="category"><img class="card-img" src="${IMG}${t.img}" alt=""><span>${t.n}</span></div>`).join('')}</div>
-  </section>
-
-  <section class="section">
-    <div class="sec-head"><a class="sec-link">כל הביקורות ›</a><h2 class="sec-title">מה אומרים עלינו</h2></div>
+    <div class="sec-head"><a class="sec-link" data-act="soon" data-title="ביקורות לקוחות">כל הביקורות ›</a><h2 class="sec-title">מה אומרים עלינו</h2></div>
     <div class="hscroll">${D.homeTestimonials.map(t=>`
       <div class="tcard"><div class="stars">★★★★★</div><p class="tquote">${t.quote}</p>
         <div class="tperson"><div class="twho"><span class="tn">${t.name}</span><span class="tev">${t.event}</span></div><span class="tav" style="background:${t.color}">${t.name.trim()[0]}</span></div>
       </div>`).join('')}</div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">עיון לפי ז׳אנר</h2></div>
+    <div class="hscroll cat-row">${D.homeGenres.map(tile).join('')}</div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">לאן בא לכם לנסוע?</h2></div>
+    <div class="hscroll cat-row">${D.homeTravel.map(tile).join('')}</div>
   </section>
 
   <section class="faq">
@@ -505,7 +600,7 @@ function pageOccasion(){
     <a data-act="home">בית</a>
   </nav>
   <section class="cat-hero">
-    <div class="hero-big" style="height:46vh;min-height:340px">
+    <div class="hero-big" style="height:46vh;min-height:340px" data-event="match" data-ev-title="${OCCASION.label}" data-ev-venue="${OCCASION.dateRange} · ארה״ב · קנדה · מקסיקו" data-ev-price="₪760" data-ev-img="sport2.jpg">
       <img class="hb-img" src="${IMG}sport2.jpg" alt="${OCCASION.label}">
       <div class="hb-scrim"></div>
       <span class="hb-badge">✦ אירוע מיוחד</span>
@@ -612,14 +707,7 @@ function pageCategory(){
   <!-- הפלייליסט של פופ -->
   <section class="section">
     <div class="sec-head"><span></span><h2 class="sec-title">הפלייליסט של פופ</h2></div>
-    <div class="playlist">
-      <div class="ph">
-        <button class="pl-play" data-act="pl-play" aria-label="נגן">${state.playing?'⏸':'▶'}</button>
-        <div class="pt"><div class="t">להיטי פופ 2026</div><div class="s">Spotify · 50 שירים</div></div>
-        <div class="pico">🎵</div>
-      </div>
-      <ol>${D.playlist.map((s,i)=>`<li><span>${s.t}</span><span class="num">${s.n}</span></li>`).join('')}</ol>
-    </div>
+    ${spotifyPlaylist('להיטי פופ 2026','Spotify · 50 שירים', D.playlist.map(s=>s.t), state.plPopOpen, 'pl-pop')}
     ${state.p1SpotifyConnected ? `
       <div class="spotify on">
         <button class="disc" data-act="spotify">נתק</button>
@@ -635,7 +723,7 @@ function pageCategory(){
 
   <!-- TikTok מהקהל -->
   <section class="section">
-    <div class="sec-head"><a class="sec-link">הכל ›</a><h2 class="sec-title">TikTok <small>מהקהל</small></h2></div>
+    <div class="sec-head"><a class="sec-link" data-act="soon" data-title="TikTok מהקהל">הכל ›</a><h2 class="sec-title">TikTok <small>מהקהל</small></h2></div>
     <div class="hscroll">
       ${D.tiktok.map(t=>`
         <div class="tt-card">
@@ -690,7 +778,7 @@ function sportsCrumb(crumb){
 }
 function featuredCard(f,dest){
   return `
-  <div class="hero-big hb--feat hb--${f.hue}" data-act="${dest}">
+  <div class="hero-big hb--feat hb--${f.hue}" data-act="${dest}"${f.event?` data-event="${f.event}"`:''}>
     <div class="hb-stripes"></div>
     <button class="follow-pill ${state.following?'on':''}" data-act="follow">${state.following?'עוקבים ♥':'עקבו ♡'}</button>
     <span class="hb-badge promo">🔖 מקודם</span>
@@ -777,7 +865,7 @@ function pageFootball(){
     <div class="sec-head"><a class="sec-link" data-act="event">הכל ›</a><h2 class="sec-title">דרבי ומשחקי יריבות</h2></div>
     <div class="hscroll derbyrow">
       ${F.derbies.map(d=>`
-        <div class="derbycard hb--${F.hue}" data-act="event">
+        <div class="derbycard hb--${F.hue}" data-act="event" data-event="${d.event||'match'}" data-ev-title="${d.name}" data-ev-venue="${d.info}" data-ev-price="${d.price}">
           <div class="hb-stripes"></div>
           <span class="derby-badge">${d.badge}</span>
           <div class="derby-body"><div class="derby-name">${d.name}</div><div class="derby-info">${d.info}</div><div class="derby-price">מ-${d.price}</div></div>
@@ -794,7 +882,7 @@ function pageFootball(){
 /* game/match list card (date box · info · price) — reused by football & nba */
 function gameCard(g){
   return `
-  <div class="gamecard" data-act="event">
+  <div class="gamecard" data-act="event" data-event="${g.ev||'match'}" data-ev-title="${g.name}" data-ev-venue="${g.venue}" data-ev-price="${g.price}" data-ev-date="${g.d} ${g.mo}">
     <div class="gc-price"><span class="amt">מ-${g.price}</span>${g.hot?'<span class="badge">🔥 אוזל</span>':''}</div>
     <div class="gc-info">
       <div class="gc-name">${g.name}</div>
@@ -811,7 +899,7 @@ function gameCard(g){
 function pageNBA(){
   const N = NBA;
   const bigCard = d=>`
-    <div class="derbycard hb--${N.hue}" data-act="event">
+    <div class="derbycard hb--${N.hue}" data-act="event" data-event="match" data-ev-title="${d.name}" data-ev-venue="${d.info}" data-ev-price="${d.price}">
       <div class="hb-stripes"></div>
       <span class="derby-badge">${d.badge}</span>
       <div class="derby-body"><div class="derby-name">${d.name}</div><div class="derby-info">${d.info}</div><div class="derby-price">מ-${d.price}</div></div>
@@ -904,7 +992,7 @@ function pageNBA(){
 
   <!-- כל הקבוצות -->
   <section class="section">
-    <div class="sec-head"><a class="sec-link">A–Z ›</a><h2 class="sec-title">כל הקבוצות</h2></div>
+    <div class="sec-head"><a class="sec-link" data-act="soon" data-title="כל הקבוצות">A–Z ›</a><h2 class="sec-title">כל הקבוצות</h2></div>
     <div class="teamgrid">
       ${N.allTeams.map((t,i)=>`
         <div class="teamcard" data-act="team" data-team="${t}">
@@ -980,22 +1068,12 @@ function pageTeam(){
   <!-- Fixtures -->
   <div class="datelist">
     ${T.fixtures.map(e=>`
-      <button class="drow-ev" data-act="event">
+      <button class="drow-ev" data-act="event" data-event="${e.ev||'match'}" data-ev-title="${T.name} ${e.opp}" data-ev-venue="${e.info}" data-ev-price="${e.price}" data-ev-date="${e.d} ${e.dow}" data-ev-img="team-realmadrid.jpg">
         <span class="chev">‹</span>
         <div class="d-price"><span class="from">מ-</span><span class="amt">${e.price}</span><span class="im">אישור מיידי</span></div>
         <div class="d-info"><div class="d-city">${e.opp}</div><div class="d-venue">${e.info}</div></div>
         <div class="d-date"><div class="dd">${e.d}</div><div class="dm">${e.dow}</div></div>
       </button>`).join('')}
-  </div>
-
-  <!-- Trip bar -->
-  <div class="tripbar">
-    <button class="btn btn-orange" data-act="package">גלו עוד</button>
-    <div class="trip-txt">
-      <div class="t">הפכו את זה לטיול</div>
-      <div class="s">רכשו כרטיס למשחק וקבלו הנחות והטבות אצל השותפים שלנו — American Express / El Al</div>
-    </div>
-    <div class="trip-ico">✈️</div>
   </div>
 
   <!-- קצת יותר על הקבוצה -->
@@ -1042,7 +1120,7 @@ function pageTeam(){
 
   <!-- איך היה במשחק? (מעל שאלות נפוצות) -->
   <section class="section">
-    <div class="sec-head"><a class="sec-link">כל 512 הביקורות ›</a><h2 class="sec-title">איך היה במשחק?</h2></div>
+    <div class="sec-head"><a class="sec-link" data-act="soon" data-title="ביקורות">כל 512 הביקורות ›</a><h2 class="sec-title">איך היה במשחק?</h2></div>
     <div class="reviews">
       ${T.reviews.map(r=>`
         <div class="rev">
@@ -1083,10 +1161,10 @@ function footer(){
       <div class="row"><input type="email" placeholder="האימייל שלכם"><button>→</button></div>
     </div>
     <div class="cols">
-      <div class="col"><h4>חברה</h4><a>מי אנחנו</a><a>אמנים בהסכמה</a><a>קריירה</a></div>
-      <div class="col"><h4>עזרה ותמיכה</h4><a>שאלות נפוצות</a><a>תנאי ביטול</a><a>יצירת קשר</a></div>
-      <div class="col"><h4>ניווט מהיר</h4><a>הופעות</a><a>ספורט</a><a>ערים</a></div>
-      <div class="col"><h4>משפטי</h4><a>תנאי שימוש</a><a>פרטיות</a><a>נגישות</a></div>
+      <div class="col"><h4>חברה</h4><a data-act="soon">מי אנחנו</a><a data-act="soon">אמנים בהסכמה</a><a data-act="soon">קריירה</a></div>
+      <div class="col"><h4>עזרה ותמיכה</h4><a data-act="soon">שאלות נפוצות</a><a data-act="soon">תנאי ביטול</a><a data-act="soon">יצירת קשר</a></div>
+      <div class="col"><h4>ניווט מהיר</h4><a data-act="soon">הופעות</a><a data-act="soon">ספורט</a><a data-act="soon">ערים</a></div>
+      <div class="col"><h4>משפטי</h4><a data-act="soon">תנאי שימוש</a><a data-act="soon">פרטיות</a><a data-act="soon">נגישות</a></div>
     </div>
   </footer>`;
 }
@@ -1140,31 +1218,12 @@ function pageLobby(){
       </button>`).join('')}
   </div>
 
-  <!-- Trip bar -->
-  <div class="tripbar">
-    <button class="btn btn-orange" data-act="package">גלו עוד</button>
-    <div class="trip-txt">
-      <div class="t">הפכו את זה לטיול</div>
-      <div class="s">רכשו כרטיס להופעה וקבלו הנחות והטבות אצל השותפים שלנו — American Express / El Al</div>
-    </div>
-    <div class="trip-ico">✈️</div>
-  </div>
-
   <!-- קצת יותר על הטור -->
   <section class="section">
     <div class="sec-head"><span></span><h2 class="sec-title">קצת יותר על הטור</h2></div>
 
     <!-- Spotify — integrated, expandable, in-page playable track list -->
-    <div class="playlist ${state.setlistOpen?'open':''}" style="margin-top:0">
-      <button class="ph ph-toggle" data-act="lobby-setlist">
-        <span class="pl-caret">${state.setlistOpen?'▴':'▾'}</span>
-        <div class="pt"><div class="t">פלייליסט הטור — קולדפליי 2026</div><div class="s">8 שירים · Spotify</div></div>
-        <div class="pico">🎵</div>
-      </button>
-      <div class="pl-tracks">
-        <ol>${D.setlist.map((sName,i)=>`<li data-act="pl-track" data-i="${i}" class="${state.playing&&state.plCurrent===i?'playing':''}"><span class="pl-row-play">${state.playing&&state.plCurrent===i?'⏸':'▶'}</span><span class="pl-t">${sName}</span><span class="num">${i+1}</span></li>`).join('')}</ol>
-      </div>
-    </div>
+    ${spotifyPlaylist('פלייליסט הטור — קולדפליי 2026','8 שירים · Spotify', D.setlist, state.setlistOpen, 'lobby-setlist')}
 
     <!-- Bio -->
     <div class="bio">
@@ -1211,7 +1270,7 @@ function pageLobby(){
 
   <!-- Testimonials — moved above "מעריצים אוהבים גם", renamed -->
   <section class="section">
-    <div class="sec-head"><a class="sec-link">כל 847 הביקורות ›</a><h2 class="sec-title">איך היה בהופעה?</h2></div>
+    <div class="sec-head"><a class="sec-link" data-act="soon" data-title="ביקורות">כל 847 הביקורות ›</a><h2 class="sec-title">איך היה בהופעה?</h2></div>
     <div class="reviews">
       ${D.reviews.map(r=>`
         <div class="rev">
@@ -1245,12 +1304,13 @@ function pageLobby(){
    ============================================================ */
 function seatMapSVG(){
   const dim = k => state.highlightListing && state.highlightListing!==k ? '.45' : '1';
+  const centerLabel = (EVENTS[state.eventKey]||EVENTS.coldplay).type==='match' ? 'מגרש' : 'במה';
   return `
   <svg viewBox="0 0 300 210" class="stadium">
     <rect x="8" y="8" width="284" height="194" rx="26" fill="#efeff3"/>
     <rect x="96" y="70" width="108" height="70" rx="8" fill="#cfe9d6"/>
     <rect x="112" y="52" width="76" height="16" rx="4" fill="#2a2a30"/>
-    <text x="150" y="64" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">STAGE</text>
+    <text x="150" y="64" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">${centerLabel}</text>
     <g data-locate="north" style="cursor:pointer;opacity:${dim('north')}"><rect x="70" y="18" width="160" height="26" rx="8" fill="#ED1860"/><text x="150" y="35" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">N</text></g>
     <g data-locate="south" style="cursor:pointer;opacity:${dim('south')}"><rect x="70" y="166" width="160" height="26" rx="8" fill="#1c7a3a"/><text x="150" y="183" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">S</text></g>
     <g data-locate="west" style="cursor:pointer;opacity:${dim('west')}"><rect x="20" y="60" width="26" height="90" rx="8" fill="#F57E20"/><text x="33" y="109" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">W</text></g>
@@ -1272,30 +1332,36 @@ function pageEvent(){
   const secLabel = state.selectedSection ? (D.sectionLabels[state.selectedSection]||'')+' ✓' : 'לחצו על אזור';
   const sortBtn=(k,l)=>`<button class="sort-btn ${state.sortBy===k?'on':''}" data-sort="${k}">${l}</button>`;
   const activeCount = p3ActiveCount();
+  const E = EVENTS[state.eventKey] || EVENTS.coldplay;
+  const evTitle = E.dynamic ? (state.evTitle||'משחק') : E.h1;
+  const evVenue = E.dynamic ? (state.evVenue?('📍 '+state.evVenue):E.venue) : E.venue;
+  const evDate  = E.dynamic ? (state.evDate?('📅 '+state.evDate):E.date) : E.date;
+  const evPrice = E.dynamic ? (state.evPrice||E.price) : E.price;
+  const evImg   = E.dynamic && state.evImg ? state.evImg : E.img;
   return `
   <!-- FULL HERO -->
   <section class="ev-hero ${state.heroCollapsed?'hide':''}">
-    <img class="eh-img" src="${IMG}artist1.jpg" alt="">
+    <img class="eh-img" src="${IMG}${evImg}" alt="">
     <div class="eh-scrim"></div>
     <div class="eh-top">
       <div class="eh-actions"><button class="eh-ic" data-act="share">${ICON.share} שתפו</button><button class="eh-ic" data-act="follow">עקבו ♡</button></div>
       <button class="eh-back" data-act="back-lobby">‹ חזרה</button>
     </div>
     <div class="eh-info">
-      <h1>קולדפליי</h1>
-      <div class="eh-venue">📍 אצטדיון ומבלי, לונדון</div>
-      <div class="eh-date">📅 4 ביולי 2026 · 20:00</div>
+      <h1>${evTitle}</h1>
+      <div class="eh-venue">${evVenue}</div>
+      <div class="eh-date">${evDate}</div>
       <div class="eh-pricebar">
-        <span class="eh-price">מ-₪520 <small>כולל עמלות</small></span>
-        <span class="eh-stats">🔥 נותרו 8 · 140 צופים עכשיו</span>
+        <span class="eh-price">מ-${evPrice} <small>כולל עמלות</small></span>
+        <span class="eh-stats">${E.stats}</span>
       </div>
     </div>
   </section>
   <!-- SLIM HERO (on scroll) -->
   <div class="ev-slim ${state.heroCollapsed?'show':''}">
     <button class="es-back" data-act="back-lobby">‹</button>
-    <div class="es-info"><div class="es-t">קולדפליי · ומבלי</div><div class="es-d">4 ביולי · 20:00</div></div>
-    <div class="es-price">מ-₪520 →</div>
+    <div class="es-info"><div class="es-t">${E.dynamic?evTitle:E.slimT}</div><div class="es-d">${E.dynamic?evDate.replace('📅 ',''):E.slimD}</div></div>
+    <div class="es-price">מ-${evPrice} →</div>
   </div>
 
   <div class="ev-trust"><span class="star">★</span> אחריות 100% · אישור מיידי · <b>ביטול כולל מילואים</b> · <span class="star">★</span> 4.8 Google</div>
@@ -1329,17 +1395,12 @@ function pageEvent(){
     </div>
   </div>
 
-  <!-- לפני ההופעה -->
+  <!-- לפני ההופעה (concerts only) -->
+  ${E.type==='concert' ? `
   <section class="section">
     <div class="sec-head"><span></span><h2 class="sec-title">לפני ההופעה</h2></div>
-    <div class="playlist" style="margin-top:0">
-      <div class="ph"><div class="pt"><div class="t">פלייליסט הטור · 20 שירים</div><div class="s">Spotify</div></div><div class="pico">🎵</div></div>
-    </div>
-    <div class="collapse ${state.setlistP3Open?'open':''}">
-      <button class="col-head" data-act="setlist3"><span class="ch">${state.setlistP3Open?'▲':'▼'}</span><span class="ct">רשימת השירים בהופעה</span></button>
-      <div class="col-body"><p style="padding:0 14px 14px;font-size:13px;color:#555;text-align:right;line-height:1.7">${D.setlist.join(' · ')}</p></div>
-    </div>
-  </section>
+    ${spotifyPlaylist('פלייליסט הטור · 20 שירים','Spotify', D.setlist, state.setlistP3Open, 'setlist3')}
+  </section>` : ''}
 
   <!-- אירועים קשורים -->
   <section class="section">
@@ -1494,7 +1555,7 @@ function accountDrawer(){
   <aside class="drawer ${open?'open':''}">
     <div class="dh"><button class="dh-x" data-act="close-drawer" aria-label="סגירה">×</button><div class="dtxt"><div class="t">האזור האישי</div><div class="s">התחברו כדי לראות הזמנות והעדפות</div></div></div>
     <div class="db">
-      ${D.accountGroups.map(g=>`<button class="drow">${g.n}<span>${g.e}</span></button>`).join('')}
+      ${D.accountGroups.map(g=>`<button class="drow" data-act="soon" data-title="${g.n}">${g.n}<span>${g.e}</span></button>`).join('')}
     </div>
     <div class="dcta"><button class="btn btn-pink" style="flex:1" data-act="close-drawer">התחברות</button><button class="btn" style="flex:1;background:#f0f0f2;color:#1a1a1a" data-act="close-drawer">הרשמה</button></div>
   </aside>`;
@@ -1520,23 +1581,26 @@ function categoriesDrawer(){
         });
       } else if(k==='sports'){
         D.drawer.sports.forEach((sp,si)=>{
-          // כדורגל is a first-class entry → Page A (Category)
-          if(si===0){ sub += `<button class="drow" data-act="football" style="font-weight:600;color:#1A1A1A">${sp.n}<span class="sign">›</span></button>`; return; }
           const so = state.mSport===('s'+si);
           sub += `<button class="drow" data-act="dsp:s${si}" style="font-weight:${so?600:400};color:${so?'#ED1860':'#1A1A1A'}">${sp.n}<span class="sign">${so?'−':'+'}</span></button>`;
-          if(so) sp.comps.forEach((c,ci)=>{
-            // NBA competition is a first-class league hub → Page B
-            if(c.n==='NBA'){ sub += `<button class="drow" data-act="nba" style="font-size:13px;padding-right:32px;font-weight:600;color:#1A1A1A">${c.n}<span class="sign">›</span></button>`; return; }
-            const co = state.mComp===('s'+si+'c'+ci);
-            sub += `<button class="drow" data-act="dcp:s${si}c${ci}" style="font-size:13px;padding-right:32px;color:${co?'#ED1860':'#333'}">${c.n}<span class="sign">${co?'−':'+'}</span></button>`;
-            if(co) sub += c.teams.map(t=>`<button class="drow" data-act="team" data-team="${t}" style="font-size:12px;padding-right:48px;color:#666">${t}</button>`).join('');
-          });
+          if(so){
+            sp.comps.forEach((c,ci)=>{
+              // NBA competition is a first-class league hub → Page B
+              if(c.n==='NBA'){ sub += `<button class="drow" data-act="nba" style="font-size:13px;padding-right:32px;font-weight:600;color:#1A1A1A">${c.n}<span class="sign">›</span></button>`; return; }
+              const co = state.mComp===('s'+si+'c'+ci);
+              sub += `<button class="drow" data-act="dcp:s${si}c${ci}" style="font-size:13px;padding-right:32px;color:${co?'#ED1860':'#333'}">${c.n}<span class="sign">${co?'−':'+'}</span></button>`;
+              if(co) sub += c.teams.map(t=>`<button class="drow" data-act="team" data-team="${t}" style="font-size:12px;padding-right:48px;color:#666">${t}</button>`).join('');
+            });
+            // "לכל אירועי ה…" — last item; כדורגל → Page A, others → all-events page
+            const allAct = si===0 ? 'football' : 'allsport';
+            sub += `<button class="drow" data-act="${allAct}" data-title="כל אירועי ה${sp.n}" style="font-size:13px;padding-right:32px;color:#ED1860;font-weight:600">לכל אירועי ה${sp.n}<span class="sign">›</span></button>`;
+          }
         });
       } else if(k==='dest'){
         sub += `<div style="padding:4px 16px 10px;color:#888;font-size:11px;text-align:right">ערים</div>`;
         sub += D.drawer.dest.map(c=>`<button class="drow" data-act="lobby" style="font-size:13px;padding-right:28px;color:#555">${c}</button>`).join('');
       } else if(k==='support'){
-        sub += D.drawer.support.map(t=>`<button class="drow" style="font-size:13px;padding-right:28px;color:#555">${t}</button>`).join('');
+        sub += D.drawer.support.map(t=>`<button class="drow" data-act="soon" data-title="${t}" style="font-size:13px;padding-right:28px;color:#555">${t}</button>`).join('');
       }
       secHtml += `<div class="sub">${sub}</div>`;
     }
@@ -1825,7 +1889,7 @@ function wire(){
     switch(true){
       case act==='drawer': set({drawerOpen:true, acctOpen:false}); break;
       case act==='account': set({acctOpen:true, drawerOpen:false}); break;
-      case act==='favs': set({page:1}); break;
+      case act==='favs': { state.phTitle='המועדפים שלי'; state.phNote='העמוד הזה עדיין בעיצוב — בקרוב'; go(8); break; }
       case act==='search': set({srOpen:true, srQuery:'', srPhase:'idle'}); break;
       case act==='close-search': set({srOpen:false, srFilterSheet:false}); break;
       case act==='sr-clear': set({srQuery:'', srPhase:'idle'}); break;
@@ -1844,15 +1908,20 @@ function wire(){
       case act==='home': go(0); break;
       case act==='category': go(1); break;
       case act==='lobby': go(2); break;
-      case act==='event': go(3); break;
+      case act==='event': { const el=a.closest('[data-event]'); const ev=el?.getAttribute('data-event')||'coldplay'; state.eventKey=ev;
+        if(ev==='match'){ state.evTitle=el.getAttribute('data-ev-title')||'משחק'; state.evVenue=el.getAttribute('data-ev-venue')||''; state.evDate=el.getAttribute('data-ev-date')||''; state.evPrice=el.getAttribute('data-ev-price')||''; state.evImg=el.getAttribute('data-ev-img')||''; }
+        go(3); break; }
       case act==='occasion': go(4); break;
       case act==='football': go(5); break;
       case act==='nba': go(6); break;
       case act==='team': { state.teamKey = a.getAttribute('data-team')||'real'; go(7); break; }
       case act==='league': { state.phTitle = a.getAttribute('data-title')||'ליגה'; state.phNote='עמוד הליגה — בקרוב'; go(8); break; }
+      case act==='allsport': { state.phTitle = a.getAttribute('data-title')||'כל האירועים'; state.phNote='כל האירועים — בקרוב'; go(8); break; }
+      case act==='soon': { state.phTitle = a.getAttribute('data-title') || a.textContent.replace(/[›»‹]/g,'').trim() || 'בקרוב'; state.phNote='העמוד הזה עדיין בעיצוב — בקרוב'; go(8); break; }
       case act==='player': { state.phTitle = a.getAttribute('data-player')||'שחקן'; state.phNote='חדשות ועדכונים על השחקן — בקרוב'; go(8); break; }
       case act==='spotify-home': break;
       case act==='pl-play': playlistToggle(); break;
+      case act==='pl-pop': set({plPopOpen:!state.plPopOpen}); break;
       case act==='cal-prev': { let mm=state.dpMonth-1, yy=state.dpYear; if(mm<0){mm=11;yy--;} set({dpMonth:mm,dpYear:yy}); break; }
       case act==='cal-next': { let mm=state.dpMonth+1, yy=state.dpYear; if(mm>11){mm=0;yy++;} set({dpMonth:mm,dpYear:yy}); break; }
       case act==='date-apply': {
@@ -1862,7 +1931,7 @@ function wire(){
         break;
       }
       case act==='back-cat': go(1); break;
-      case act==='back-lobby': go(2); break;
+      case act==='back-lobby': go((EVENTS[state.eventKey]||EVENTS.coldplay).back); break;
       case act==='setlist3': set({setlistP3Open:!state.setlistP3Open}); break;
       case act==='p3filter': set({openSheet:'p3-filter'}); break;
       case act==='p3clear': set({selectedSection:null, p3Qty:null, p3Min:'', p3Max:'', p3f:{together:false,front:false,view:false,access:false}}); break;
