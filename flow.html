@@ -600,7 +600,7 @@ function pageOccasion(){
     <a data-act="home">בית</a>
   </nav>
   <section class="cat-hero">
-    <div class="hero-big" style="height:46vh;min-height:340px" data-event="match" data-ev-title="${OCCASION.label}" data-ev-venue="${OCCASION.dateRange} · ארה״ב · קנדה · מקסיקו" data-ev-price="₪760" data-ev-img="sport2.jpg">
+    <div class="hero-big" style="height:46vh;min-height:340px" data-act="event" data-event="match" data-ev-title="${OCCASION.label}" data-ev-venue="${OCCASION.dateRange} · ארה״ב · קנדה · מקסיקו" data-ev-price="₪760" data-ev-img="sport2.jpg">
       <img class="hb-img" src="${IMG}sport2.jpg" alt="${OCCASION.label}">
       <div class="hb-scrim"></div>
       <span class="hb-badge">✦ אירוע מיוחד</span>
@@ -726,7 +726,7 @@ function pageCategory(){
     <div class="sec-head"><a class="sec-link" data-act="soon" data-title="TikTok מהקהל">הכל ›</a><h2 class="sec-title">TikTok <small>מהקהל</small></h2></div>
     <div class="hscroll">
       ${D.tiktok.map(t=>`
-        <div class="tt-card">
+        <div class="tt-card" data-act="lobby">
           <img src="${IMG}${t.img}" alt=""><div class="sc"></div>
           <div class="play">${ICON.play}</div>
           <div class="m"><div class="n">${t.n}</div><div class="l">${t.l}</div></div>
@@ -1247,7 +1247,7 @@ function pageLobby(){
     <!-- TikTok reels -->
     <div class="sub-h">TikTok Reels מהטור</div>
     <div class="hscroll">
-      ${D.reels.map(t=>`<div class="tt-card"><img src="${IMG}${t.img}" alt=""><div class="sc"></div><div class="play">${ICON.play}</div><div class="m"><div class="n">${t.n}</div><div class="l">${t.l}</div></div></div>`).join('')}
+      ${D.reels.map(t=>`<div class="tt-card" data-act="lobby"><img src="${IMG}${t.img}" alt=""><div class="sc"></div><div class="play">${ICON.play}</div><div class="m"><div class="n">${t.n}</div><div class="l">${t.l}</div></div></div>`).join('')}
     </div>
   </section>
 
