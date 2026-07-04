@@ -43,6 +43,8 @@ const state = {
   // ---- sports pages (A=football / B=nba / C=team lobby) ----
   favCount:3, followed:{lakers:true,celtics:true,nuggets:true}, phTitle:'', phNote:'',
   nbaTab:'games', faqSportOpen:0, teamKey:'real', homeAway:false,
+  // ---- AI search ----
+  aiConvo:[], aiReturn:0,
 };
 
 /* ---------- data (exact copy from the prototype) ---------- */
@@ -404,7 +406,8 @@ const esc = s => s;
    ============================================================ */
 function render(){
   const app = document.getElementById('app');
-  app.innerHTML = header() + (
+  const isAI = state.page===9;
+  app.innerHTML = (isAI?'':header()) + (
     state.page===0 ? pageHome() :
     state.page===1 ? pageCategory() :
     state.page===2 ? pageLobby() :
@@ -414,8 +417,9 @@ function render(){
     state.page===6 ? pageNBA() :
     state.page===7 ? pageTeam() :
     state.page===8 ? pagePlaceholder('', state.phTitle, state.phNote) :
+    isAI ? pageAiChat() :
     pageHome()
-  ) + whatsapp() + overlays();
+  ) + (isAI?'':whatsapp()) + (isAI?'':aiFab()) + overlays();
   wire();
 }
 
@@ -443,6 +447,96 @@ function header(){
 /* ---------- WhatsApp FAB ---------- */
 function whatsapp(){
   return `<a class="wa" href="https://wa.me/972500000000" target="_blank" rel="noopener" aria-label="WhatsApp"><img src="assets/icon-whatsapp.svg" alt=""></a>`;
+}
+
+/* ============================================================
+   AI SEARCH — one conversation screen, three entry points.
+   Grounded on real (sample) inventory; all-in cited prices;
+   always a path to a human. Keyword search stays primary.
+   ============================================================ */
+const AI_CARDS_CONCERT = [
+  {name:'קולדפליי — Music of the Spheres', venue:'וומבלי, לונדון', date:'יום א׳ 17 אוג׳ 2026', section:'יציע צפון, שורה 12', price:'₪1,290', img:'artist1.jpg', ev:'coldplay'},
+  {name:'קולדפליי — Music of the Spheres', venue:'וומבלי, לונדון', date:'יום ב׳ 18 אוג׳ 2026', section:'יציע מזרח, שורה 20', price:'₪1,440', img:'artist1.jpg', ev:'coldplay'},
+];
+const AI_CARDS_SPORT = [
+  {name:'אל קלאסיקו · ריאל נגד ברצלונה', venue:'סנטיאגו ברנבאו, מדריד', date:'שבת 14 יולי 2026', section:'טריבונה מערב, שורה 8', price:'₪690', img:'team-realmadrid.jpg', ev:'clasico'},
+  {name:'ריאל מדריד נגד אתלטיקו', venue:'סנטיאגו ברנבאו, מדריד', date:'ראשון 21 יולי 2026', section:'יציע צפון, שורה 14', price:'₪620', img:'team-realmadrid.jpg', ev:'match', evTitle:'ריאל מדריד נגד אתלטיקו מדריד', evVenue:'סנטיאגו ברנבאו, מדריד', evPrice:'₪620'},
+];
+const AI_STARTERS = ['כרטיס לקולדפליי בלונדון עד ₪1500','משחק של ריאל מדריד בקיץ','אירועי ספורט בסוף השבוע','הופעה בחו״ל עם ביטול כולל מילואים'];
+function aiRespond(query){
+  const q=(query||'').trim();
+  const sport=/כדורגל|ריאל|ברצלונ|קלאסיקו|nba|כדורסל|לייקרס|דרבי|משחק|ספורט|מונדיאל|אתלטיקו/i.test(q);
+  return sport
+    ? {summary:'מצאתי משחקים זמינים בטווח שלך. ההצעות המשתלמות ביותר, כולל כל העמלות:', cards:AI_CARDS_SPORT}
+    : {summary:'מצאתי 3 מופעים בוומבלי בטווח שלך. שתי האפשרויות המשתלמות ביותר, כולל כל העמלות:', cards:AI_CARDS_CONCERT};
+}
+function openAI(query){
+  if(state.page!==9) state.aiReturn = state.page;
+  const q=(query||'').trim();
+  state.aiConvo = q ? [{q, r:aiRespond(q)}] : [];
+  state.srOpen=false; state.srFilterSheet=false; state.drawerOpen=false; state.acctOpen=false;
+  go(9);
+}
+function aiSend(text){
+  const q=(text||'').trim(); if(!q) return;
+  state.aiConvo.push({q, r:aiRespond(q)});
+  render();
+  window.scrollTo(0, document.body.scrollHeight);
+}
+/* AI conversation screen (page 9) */
+function pageAiChat(){
+  const evCard=c=>{
+    const evAttr = c.ev==='match'
+      ? `data-event="match" data-ev-title="${c.evTitle||c.name}" data-ev-venue="${c.evVenue||c.venue}" data-ev-price="${c.evPrice||c.price}" data-ev-img="${c.img}"`
+      : `data-event="${c.ev}"`;
+    return `
+    <div class="ai-evc" data-act="event" ${evAttr}>
+      <img class="ai-evc-img" src="${IMG}${c.img}" alt="">
+      <div class="ai-evc-body">
+        <div class="ai-evc-nm">${c.name}</div>
+        <div class="ai-evc-mt">${c.venue} · ${c.date} · ${c.section}</div>
+        <span class="ai-badge">✓ ביטול כולל מילואים</span>
+        <div class="ai-evc-price">${c.price} <small>כולל עמלות · ליחיד</small></div>
+        <button class="ai-cta" data-act="event" ${evAttr}>▶ לכרטיסים</button>
+      </div>
+    </div>`;
+  };
+  const fups=['זול יותר','כולל טיסה ומלון','מקומות טובים יותר','תאריכים אחרים'];
+  const turn=t=>`
+    <div class="ai-urow"><div class="ai-ubub">${t.q}</div></div>
+    <div class="ai-abub">
+      <div class="ai-asig"><span class="dot">✦</span> Live Tickets AI</div>
+      <div class="ai-asum">${t.r.summary}</div>
+      ${t.r.cards.map(evCard).join('')}
+      <div class="ai-cite"><span class="g">●</span> מבוסס על מלאי אמיתי · מחירים כולל הכל · עודכן היום</div>
+      <div class="ai-fups">${fups.map(f=>`<button class="ai-fup" data-act="ai-fup" data-q="${f}">${f}</button>`).join('')}</div>
+      <div class="ai-handoff" data-act="package">💬 רוצה עזרה אישית? דברו עם נציג <span class="wa-link">WhatsApp ←</span></div>
+    </div>`;
+  const landing=`
+    <div class="ai-hello">✦ שאלו אותי כל דבר על כרטיסים —<br>אני מחפש במלאי האמיתי בשבילכם</div>
+    ${AI_STARTERS.map(s=>`<button class="ai-starter" data-act="ai-fup" data-q="${s}"><span class="sp">✦</span>${s}</button>`).join('')}`;
+  return `
+  <div class="ai-screen">
+    <div class="ai-head">
+      <div class="ai-headicons">
+        <button class="circle-btn" data-act="favs">${ICON.heart}<span class="nav-badge">${state.favCount}</span></button>
+        <button class="circle-btn" data-act="drawer">${ICON.menu}</button>
+      </div>
+      <span class="ai-title"><span class="dot">✦</span> חיפוש עם AI</span>
+      <button class="circle-btn ai-back-btn" data-act="ai-back" aria-label="חזרה">→</button>
+    </div>
+    <div class="ai-conv">${state.aiConvo.length ? state.aiConvo.map(turn).join('') : landing}</div>
+    <div class="ai-composer">
+      <input id="aiInput" class="ai-field" placeholder="כתבו הודעה…" autocomplete="off">
+      <button class="ai-send" data-act="ai-send" aria-label="שליחה">↑</button>
+    </div>
+  </div>`;
+}
+/* sticky AI FAB — home (after scroll) + category/lobby/event; hidden in the chat */
+function aiFab(){
+  if(![0,1,2,3,4,5,6,7].includes(state.page)) return '';
+  const homeCls = state.page===0 ? ' hide-home'+(state.headerSolid?' show':'') : '';
+  return `<button class="ai-fab${homeCls}" data-act="ai-open">✦ חיפוש עם AI</button>`;
 }
 
 /* ---------- shared Spotify playlist component (expandable, in-page playable) ---------- */
@@ -527,7 +621,10 @@ function pageHome(){
     <p class="eyebrow">✨ החוויות הכי גדולות בעולם — במרחק טיסה אחת</p>
     <h1>מה בא לכם לראות?</h1>
     <p class="sub">חברו את Spotify וקבלו המלצות מותאמות אישית לפי המוזיקה שאתם אוהבים</p>
-    <div class="hh-search" data-act="search">${ICON.searchSm}<span>חפשו אמן, הופעה, עיר…</span></div>
+    <div class="hh-row">
+      <button class="hh-ai" data-act="ai-open">✦ AI</button>
+      <div class="hh-search" data-act="search">${ICON.searchSm}<span>חפשו אמן, הופעה, עיר…</span></div>
+    </div>
   </section>
 
   <div class="spotify" style="margin-top:14px">
@@ -1706,6 +1803,11 @@ function searchOverlay(){
         <button class="sm-filter" data-act="sr-filter">סינון</button>
         <div class="res-sort">${['best','price','date'].map(k=>`<button class="sort-btn ${state.srSortBy===k?'on':''}" data-srsort="${k}">${srSortLabel[k]}</button>`).join('')}</div>
         <div class="res-title">תוצאות עבור "${q}"</div>
+      </div>
+      <div class="ai-overview">
+        <div class="ai-oh"><span class="dot">✦</span> סקירת AI</div>
+        <p class="ai-osum">${aiRespond(q).summary} <span class="fade">כל המחירים כוללים עמלות.</span></p>
+        <button class="ai-ogo" data-act="ai-open" data-q="${q.replace(/"/g,'&quot;')}">המשיכו לשיחה ←</button>
       </div>`;
     if(r.topMatch) out+=`
       <div class="res-top" data-act="sr-perf">
@@ -1731,8 +1833,8 @@ function searchOverlay(){
   return `
   <div class="overlay ${open?'open':''}">
     <div class="ov-head">
-      <div class="field">${ICON.searchSm}<input id="srInput" data-srinput placeholder="חפשו אמן, קבוצה, עיר, ז׳אנר…" value="${q.replace(/"/g,'&quot;')}" autocomplete="off">${q?'<button class="ov-x" data-act="sr-clear">✕</button>':''}</div>
       <button class="ov-close" data-act="close-search">סגירה</button>
+      <div class="field"><button class="ai-pill" data-act="ai-open" data-q-field="1">✦ AI</button><input id="srInput" data-srinput placeholder="חפשו אמן, קבוצה, עיר, ז׳אנר…" value="${q.replace(/"/g,'&quot;')}" autocomplete="off">${q?'<button class="ov-x" data-act="sr-clear">✕</button>':''}${ICON.searchSm}</div>
     </div>
     <div class="ov-body">${body}</div>
     ${searchFilterSheet()}
@@ -1819,6 +1921,7 @@ function wire(){
   };
   document.getElementById('app').onkeydown = (e)=>{
     if(e.key==='Enter' && e.target.closest('[data-srinput]') && state.srQuery.trim()){ set({srPhase:'results'}); }
+    else if(e.key==='Enter' && e.target.id==='aiInput'){ e.preventDefault(); aiSend(e.target.value); }
   };
   // focus the search field when the overlay opens (don't steal focus mid-typing)
   if(state.srOpen){ const i=document.getElementById('srInput'); if(i && document.activeElement!==i){ i.focus(); const n=i.value.length; try{i.setSelectionRange(n,n);}catch(_){} } }
@@ -1891,6 +1994,10 @@ function wire(){
       case act==='account': set({acctOpen:true, drawerOpen:false}); break;
       case act==='favs': { state.phTitle='המועדפים שלי'; state.phNote='העמוד הזה עדיין בעיצוב — בקרוב'; go(8); break; }
       case act==='search': set({srOpen:true, srQuery:'', srPhase:'idle'}); break;
+      case act==='ai-open': { let q=a.getAttribute('data-q'); if(q===null && a.hasAttribute('data-q-field')) q=state.srQuery; openAI(q||''); break; }
+      case act==='ai-send': { const i=document.getElementById('aiInput'); aiSend(i?i.value:''); break; }
+      case act==='ai-fup': aiSend(a.getAttribute('data-q')||''); break;
+      case act==='ai-back': go(state.aiReturn||0); break;
       case act==='close-search': set({srOpen:false, srFilterSheet:false}); break;
       case act==='sr-clear': set({srQuery:'', srPhase:'idle'}); break;
       case act==='sr-clear-recent': set({srRecent:[]}); break;
@@ -1982,6 +2089,8 @@ window.addEventListener('scroll', ()=>{
       if(h) h.classList.toggle('solid', solid);
     }
   }
+  // AI FAB appears on the homepage after scrolling
+  if(state.page===0){ const fab=document.querySelector('.ai-fab.hide-home'); if(fab) fab.classList.toggle('show', window.scrollY>40); }
   if(state.page!==3) return;
   const c = window.scrollY > 220;
   if(c!==state.heroCollapsed){
