@@ -19,6 +19,17 @@
    2=Lobby, 3=Event.  Structure / IA / copy preserved.
    ============================================================ */
 const IMG = 'assets/cards/';
+// Content-aware image for match/derby cards that carry no explicit `img`.
+function matchImg(text){
+  const t=(text||'').toLowerCase();
+  if(/קלאסיקו|ריאל|ברצלונ|בארסה|barça|barca|real madrid/.test(t)) return 'team-realmadrid.jpg';
+  if(/לייקרס|סלטיקס|נאגטס|ניקס|נטס|בוסטון|לוס אנג|nba|כדורסל/.test(t)) return 'nba.jpg';
+  if(/ליגת האלופות|אלופות|champions/.test(t)) return 'ucl.jpg';
+  if(/מונדיאל|נבחרת|גביע העולם|world cup/.test(t)) return 'sport2.jpg';
+  if(/לה ליגה/.test(t)) return 'laliga.jpg';
+  if(/מנצ|סיטי|ארסנל|יונייטד|אתיחאד|צ׳לסי|ליברפול|דרבי|אנגל/.test(t)) return 'sport3.jpg';
+  return 'sport1.jpg';
+}
 const state = {
   page: 0,
   faqHome: 0,
@@ -431,7 +442,7 @@ function render(){
 
 /* ---------- header (shared) ---------- */
 function header(){
-  const floating = (state.page===0 || state.page===2 || state.page===7);   // full-bleed hero pages
+  const floating = (state.page===0 || state.page===2 || state.page===3 || state.page===7);   // full-bleed hero pages
   const cls = 'header' + (floating ? ' header--float' + (state.headerSolid?' solid':'') : '');
   return `
   <header class="${cls}">
@@ -724,8 +735,10 @@ function pageHome(){
   };
   const tile=x=>`<div class="cat-card" data-act="${x.act||'category'}"${x.title?` data-title="${x.title}"`:''}${x.team?` data-team="${x.team}"`:''}><img class="card-img" src="${IMG}${x.img}" alt=""><span>${x.n}</span></div>`;
   const derby=d=>`
-    <div class="derbycard hb--${d.hue}" data-act="event" data-event="${d.event||'match'}" data-ev-title="${d.name}" data-ev-venue="${d.info}" data-ev-price="${d.price}">
+    <div class="derbycard hb--${d.hue}" data-act="event" data-event="${d.event||'match'}" data-ev-title="${d.name}" data-ev-venue="${d.info}" data-ev-price="${d.price}" data-ev-img="${d.img||matchImg(d.name+' '+d.info)}">
+      <img class="derby-img" src="${IMG}${d.img||matchImg(d.name+' '+d.info)}" alt="">
       <div class="hb-stripes"></div>
+      <div class="derby-scrim"></div>
       <span class="derby-badge">${d.badge}</span>
       <div class="derby-body"><div class="derby-name">${d.name}</div><div class="derby-info">${d.info}</div><div class="derby-price">מ-${d.price}</div></div>
     </div>`;
@@ -1118,8 +1131,10 @@ function pageFootball(){
     <div class="sec-head"><a class="sec-link" data-act="event">הכל ›</a><h2 class="sec-title">דרבי ומשחקי יריבות</h2></div>
     <div class="hscroll derbyrow">
       ${F.derbies.map(d=>`
-        <div class="derbycard hb--${F.hue}" data-act="event" data-event="${d.event||'match'}" data-ev-title="${d.name}" data-ev-venue="${d.info}" data-ev-price="${d.price}">
+        <div class="derbycard hb--${F.hue}" data-act="event" data-event="${d.event||'match'}" data-ev-title="${d.name}" data-ev-venue="${d.info}" data-ev-price="${d.price}" data-ev-img="${d.img||matchImg(d.name+' '+d.info)}">
+          <img class="derby-img" src="${IMG}${d.img||matchImg(d.name+' '+d.info)}" alt="">
           <div class="hb-stripes"></div>
+          <div class="derby-scrim"></div>
           <span class="derby-badge">${d.badge}</span>
           <div class="derby-body"><div class="derby-name">${d.name}</div><div class="derby-info">${d.info}</div><div class="derby-price">מ-${d.price}</div></div>
         </div>`).join('')}
@@ -1135,13 +1150,14 @@ function pageFootball(){
 /* game/match list card (date box · info · price) — reused by football & nba */
 function gameCard(g){
   return `
-  <div class="gamecard" data-act="event" data-event="${g.ev||'match'}" data-ev-title="${g.name}" data-ev-venue="${g.venue}" data-ev-price="${g.price}" data-ev-date="${g.d} ${g.mo}">
+  <div class="gamecard" data-act="event" data-event="${g.ev||'match'}" data-ev-title="${g.name}" data-ev-venue="${g.venue}" data-ev-price="${g.price}" data-ev-date="${g.d} ${g.mo}" data-ev-img="${g.img||matchImg(g.name+' '+g.venue)}">
     <div class="gc-price"><span class="amt">מ-${g.price}</span>${g.hot?'<span class="badge">🔥 אוזל</span>':''}</div>
     <div class="gc-info">
       <div class="gc-name">${g.name}</div>
       <div class="gc-venue">${g.venue}</div>
       <span class="gc-ok">אישור מיידי</span>
     </div>
+    <img class="gc-thumb" src="${IMG}${g.img||matchImg(g.name+' '+g.venue)}" alt="">
     <div class="gc-date"><span class="d">${g.d}</span><span class="mo">${g.mo}</span></div>
   </div>`;
 }
@@ -1152,8 +1168,10 @@ function gameCard(g){
 function pageNBA(){
   const N = NBA;
   const bigCard = d=>`
-    <div class="derbycard hb--${N.hue}" data-act="event" data-event="match" data-ev-title="${d.name}" data-ev-venue="${d.info}" data-ev-price="${d.price}">
+    <div class="derbycard hb--${N.hue}" data-act="event" data-event="match" data-ev-title="${d.name}" data-ev-venue="${d.info}" data-ev-price="${d.price}" data-ev-img="${d.img||matchImg(d.name+' '+d.info)}">
+      <img class="derby-img" src="${IMG}${d.img||matchImg(d.name+' '+d.info)}" alt="">
       <div class="hb-stripes"></div>
+      <div class="derby-scrim"></div>
       <span class="derby-badge">${d.badge}</span>
       <div class="derby-body"><div class="derby-name">${d.name}</div><div class="derby-info">${d.info}</div><div class="derby-price">מ-${d.price}</div></div>
     </div>`;
@@ -1614,11 +1632,13 @@ function pageEvent(){
   <!-- SLIM HERO (on scroll) — back + logo on top, event details below -->
   <div class="ev-slim ${state.heroCollapsed?'show':''}">
     <div class="es-row">
-      <button class="es-back" data-act="back-lobby">‹</button>
       <a class="es-logo" data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
-      <div class="es-price">מ-${evPrice} →</div>
+      <button class="es-back" data-act="back-lobby">→</button>
     </div>
-    <div class="es-info"><span class="es-t">${E.dynamic?evTitle:E.slimT}</span> · <span class="es-d">${E.dynamic?evDate.replace('📅 ',''):E.slimD}</span></div>
+    <div class="es-info">
+      <div class="es-price">מ-${evPrice}</div>
+      <div class="es-meta"><span class="es-t">${E.dynamic?evTitle:E.slimT}</span> · <span class="es-d">${E.dynamic?evDate.replace('📅 ',''):E.slimD}</span></div>
+    </div>
   </div>
 
   <div class="ev-trust"><span class="star">★</span> אחריות 100% · אישור מיידי · <b>ביטול כולל מילואים</b> · <span class="star">★</span> 4.8 Google</div>
@@ -2067,7 +2087,7 @@ function searchFilterSheet(){
    BEHAVIOUR
    ============================================================ */
 function set(patch){ Object.assign(state, patch); render(); }
-function go(page){ stopPlaylistAudio(); state.playing=false; state.headerSolid=false; window.scrollTo(0,0); set({page, openSheet:null, srOpen:false, drawerOpen:false, acctOpen:false}); }
+function go(page){ stopPlaylistAudio(); state.playing=false; state.headerSolid=false; state.heroCollapsed=false; window.scrollTo(0,0); set({page, openSheet:null, srOpen:false, drawerOpen:false, acctOpen:false}); }
 
 /* ---- Spotify playlist: real in-page audio (Web Audio API) ---- */
 let audioCtx=null, audioTimer=null;
@@ -2305,6 +2325,9 @@ window.addEventListener('scroll', ()=>{
     state.heroCollapsed = c;
     const slim = document.querySelector('.ev-slim');
     if(slim) slim.classList.toggle('show', c);
+    // hand off from the transparent floating nav to the slim header
+    const h = document.querySelector('.header--float');
+    if(h) h.classList.toggle('nav-hidden', c);
   }
 }, {passive:true});
 
