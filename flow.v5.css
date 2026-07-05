@@ -23,10 +23,15 @@ img{display:block;}
 /* layout LTR; each text block resolves its own direction (RTL Hebrew) */
 .app h1,.app h2,.app h3,.app p,.app span,.app a,.app input,.app button,.app li,.app label{unicode-bidi:plaintext;}
 
-/* phone frame */
+/* phone frame (desktop only) */
 .app{
   width:375px;min-height:667px;background:var(--page);position:relative;overflow:hidden;
   box-shadow:0 10px 40px rgba(0,0,0,.18);
+}
+/* on real mobile devices: no frame — fill the screen */
+@media (max-width:640px){
+  body{background:var(--page);display:block;}
+  .app{width:100%;min-height:100dvh;box-shadow:none;}
 }
 
 /* ---------- rails ---------- */
