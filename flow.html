@@ -559,6 +559,19 @@ function spotifyPlaylist(title, meta, tracks, open, toggleAct){
   </div>`;
 }
 
+/* ---------- Spotify connect banner (fanned avatars + centered CTA) ---------- */
+const SPOTIFY_LOGO = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.52 17.34c-.24.36-.66.48-1.02.24-2.82-1.74-6.36-2.1-10.56-1.14-.42.12-.78-.18-.9-.54-.12-.42.18-.78.54-.9 4.56-1.02 8.52-.6 11.64 1.32.42.18.48.66.3 1.02zm1.44-3.3c-.3.42-.84.6-1.26.3-3.24-1.98-8.16-2.58-11.94-1.38-.48.12-1.02-.12-1.14-.6-.12-.48.12-1.02.6-1.14 4.38-1.32 9.78-.66 13.5 1.62.36.18.54.78.24 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.1 9.3c-.6.18-1.2-.18-1.38-.72-.18-.6.18-1.2.72-1.38 4.32-1.32 11.34-1.02 15.66 1.5.54.3.72 1.02.42 1.56-.3.42-1.02.6-1.5.3z"/></svg>`;
+function spotifyBanner(act){
+  const fan=['artist2.jpg','artist3.jpg','artist4.jpg','artist5.jpg','artist6.jpg'];
+  return `
+  <div class="sp-banner">
+    <div class="sp-fan">${fan.map(f=>`<img src="${IMG}${f}" alt="">`).join('')}</div>
+    <div class="sp-title">התחברו ל-Spotify</div>
+    <div class="sp-sub">היו הראשונים לדעת מתי האמנים האהובים עליכם מופיעים בקרבתכם</div>
+    <button class="sp-connect" data-act="${act}">${SPOTIFY_LOGO} חיבור</button>
+  </div>`;
+}
+
 /* ============================================================
    PAGE 0 — HOME  (מה בא לכם לראות?)
    Artist cards → Lobby · genres/tiles → Category · search everywhere
@@ -625,18 +638,14 @@ function pageHome(){
     <div class="hero-slide" style="background-image:url('assets/hero-3.jpg')"></div>
     <p class="eyebrow">✨ החוויות הכי גדולות בעולם — במרחק טיסה אחת</p>
     <h1>מה בא לכם לראות?</h1>
-    <p class="sub">חברו את Spotify וקבלו המלצות מותאמות אישית לפי המוזיקה שאתם אוהבים</p>
+    <p class="sub">כל המשחקים, התחרויות, וההופעות בחו״ל - במקום אחד</p>
     <div class="hh-row">
       <button class="hh-ai" data-act="ai-open">✦ חיפוש AI</button>
       <div class="hh-search" data-act="search">${ICON.searchSm}<span>חפשו אמן, הופעה, עיר…</span></div>
     </div>
   </section>
 
-  <div class="spotify" style="margin-top:14px">
-    <button class="btn btn-spotify" data-act="spotify-home">חיבור</button>
-    <div class="txt"><div class="t">חברו Spotify להמלצות אישיות</div><div class="s">אירועים לפי הטעם המוזיקלי שלכם</div></div>
-    <div class="note">🎵</div>
-  </div>
+  ${spotifyBanner('spotify-home')}
 
   <section class="section">
     <div class="sec-head"><a class="sec-link" data-act="soon" data-title="המועדפים שלי">לכל המועדפים ›</a><h2 class="sec-title">צפית לאחרונה</h2></div>
@@ -845,11 +854,7 @@ function pageCategory(){
         <div class="okwrap"><div class="t">Spotify מחובר ✓</div><div class="s">ממליצים לפי: Coldplay, BTS, Harry Styles…</div></div>
         <div class="note">🎵</div>
       </div>` : `
-      <div class="spotify">
-        <button class="btn btn-spotify connect" data-act="spotify">חיבור</button>
-        <div class="txt"><div class="t">חברו Spotify להמלצות אישיות</div><div class="s">אירועים לפי הטעם המוזיקלי שלכם</div></div>
-        <div class="note">🎵</div>
-      </div>`}
+      ${spotifyBanner('spotify')}`}
   </section>
 
   <!-- TikTok מהקהל -->
