@@ -444,7 +444,7 @@ img{display:block;}
 .footer{margin-top:28px;background:#16121f;color:#cfcad6;padding:26px 16px 90px;}
 .footer .news .t{font-size:16px;font-weight:600;color:#fff;text-align:right;}
 .footer .news .s{font-size:12px;color:#9a94a6;text-align:right;margin-top:4px;}
-.footer .news .row{display:flex;gap:8px;margin-top:12px;}
+.footer .news .row{display:flex;flex-direction:row-reverse;gap:8px;margin-top:12px;}
 .footer .news input{flex:1;height:40px;border:1px solid #33303c;background:#221d2c;border-radius:10px;
   padding:0 12px;color:#fff;text-align:right;font-family:inherit;font-size:13px;}
 .footer .news button{width:40px;height:40px;border-radius:10px;border:none;background:var(--pink);color:#fff;font-size:16px;cursor:pointer;}
