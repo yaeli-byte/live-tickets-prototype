@@ -193,6 +193,8 @@ const D = {
   ],
   faqP3:[
     {q:'מקומות צמודים?', a:'בחרו כמות בעמוד הבחירה — אנחנו מבטיחים מקומות צמודים. מוצג בבירור לפני הרכישה.'},
+    {q:'מה מדיניות הביטולים?', a:'ניתן לבטל עד 48 שעות לפני האירוע לקבלת זיכוי מלא. בנוסף, הכיסוי כולל ביטול כולל מילואים — בהצגת צו קריאה תקבלו החזר מלא, גם ברגע האחרון.'},
+    {q:'מהם תנאי השימוש והרכישה?', a:'כל הכרטיסים מאומתים ומגובים באחריות רכישה 100%. כל המחירים כוללים את כל העמלות — אין תוספות בקופה. הרכישה כפופה לתנאי השימוש ולמדיניות הפרטיות המלאים של Live Tickets.'},
   ],
   // ---- Home (page 0) ----
   homeRecent:[
@@ -1572,19 +1574,17 @@ function pageLobby(){
    PAGE 3 — EVENT  (קולדפליי · ומבלי — seat map + listings)
    ============================================================ */
 function seatMapSVG(){
-  const dim = k => state.highlightListing && state.highlightListing!==k ? '.45' : '1';
+  // Zones are semi-transparent tap overlays sitting on the real stadium background.
+  const dim = k => state.highlightListing && state.highlightListing!==k ? '.22' : '.62';
   const centerLabel = (EVENTS[state.eventKey]||EVENTS.coldplay).type==='match' ? 'מגרש' : 'במה';
   return `
-  <svg viewBox="0 0 300 210" class="stadium">
-    <rect x="8" y="8" width="284" height="194" rx="26" fill="#efeff3"/>
-    <rect x="96" y="70" width="108" height="70" rx="8" fill="#cfe9d6"/>
-    <rect x="112" y="52" width="76" height="16" rx="4" fill="#2a2a30"/>
-    <text x="150" y="64" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">${centerLabel}</text>
-    <g data-locate="north" style="cursor:pointer;opacity:${dim('north')}"><rect x="70" y="18" width="160" height="26" rx="8" fill="#ED1860"/><text x="150" y="35" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">N</text></g>
-    <g data-locate="south" style="cursor:pointer;opacity:${dim('south')}"><rect x="70" y="166" width="160" height="26" rx="8" fill="#1c7a3a"/><text x="150" y="183" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">S</text></g>
-    <g data-locate="west" style="cursor:pointer;opacity:${dim('west')}"><rect x="20" y="60" width="26" height="90" rx="8" fill="#F57E20"/><text x="33" y="109" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">W</text></g>
-    <g data-locate="east" style="cursor:pointer;opacity:${dim('east')}"><rect x="254" y="60" width="26" height="90" rx="8" fill="#F57E20"/><text x="267" y="109" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">E</text></g>
-    <g data-locate="vip" style="cursor:pointer;opacity:${dim('vip')}"><rect x="112" y="142" width="76" height="16" rx="4" fill="#ED1860"/><text x="150" y="154" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">VIP</text></g>
+  <svg viewBox="0 0 300 210" class="stadium" preserveAspectRatio="xMidYMid meet">
+    <g data-locate="north" style="cursor:pointer;opacity:${dim('north')}"><rect x="70" y="16" width="160" height="26" rx="9" fill="#ED1860"/><text x="150" y="33" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">N</text></g>
+    <g data-locate="south" style="cursor:pointer;opacity:${dim('south')}"><rect x="70" y="168" width="160" height="26" rx="9" fill="#1c7a3a"/><text x="150" y="185" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">S</text></g>
+    <g data-locate="west" style="cursor:pointer;opacity:${dim('west')}"><rect x="18" y="58" width="26" height="94" rx="9" fill="#F57E20"/><text x="31" y="109" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">W</text></g>
+    <g data-locate="east" style="cursor:pointer;opacity:${dim('east')}"><rect x="256" y="58" width="26" height="94" rx="9" fill="#F57E20"/><text x="269" y="109" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">E</text></g>
+    <g data-locate="vip" style="cursor:pointer;opacity:${dim('vip')}"><rect x="114" y="140" width="72" height="16" rx="5" fill="#ED1860"/><text x="150" y="152" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">VIP</text></g>
+    <text x="150" y="108" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" opacity=".85" style="text-shadow:0 1px 3px rgba(0,0,0,.6)">${centerLabel}</text>
   </svg>`;
 }
 function seatMapViz(){
@@ -1671,6 +1671,13 @@ function pageEvent(){
         </div>`;}).join('')}
     </div>
   </div>
+
+  <!-- מדיניות ביטולים (בין הכרטיסים למידע על האצטדיון) -->
+  <a class="cancel-link" data-act="soon" data-title="מדיניות הביטולים">
+    <span class="cl-ic">🛡️</span>
+    <span class="cl-tx">לחצו כדי לקרוא את מדיניות הביטולים המלאה</span>
+    <span class="cl-ar">←</span>
+  </a>
 
   <!-- לפני ההופעה (concerts only) -->
   ${E.type==='concert' ? `
