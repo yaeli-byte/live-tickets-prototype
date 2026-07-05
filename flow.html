@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=6" />
+<link rel="stylesheet" href="flow.v5.css?v=7" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -834,6 +834,12 @@ function pageHome(){
 
 /* ---------- מונדיאל knockout bracket ---------- */
 const MONDIAL_BRACKET = {
+  groups:[
+    {a:{n:'ברזיל',f:'🇧🇷',s:'2'}, b:{n:'סרביה',f:'🇷🇸',s:'0'}, when:'הסתיים', done:true},
+    {a:{n:'ארגנטינה',f:'🇦🇷',s:'3'}, b:{n:'מקסיקו',f:'🇲🇽',s:'1'}, when:'הסתיים', done:true},
+    {a:{n:'אנגליה',f:'🇬🇧',s:'1'}, b:{n:'הולנד',f:'🇳🇱',s:'1'}, when:'הסתיים', done:true},
+    {a:{n:'גרמניה',f:'🇩🇪',s:'2'}, b:{n:'יפן',f:'🇯🇵',s:'2'}, when:'הסתיים', done:true},
+  ],
   r16:[
     {a:{n:'קנדה',f:'🇨🇦',s:'0'}, b:{n:'מרוקו',f:'🇲🇦',s:'3'}, when:'הסתיים', done:true},
     {a:{n:'פרגוואי',f:'🇵🇾'}, b:{n:'צרפת',f:'🇫🇷'}, when:'מחר · 00:00'},
@@ -844,18 +850,32 @@ const MONDIAL_BRACKET = {
     {a:{n:'מרוקו',f:'🇲🇦'}, b:{n:'TBD',f:'🛡'}, when:'ה׳ 9 יול · 23:00'},
     {a:{n:'TBD',f:'🛡'}, b:{n:'TBD',f:'🛡'}, when:'ו׳ 10 יול · 22:00'},
   ],
+  sf:[
+    {a:{n:'TBD',f:'🛡'}, b:{n:'TBD',f:'🛡'}, when:'ג׳ 14 יול · 22:00'},
+    {a:{n:'TBD',f:'🛡'}, b:{n:'TBD',f:'🛡'}, when:'ד׳ 15 יול · 22:00'},
+  ],
+  final:[
+    {a:{n:'TBD',f:'🛡'}, b:{n:'TBD',f:'🛡'}, when:'א׳ 19 יול · 22:00 · MetLife'},
+  ],
 };
+const MONDIAL_STAGES=[
+  {key:'groups', label:'שלב הבתים'},
+  {key:'r16',    label:'שמינית גמר'},
+  {key:'qf',     label:'רבע גמר'},
+  {key:'sf',     label:'חצי גמר'},
+  {key:'final',  label:'גמר'},
+];
 function mondialBracket(){
   const tr=t=>`<div class="bt-row"><span class="bt-flag">${t.f}</span><span class="bt-name">${t.n}</span><span class="bt-score">${t.s!==undefined?t.s:''}</span></div>`;
   const card=m=>`<button class="bmatch" data-act="event" data-event="match" data-ev-title="${m.a.n} נגד ${m.b.n}" data-ev-venue="מונדיאל 2026 · ${m.when}" data-ev-price="₪760" data-ev-img="sport2.jpg">
     <div class="bm-when">${m.done?'<span class="bm-ft">הסתיים</span>':''}${m.when}</div>${tr(m.a)}${tr(m.b)}</button>`;
+  const active='r16';
   return `
   <section class="section">
     <div class="sec-head"><span></span><h2 class="sec-title">טבלת המשחקים</h2></div>
-    <div class="brk-tabs">${['שלב הבתים','שמינית גמר','רבע גמר','חצי גמר','גמר'].map((t,i)=>`<button class="brk-tab ${i===1?'on':''}">${t}</button>`).join('')}</div>
+    <div class="brk-tabs">${MONDIAL_STAGES.map(s=>`<button class="brk-tab ${s.key===active?'on':''}" data-act="brk-tab" data-stage="${s.key}">${s.label}</button>`).join('')}</div>
     <div class="bracket">
-      <div class="brk-col"><div class="brk-lbl">שמינית גמר</div>${MONDIAL_BRACKET.r16.map(card).join('')}</div>
-      <div class="brk-col brk-col2"><div class="brk-lbl">רבע גמר</div>${MONDIAL_BRACKET.qf.map(card).join('')}</div>
+      ${MONDIAL_STAGES.map((s,i)=>`<div class="brk-col ${i>=2?'brk-col2':''}" data-stage="${s.key}"><div class="brk-lbl">${s.label}</div>${(MONDIAL_BRACKET[s.key]||[]).map(card).join('')}</div>`).join('')}
     </div>
   </section>`;
 }
@@ -884,11 +904,11 @@ function pageOccasion(){
   </section>
   <section class="section">
     <div class="sec-head"><span></span><h2 class="sec-title">אירועים נבחרים</h2></div>
-    <div class="occ-grid">
+    <div class="hscroll">
       ${D.occasionEvents.map(e=>`
-        <div class="occ-card" data-act="event">
-          <div class="occ-media"><img src="${IMG}${e.img}" alt="${e.name}"><button class="heart ${state.hearts['occ_'+e.name]?'on':''}" data-heart="occ_${e.name}">${ICON.hs}</button></div>
-          <div class="occ-body"><div class="occ-name">${e.name}</div><div class="occ-meta">${e.meta}</div><div class="occ-price">מ-${e.price}<span class="allin"> · כולל עמלות</span></div></div>
+        <div class="ecard" data-act="event" data-event="match" data-ev-title="${e.name}" data-ev-venue="מונדיאל 2026 · ${e.meta}" data-ev-price="${e.price}" data-ev-img="${e.img}">
+          <div class="media"><img src="${IMG}${e.img}" alt="${e.name}"><div class="top"><button class="heart ${state.hearts['occ_'+e.name]?'on':''}" data-heart="occ_${e.name}">${ICON.hs}</button><span></span></div></div>
+          <div class="meta"><div class="en">${e.name}</div><div class="esub">${e.meta}</div><div class="ep">מ-${e.price}<span class="allin"> · כולל עמלות</span></div></div>
         </div>`).join('')}
     </div>
   </section>
@@ -1886,7 +1906,12 @@ function categoriesDrawer(){
               if(c.n==='NBA'){ sub += `<button class="drow" data-act="nba" style="font-size:13px;padding-right:32px;font-weight:600;color:#1A1A1A">${c.n}<span class="sign">›</span></button>`; return; }
               const co = state.mComp===('s'+si+'c'+ci);
               sub += `<button class="drow" data-act="dcp:s${si}c${ci}" style="font-size:13px;padding-right:32px;color:${co?'#ED1860':'#333'}">${c.n}<span class="sign">${co?'−':'+'}</span></button>`;
-              if(co) sub += c.teams.map(t=>`<button class="drow" data-act="team" data-team="${t}" style="font-size:12px;padding-right:48px;color:#666">${t}</button>`).join('');
+              if(co){
+                sub += c.teams.map(t=>`<button class="drow" data-act="team" data-team="${t}" style="font-size:12px;padding-right:48px;color:#666">${t}</button>`).join('');
+                // "לכל אירועי ה…" for this league → its events hub
+                const compAct = c.n.includes('מונדיאל') ? 'occasion' : (si===0 ? 'football' : 'allsport');
+                sub += `<button class="drow" data-act="${compAct}" data-title="${c.n}" style="font-size:12px;padding-right:48px;color:#ED1860;font-weight:600">לכל אירועי ${c.n}<span class="sign">›</span></button>`;
+              }
             });
             // "לכל אירועי ה…" — last item; כדורגל → Page A, others → all-events page
             const allAct = si===0 ? 'football' : 'allsport';
@@ -2243,6 +2268,17 @@ function wire(){
       case act==='sr-filter': set({srFilterSheet:true}); break;
       case act==='sr-filter-close': set({srFilterSheet:false}); break;
       case act==='mu-follow': set({muFollowed:true}); break;
+      case act==='brk-tab': {  // scroll the bracket to the chosen stage (no re-render)
+        const stage=a.getAttribute('data-stage');
+        const bracket=document.querySelector('.bracket');
+        const col=bracket&&bracket.querySelector('.brk-col[data-stage="'+stage+'"]');
+        if(col){
+          const bR=bracket.getBoundingClientRect(), cR=col.getBoundingClientRect();
+          bracket.scrollBy({left:(cR.left+cR.width/2)-(bR.left+bR.width/2), behavior:'smooth'});
+        }
+        document.querySelectorAll('.brk-tab').forEach(t=>t.classList.toggle('on', t.getAttribute('data-stage')===stage));
+        return;
+      }
       case act==='close-drawer': set({drawerOpen:false, acctOpen:false, drawerSection:null, drawerMusicGroup:null, mSport:null, mComp:null}); break;
       case act==='close-sheet': set({openSheet:null}); break;
       case act==='lastminute': set({p1LastMinute:!state.p1LastMinute}); break;
