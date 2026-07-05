@@ -26,6 +26,7 @@ const state = {
   acctOpen:false, drawerOpen:false, drawerSection:null, drawerMusicGroup:null, mSport:null, mComp:null,
   srOpen:false, openSheet:null,
   srQuery:'', srPhase:'idle', srSortBy:'best', srFilterSheet:false, srHearts:{},
+  aiLastMatchup:null, muFollowed:false,
   srRecent:['קולדפליי','ריאל מדריד','טיילור סוויפט'],
   p1LastMinute:false, p1GenreSelected:null, p1CitySelected:null, p1DateLabel:null,
   p1SpotifyConnected:false, playing:false, playIdx:0, plCurrent:0, plPopOpen:false,
@@ -92,7 +93,7 @@ const D = {
   // ---- Search corpus (from the prototype) ----
   SR_PERF:[
     {key:'coldplay',name:'קולדפליי',type:'performer',tags:['cold','קולד','coldplay'],meta:'להקה · פופ רוק',icon:'🎵'},
-    {key:'real',name:'ריאל מדריד',type:'team',tags:['ריאל','real','מדריד'],meta:'כדורגל · ספרד',icon:'⚽'},
+    {key:'real',name:'ריאל מדריד',type:'team',tags:['ריאל','real','מדריד'],meta:'כדורגל · ספרד',icon:'⚽',lobby:7,teamKey:'real'},
     {key:'taylor',name:'טיילור סוויפט',type:'performer',tags:['טיילור','taylor','swift'],meta:'אמנית · פופ',icon:'🎤'},
     {key:'bts',name:'BTS',type:'performer',tags:['bts','בי טי'],meta:'להקה · K-Pop',icon:'🎤'},
     {key:'harry',name:'הארי סטיילס',type:'performer',tags:['הארי','harry','styles'],meta:'אמן · פופ',icon:'🎵'},
@@ -104,7 +105,7 @@ const D = {
   SR_EVENTS:[
     {id:'e1',name:'קולדפליי · ומבלי',date:'4 יולי 2026',venue:'ומבלי, לונדון',price:'₪520',perfKey:'coldplay',city:'לונדון',cat:'performer'},
     {id:'e2',name:'קולדפליי · פריז',date:'12 יולי 2026',venue:'סטאד דה פראנס, פריז',price:'₪610',perfKey:'coldplay',city:'פריז',cat:'performer'},
-    {id:'e3',name:'ריאל מדריד vs. ברצלונה',date:'28 יולי 2026',venue:'ברנבאו, מדריד',price:'₪740',perfKey:'real',city:'מדריד',cat:'team'},
+    {id:'e3',name:'ריאל מדריד vs. ברצלונה',date:'28 יולי 2026',venue:'ברנבאו, מדריד',price:'₪740',perfKey:'real',city:'מדריד',cat:'team',ev:'clasico'},
     {id:'e4',name:'טיילור סוויפט · אמסטרדם',date:'5 אוג׳ 2026',venue:'יוהאן קרויף, אמסטרדם',price:'₪820',perfKey:'taylor',city:'אמסטרדם',cat:'performer'},
     {id:'e5',name:'BTS · טוקיו',date:'22 אוג׳',venue:'סייטאמה ארנה, טוקיו',price:'₪950',perfKey:'bts',city:'טוקיו',cat:'performer'},
     {id:'e6',name:'מנצ׳סטר סיטי vs. ארסנל',date:'14 ספט׳',venue:'אתיחאד, מנצ׳סטר',price:'₪580',perfKey:'manchester',city:'מנצ׳סטר',cat:'team'},
@@ -467,9 +468,125 @@ const AI_CARDS_SPORT = [
   {name:'אל קלאסיקו · ריאל נגד ברצלונה', venue:'סנטיאגו ברנבאו, מדריד', date:'שבת 14 יולי 2026', section:'טריבונה מערב, שורה 8', price:'₪690', img:'team-realmadrid.jpg', ev:'clasico'},
   {name:'ריאל מדריד נגד אתלטיקו', venue:'סנטיאגו ברנבאו, מדריד', date:'ראשון 21 יולי 2026', section:'יציע צפון, שורה 14', price:'₪620', img:'team-realmadrid.jpg', ev:'match', evTitle:'ריאל מדריד נגד אתלטיקו מדריד', evVenue:'סנטיאגו ברנבאו, מדריד', evPrice:'₪620'},
 ];
-const AI_STARTERS = ['כרטיס לקולדפליי בלונדון עד ₪1500','משחק של ריאל מדריד בקיץ','אירועי ספורט בסוף השבוע','הופעה בחו״ל עם ביטול כולל מילואים'];
+const AI_STARTERS = ['אל קלאסיקו — ריאל נגד ברצלונה','משחק של ריאל מדריד בקיץ','אירועי ספורט בסוף השבוע','הופעה בחו״ל עם ביטול כולל מילואים'];
+
+/* ============================================================
+   MATCHUP / RIVALRY RESOLUTION LAYER
+   Three lookup layers checked before literal text match:
+   1) team alias map  2) rivalry/nickname map  3) head-to-head parser.
+   All converge on a resolved team-pair → its scheduled fixture(s).
+   Feeds type-ahead, results page, and AI search. Keyword search stays primary.
+   ============================================================ */
+const TEAMS = [
+  {key:'real',     name:'ריאל מדריד',        img:'team-realmadrid.jpg', aliases:['ריאל מדריד','ריאל','real madrid','real','los blancos','לוס בלנקוס']},
+  {key:'barca',    name:'ברצלונה',           img:'team-barcelona.jpg',  aliases:['ברצלונה','ברסה','בארסה','barça','barca','barcelona','fcb','ברסלונה']},
+  {key:'atletico', name:'אתלטיקו מדריד',      img:'sport1.jpg',          aliases:['אתלטיקו מדריד','אתלטיקו','atletico madrid','atletico','atlético','אתלטי']},
+  {key:'lakers',   name:'לוס אנג׳לס לייקרס',  img:'nba.jpg',             aliases:['לוס אנג׳לס לייקרס','לייקרס','la lakers','lakers']},
+  {key:'celtics',  name:'בוסטון סלטיקס',      img:'nba.jpg',             aliases:['בוסטון סלטיקס','סלטיקס','boston celtics','celtics']},
+];
+const RIVALRIES = [
+  {key:'clasico',      name:'אל קלאסיקו',        pair:['real','barca'],     nicknames:['אל קלאסיקו','קלאסיקו','סופר קלאסיקו','el clásico','el clasico','super clasico','clasico','classico','klasiko']},
+  {key:'derbi-madrid', name:'דרבי מדריד',        pair:['real','atletico'],  nicknames:['דרבי מדריד','דרבי מדרילניו','derbi madrileño','derbi madrid','madrid derby']},
+  {key:'lakers-celtics',name:'לייקרס נגד סלטיקס', pair:['lakers','celtics'], nicknames:['לייקרס נגד סלטיקס','לייקרס סלטיקס','lakers celtics','lakers vs celtics','nba rivalry']},
+];
+// Scheduled meetings, keyed by an (order-independent) team pair.
+const FIXTURES = [
+  {pair:['real','barca'], rivalry:'clasico', title:'ריאל מדריד נגד ברצלונה', date:'שבת · 14 יולי 2026',   comp:'לה ליגה', venue:'סנטיאגו ברנבאו, מדריד', price:'₪690', img:'team-realmadrid.jpg', ev:'clasico'},
+  {pair:['real','barca'], rivalry:'clasico', title:'ברצלונה נגד ריאל מדריד', date:'ראשון · 20 דצמבר 2026', comp:'לה ליגה', venue:'קאמפ נואו, ברצלונה', price:'₪780', img:'team-barcelona.jpg', ev:'match', evTitle:'ברצלונה נגד ריאל מדריד', evVenue:'קאמפ נואו, ברצלונה', evPrice:'₪780', evDate:'20 דצמבר 2026', evImg:'team-barcelona.jpg'},
+];
+function mNorm(s){ return (s||'').toString().toLowerCase().replace(/[.'"׳״]/g,'').replace(/\s+/g,' ').trim(); }
+function mSamePair(a,b){ return a&&b&&a.length===2&&b.length===2 && ((a[0]===b[0]&&a[1]===b[1])||(a[0]===b[1]&&a[1]===b[0])); }
+function mFindRivalry(pair){ return RIVALRIES.find(r=>mSamePair(r.pair,pair))||null; }
+// Alias hit score: full substring match (strong) or last-word prefix while typing (weak).
+function mAliasHit(text, alias){
+  const t=mNorm(text), na=mNorm(alias); if(!na||!t) return 0;
+  if(t.includes(na)) return na.length;
+  const last=t.split(' ').pop();
+  if(last.length>=3 && na.startsWith(last)) return last.length*0.4;
+  return 0;
+}
+function mResolveTeam(text){
+  let best=null,bestScore=0;
+  for(const tm of TEAMS){ for(const a of tm.aliases){ const s=mAliasHit(text,a); if(s>bestScore){ best=tm; bestScore=s; } } }
+  return best;
+}
+function mTeamGames(key){ return FIXTURES.filter(f=>f.pair.includes(key)); }
+function mBuild(pair, rivalry){
+  const teams=pair.map(k=>TEAMS.find(t=>t.key===k)).filter(Boolean);
+  return {teams, pair, rivalry:rivalry||mFindRivalry(pair), fixtures:FIXTURES.filter(f=>mSamePair(f.pair,pair))};
+}
+// Returns {teams,pair,rivalry,fixtures} or null. Order-independent.
+function resolveMatchup(query){
+  const raw=(query||'').trim(); if(!raw) return null;
+  const q=mNorm(raw);
+  // 1) rivalry / nickname (longest match wins)
+  let rHit=null,rLen=0;
+  for(const r of RIVALRIES){ for(const n of r.nicknames){ const nn=mNorm(n); if(nn && q.includes(nn) && nn.length>rLen){ rHit=r; rLen=nn.length; } } }
+  if(rHit) return mBuild(rHit.pair, rHit);
+  // 2) head-to-head connector: TeamA (נגד|מול|vs|v|-) TeamB
+  const parts=raw.split(/\s*(?:\bנגד\b|\bמול\b|\bvs\.?\b|\bv\b|\s-\s)\s*/i).filter(Boolean);
+  if(parts.length>=2){ const a=mResolveTeam(parts[0]), b=mResolveTeam(parts[1]); if(a&&b&&a.key!==b.key) return mBuild([a.key,b.key]); }
+  // 3) two known teams anywhere (order-independent, no connector; supports mid-typing)
+  const found=[];
+  for(const tm of TEAMS){ if(tm.aliases.some(al=>mAliasHit(raw,al)>0)){ if(!found.includes(tm.key)) found.push(tm.key); } }
+  if(found.length>=2) return mBuild([found[0],found[1]]);
+  return null;
+}
+// Event nav attributes for a fixture (reuses the generic 'event' click handler).
+function fxAttrs(f){
+  return f.ev==='clasico'
+    ? `data-event="clasico"`
+    : `data-event="match" data-ev-title="${(f.evTitle||f.title)}" data-ev-venue="${(f.evVenue||f.venue)}" data-ev-price="${(f.evPrice||f.price)}" data-ev-date="${(f.evDate||f.date)}" data-ev-img="${(f.evImg||f.img)}"`;
+}
+function pNum(p){ return parseInt((p||'').toString().replace(/[^\d]/g,''))||0; }
+function fxToAiCard(f){ return {name:f.title, venue:f.venue, date:f.date, section:f.comp, price:f.price, img:f.img, ev:f.ev, evTitle:f.evTitle, evVenue:f.evVenue, evPrice:f.evPrice, evDate:f.evDate, evImg:f.evImg}; }
+// Head-to-head block for the results page (matchup outranks generic grouping).
+function matchupBlock(q){
+  const mu=resolveMatchup(q); if(!mu) return '';
+  const names=mu.teams.map(t=>t.name).join(' נגד ');
+  const head=`<div class="mu-head"><span class="mu-tag">${mu.rivalry?'יריבות · ראש בראש':'ראש בראש'}</span><h4 class="mu-title">${mu.rivalry?mu.rivalry.name+' · '+names:names}</h4></div>`;
+  const fxCard=(f)=>`
+    <div class="mu-fx" data-act="event" ${fxAttrs(f)}>
+      <img class="mu-fx-img" src="${IMG}${f.img}" alt="">
+      <div class="mu-fx-body">
+        <div class="mu-fx-nm">${f.title}</div>
+        <div class="mu-fx-mt">${f.date} · ${f.comp} · ${f.venue}</div>
+        <span class="ai-badge">✓ ביטול כולל מילואים</span>
+        <div class="mu-fx-price">מ-${f.price}<span class="fees"> · כולל עמלות</span></div>
+      </div>
+      <span class="mu-fx-cta">לכרטיסים ›</span>
+    </div>`;
+  if(mu.fixtures.length) return `<div class="mu-block">${head}${mu.fixtures.map(fxCard).join('')}</div>`;
+  // no scheduled meeting → don't dead-end
+  const alt=[]; mu.teams.forEach(t=>mTeamGames(t.key).forEach(f=>{ if(!alt.some(x=>x.title===f.title)) alt.push(f); }));
+  const follow = state.muFollowed
+    ? `<div class="mu-followed">✓ עוקבים אחרי שתי הקבוצות — נודיע לכם כשייקבע משחק</div>`
+    : `<button class="mu-follow" data-act="mu-follow">🔔 עקבו אחרי שתי הקבוצות · קבלו התראה כשמשחק ייקבע</button>`;
+  const altHtml = alt.length ? `<div class="mu-alt-h">בינתיים — משחקים קרובים של הקבוצות</div>`+alt.slice(0,3).map(fxCard).join('') : '';
+  const namesL=mu.teams.map(t=>t.name).join(' ל');
+  return `<div class="mu-block">${head}
+    <div class="mu-empty"><div class="mu-empty-t">אין כרגע משחק מתוזמן בין ${namesL}</div>${follow}</div>${altHtml}</div>`;
+}
 function aiRespond(query){
   const q=(query||'').trim();
+  // Matchup / rivalry / H2H — resolved before literal matching.
+  const mu=resolveMatchup(q);
+  if(mu){
+    state.aiLastMatchup=mu;
+    const names=mu.teams.map(t=>t.name).join(' נגד ');
+    if(mu.fixtures.length){
+      const n=mu.fixtures.length;
+      return {summary:(mu.rivalry?mu.rivalry.name+' — ':'')+'מצאתי '+(n>1?n+' מפגשים מתוזמנים':'משחק מתוזמן')+' בין '+names+'. המחירים כוללים את כל העמלות:', cards:mu.fixtures.map(fxToAiCard)};
+    }
+    const alt=[]; mu.teams.forEach(t=>mTeamGames(t.key).forEach(f=>{ if(!alt.some(x=>x.title===f.title)) alt.push(f); }));
+    return {summary:'אין כרגע משחק מתוזמן בין '+mu.teams.map(t=>t.name).join(' ל-')+'. עקבו אחרי שתי הקבוצות ואעדכן ברגע שייקבע'+(alt.length?' — בינתיים, משחקים קרובים שלהן:':'.'), cards:alt.map(fxToAiCard)};
+  }
+  // Follow-ups grounded on the last resolved matchup.
+  if(state.aiLastMatchup && state.aiLastMatchup.fixtures.length){
+    const fx=state.aiLastMatchup.fixtures;
+    if(/זול|cheap/i.test(q)){ const c=[...fx].sort((a,b)=>pNum(a.price)-pNum(b.price))[0]; return {summary:'הכי זול: '+c.title+' — מ-'+c.price+' (כולל כל העמלות), '+c.date+' · '+c.venue+'.', cards:[fxToAiCard(c)]}; }
+    if(/מתי|הבא|התאריך|when|next/i.test(q)){ const c=fx[0]; return {summary:'המשחק הבא: '+c.title+' · '+c.date+' · '+c.venue+'. מ-'+c.price+' כולל עמלות.', cards:[fxToAiCard(c)]}; }
+  }
   const sport=/כדורגל|ריאל|ברצלונ|קלאסיקו|nba|כדורסל|לייקרס|דרבי|משחק|ספורט|מונדיאל|אתלטיקו/i.test(q);
   return sport
     ? {summary:'מצאתי משחקים זמינים בטווח שלך. ההצעות המשתלמות ביותר, כולל כל העמלות:', cards:AI_CARDS_SPORT}
@@ -1784,20 +1901,33 @@ function srDetectIntent(q){
 function srTypeahead(q){
   if(!q.trim()) return [];
   const ql=q.toLowerCase(), intent=srDetectIntent(q), rows=[];
+  // Matchup / rivalry / H2H resolves ABOVE literal suggestions.
+  // When it resolves, we suppress the generic literal rows so every suggestion
+  // leads to the matchup (not an unrelated stub that lands on Coldplay).
+  const mu=resolveMatchup(q);
+  if(mu){
+    if(mu.fixtures.length){
+      mu.fixtures.slice(0,2).forEach(f=>rows.push({kind:'matchup',label:f.title,sub:(mu.rivalry?mu.rivalry.name+' · ':'')+f.date+' · מ-'+f.price,thumb:f.img,fx:f}));
+    } else {
+      rows.push({kind:'matchup',label:(mu.rivalry?mu.rivalry.name:mu.teams.map(t=>t.name).join(' נגד ')),sub:'אין משחק מתוזמן · הצגת אפשרויות',thumb:(mu.teams[0]||{}).img,muQ:q});
+    }
+    rows.push({kind:'all',label:'כל התוצאות עבור "'+q+'"',sub:'',icon:'🔍'});
+    return rows;
+  }
   const topPerf=D.SR_PERF.find(p=>p.tags.some(t=>ql.includes(t)));
   const topCity=D.SR_CITIES.find(c=>c.name.includes(q)||ql.includes(c.name.toLowerCase()));
   const topCat=D.srCats.find(c=>c.tags.some(t=>ql.includes(t)));
   const topEvt=D.SR_EVENTS.find(e=>e.name.toLowerCase().includes(ql));
   const top=topPerf||topCity||topCat||topEvt;
-  if(top) rows.push({kind:'top',label:top.name||'',sub:top.meta||top.date||'',icon:top.icon||'🔍'});
+  if(top) rows.push({kind:'top',label:top.name||'',sub:top.meta||top.date||'',icon:top.icon||'🔍',ev:top.ev,navP:top.lobby,navTeam:top.teamKey});
   if(intent==='performer'&&topPerf){
-    D.SR_EVENTS.filter(e=>e.perfKey===topPerf.key).slice(0,3).forEach(e=>rows.push({kind:'event',label:e.name,sub:e.date+' · '+e.venue+' · '+e.price,icon:'🎫'}));
-    D.SR_PERF.filter(p=>p.type===topPerf.type&&p.key!==topPerf.key).slice(0,2).forEach(p=>rows.push({kind:'performer',label:p.name,sub:p.meta,icon:p.icon}));
+    D.SR_EVENTS.filter(e=>e.perfKey===topPerf.key).slice(0,3).forEach(e=>rows.push({kind:'event',label:e.name,sub:e.date+' · '+e.venue+' · '+e.price,icon:'🎫',ev:e.ev}));
+    D.SR_PERF.filter(p=>p.type===topPerf.type&&p.key!==topPerf.key).slice(0,2).forEach(p=>rows.push({kind:'performer',label:p.name,sub:p.meta,icon:p.icon,navP:p.lobby,navTeam:p.teamKey}));
   } else if(intent==='location'&&topCity){
-    D.SR_EVENTS.filter(e=>e.city===topCity.name).slice(0,3).forEach(e=>rows.push({kind:'event',label:e.name,sub:e.date+' · '+e.price,icon:'🎫'}));
+    D.SR_EVENTS.filter(e=>e.city===topCity.name).slice(0,3).forEach(e=>rows.push({kind:'event',label:e.name,sub:e.date+' · '+e.price,icon:'🎫',ev:e.ev}));
   } else if(intent==='category'&&topCat){
     D.srCats.filter(c=>c.key!==topCat.key).slice(0,2).forEach(c=>rows.push({kind:'category',label:c.name,sub:'',icon:c.icon}));
-    D.SR_EVENTS.filter(e=>e.cat==='category'||(topCat.key==='football'&&e.cat==='team')).slice(0,3).forEach(e=>rows.push({kind:'event',label:e.name,sub:e.date+' · '+e.price,icon:'🎫'}));
+    D.SR_EVENTS.filter(e=>e.cat==='category'||(topCat.key==='football'&&e.cat==='team')).slice(0,3).forEach(e=>rows.push({kind:'event',label:e.name,sub:e.date+' · '+e.price,icon:'🎫',ev:e.ev}));
   }
   rows.push({kind:'all',label:'כל התוצאות עבור "'+q+'"',sub:'',icon:'🔍'});
   return rows.slice(0,8);
@@ -1848,19 +1978,35 @@ function searchOverlay(){
     const tagColor={event:'#1c7a3a',top:'#ed1860',performer:'#216ca5',category:'#216ca5'};
     const tagLabel={event:'אירוע',top:'התאמה',performer:'אמן',category:'קטגוריה'};
     const act=r=> r.kind==='all'?'sr-all': r.kind==='event'?'sr-event': (r.kind==='performer'||r.kind==='top')?'sr-perf':'sr-setq';
-    body=srTypeahead(q).map(r=>`
-      <div class="ta-row" data-act="${act(r)}" data-q="${r.label}">
+    body=srTypeahead(q).map(r=>{
+      if(r.kind==='matchup'){
+        // fixture → straight to the match (Event) page; nickname-only → results (H2H / fallback)
+        const attr = r.fx ? `data-act="event" ${fxAttrs(r.fx)}` : `data-act="sr-setq" data-q="${(r.muQ||r.label).replace(/"/g,'&quot;')}"`;
+        const tag = r.fx ? {t:'משחק',c:'#1c7a3a'} : {t:'יריבות',c:'#ed1860'};
+        return `
+      <div class="ta-row ta-matchup" ${attr}>
+        <img class="ov-thumb" src="${IMG}${r.thumb||srThumb(r.label)}" alt="">
+        <div class="tx"><div class="n">${r.label}${r.fx?'':' →'}</div>${r.sub?`<div class="s">${r.sub}</div>`:''}</div>
+        <span class="ta-tag" style="color:${tag.c};background:${tag.c}1a">${tag.t}</span>
+      </div>`;
+      }
+      const nav = (r.ev?` data-ev="${r.ev}"`:'') + (r.navP?` data-p="${r.navP}" data-team="${r.navTeam||''}"`:'');
+      return `
+      <div class="ta-row" data-act="${act(r)}" data-q="${r.label}"${nav}>
         <img class="ov-thumb" src="${IMG}${srThumb(r.label)}" alt="">
         <div class="tx"><div class="n">${r.label}</div>${r.sub?`<div class="s">${r.sub}</div>`:''}</div>
         ${tagLabel[r.kind]?`<span class="ta-tag" style="color:${tagColor[r.kind]};background:${tagColor[r.kind]}1a">${tagLabel[r.kind]}</span>`:''}
-      </div>`).join('');
+      </div>`;
+    }).join('');
   } else {
     const r=srResults(q);
     const sec=(t)=>`<h4 class="res-h">${t}</h4>`;
     let out=`
       <div class="res-bar">
-        <button class="sm-filter" data-act="sr-filter">סינון</button>
-        <div class="res-sort">${['best','price','date'].map(k=>`<button class="sort-btn ${state.srSortBy===k?'on':''}" data-srsort="${k}">${srSortLabel[k]}</button>`).join('')}</div>
+        <div class="res-sort">
+          <button class="sm-filter" data-act="sr-filter">סינון</button>
+          <button class="sort-btn ${state.srSortBy==='best'?'on':''}" data-srsort="best">${srSortLabel.best}</button>
+        </div>
         <div class="res-title">תוצאות עבור "${q}"</div>
       </div>
       <div class="ai-overview">
@@ -1868,14 +2014,15 @@ function searchOverlay(){
         <p class="ai-osum">${aiRespond(q).summary} <span class="fade">כל המחירים כוללים עמלות.</span></p>
         <button class="ai-ogo" data-act="ai-open" data-q="${q.replace(/"/g,'&quot;')}">המשיכו לשיחה ←</button>
       </div>`;
+    out+=matchupBlock(q);   // matchup / H2H outranks generic team/city grouping
     if(r.topMatch) out+=`
-      <div class="res-top" data-act="sr-perf">
-        <span class="res-cta">לאמן ›</span>
+      <div class="res-top" data-act="sr-perf" data-p="${r.topMatch.lobby||2}" data-team="${r.topMatch.teamKey||''}">
+        <span class="res-cta">${r.topMatch.lobby===7?'לעמוד הקבוצה ›':'לאמן ›'}</span>
         <div class="tx"><div class="n">${r.topMatch.name}</div><div class="s">${r.topMatch.meta||''}</div></div>
         <img class="ov-thumb" src="${IMG}${srThumb(r.topMatch.name)}" alt="">
       </div>`;
     if(r.events.length){ out+=sec('אירועים')+`<div class="res-evs">`+r.events.map(e=>`
-      <div class="res-ev" data-act="sr-event">
+      <div class="res-ev" data-act="sr-event" data-ev="${e.ev||'coldplay'}">
         <button class="ev-heart ${state.srHearts[e.id]?'on':''}" data-heart="sr_${e.id}">${ICON.hs}</button>
         <div class="ev-body">
           <div class="ev-name">${e.name}</div>
@@ -1884,7 +2031,7 @@ function searchOverlay(){
         </div>
         <img class="ev-thumb" src="${IMG}${SR_EVENT_IMG[e.perfKey]||'artist3.jpg'}" alt="">
       </div>`).join('')+`</div>`; }
-    if(r.performers.length){ out+=sec('אמנים')+r.performers.map(p=>`<div class="ov-row" data-act="sr-perf"><div class="tx"><div class="n">${p.name}</div><div class="m">${p.meta||''}</div></div><img class="ov-thumb" src="${IMG}${srThumb(p.name)}" alt=""></div>`).join(''); }
+    if(r.performers.length){ out+=sec('אמנים')+r.performers.map(p=>`<div class="ov-row" data-act="sr-perf" data-p="${p.lobby||2}" data-team="${p.teamKey||''}"><div class="tx"><div class="n">${p.name}</div><div class="m">${p.meta||''}</div></div><img class="ov-thumb" src="${IMG}${srThumb(p.name)}" alt=""></div>`).join(''); }
     if(r.cities.length){ out+=sec('מיקומים')+r.cities.map(c=>`<div class="ov-row" data-act="sr-setq" data-q="${c.name}"><div class="tx"><div class="n">${c.name}</div><div class="s">${c.meta}</div></div><img class="ov-thumb" src="${IMG}${srThumb(c.name)}" alt=""></div>`).join(''); }
     if(r.categories.length){ out+=sec('קטגוריות')+`<div class="ov-chips">`+r.categories.map(c=>`<button class="res-chip" data-act="sr-cat-nav">${c.icon} ${c.name}</button>`).join('')+`</div>`; }
     body=out;
@@ -2063,11 +2210,12 @@ function wire(){
       case act==='sr-clear-recent': set({srRecent:[]}); break;
       case act==='sr-all': set({srPhase:'results'}); break;
       case act==='sr-setq': set({srQuery: a.getAttribute('data-q')||'', srPhase:'results'}); break;
-      case act==='sr-event': state.srQuery=''; state.srPhase='idle'; state.srFilterSheet=false; go(3); break;
-      case act==='sr-perf': state.srQuery=''; state.srPhase='idle'; state.srFilterSheet=false; go(2); break;
+      case act==='sr-event': { const ev=a.getAttribute('data-ev')||'coldplay'; state.eventKey=ev; state.srQuery=''; state.srPhase='idle'; state.srFilterSheet=false; go(3); break; }
+      case act==='sr-perf': { const p=parseInt(a.getAttribute('data-p'),10)||2; if(p===7) state.teamKey=a.getAttribute('data-team')||'real'; state.srQuery=''; state.srPhase='idle'; state.srFilterSheet=false; go(p); break; }
       case act==='sr-cat-nav': state.srQuery=''; state.srPhase='idle'; state.srFilterSheet=false; go(1); break;
       case act==='sr-filter': set({srFilterSheet:true}); break;
       case act==='sr-filter-close': set({srFilterSheet:false}); break;
+      case act==='mu-follow': set({muFollowed:true}); break;
       case act==='close-drawer': set({drawerOpen:false, acctOpen:false, drawerSection:null, drawerMusicGroup:null, mSport:null, mComp:null}); break;
       case act==='close-sheet': set({openSheet:null}); break;
       case act==='lastminute': set({p1LastMinute:!state.p1LastMinute}); break;

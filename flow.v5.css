@@ -532,7 +532,7 @@ img{display:block;}
 /* results */
 .res-bar{display:flex;flex-direction:column;gap:10px;padding:4px 0 6px;}
 .res-title{font-size:13px;color:var(--muted);text-align:right;order:-1;}
-.res-sort{display:flex;gap:6px;justify-content:flex-end;}
+.res-sort{display:flex;gap:8px;justify-content:flex-end;align-items:center;}
 .res-h{font-size:12px;color:var(--muted);text-align:right;margin:16px 0 6px;font-weight:600;}
 .res-top{display:flex;align-items:center;gap:12px;justify-content:flex-end;padding:12px;background:#fdeef4;border-radius:12px;cursor:pointer;margin-top:6px;}
 .res-top .ic{font-size:22px;order:3;}
@@ -540,6 +540,28 @@ img{display:block;}
 .res-top .tx .n{font-size:15px;font-weight:600;color:var(--ink);}
 .res-top .tx .s{font-size:11px;color:var(--muted);}
 .res-top .res-cta{order:1;font-size:12px;font-weight:600;color:var(--pink);flex-shrink:0;}
+
+/* ===== Matchup / rivalry (H2H) result block ===== */
+.mu-block{margin:2px 16px 14px;border:1.5px solid #f3c9d9;border-radius:14px;background:linear-gradient(140deg,#fff5f9 0%,#fff 60%);padding:12px;}
+.ta-matchup{background:#fff5f9;border-radius:10px;padding-inline:8px;}
+.mu-head{text-align:right;margin-bottom:10px;}
+.mu-tag{display:inline-block;font-size:10px;font-weight:700;color:var(--pink);background:#fbe0eb;border-radius:6px;padding:2px 8px;}
+.mu-title{font-size:15px;font-weight:700;color:var(--ink);margin-top:6px;direction:rtl;}
+.mu-fx{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px;cursor:pointer;margin-top:8px;transition:transform .15s,box-shadow .15s,border-color .15s;}
+.mu-fx:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08);border-color:#cfcfcf;}
+.mu-fx-img{width:56px;height:56px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--card-dark);order:3;}
+.mu-fx-body{flex:1;text-align:right;min-width:0;order:2;}
+.mu-fx-nm{font-size:14px;font-weight:700;color:var(--ink);direction:rtl;}
+.mu-fx-mt{font-size:11px;color:var(--muted);margin:2px 0 5px;}
+.mu-fx-price{font-size:13px;font-weight:700;color:var(--ink);margin-top:5px;}
+.mu-fx-price .fees{font-size:10px;font-weight:400;color:var(--muted);}
+.mu-fx-cta{order:1;font-size:12px;font-weight:600;color:var(--pink);flex-shrink:0;}
+.mu-empty{text-align:right;background:#fff;border:1px dashed #e3c3d1;border-radius:12px;padding:14px;}
+.mu-empty-t{font-size:13px;font-weight:600;color:var(--ink);}
+.mu-follow{margin-top:10px;width:100%;background:var(--pink);color:#fff;border:none;border-radius:10px;padding:11px;font:600 12px 'Rubik',sans-serif;cursor:pointer;}
+.mu-followed{margin-top:10px;font-size:12px;font-weight:600;color:#128a4b;text-align:center;}
+.mu-alt-h{font-size:12px;font-weight:600;color:var(--muted);text-align:right;margin:12px 2px 2px;}
+
 /* event results — design-system card style (thumbnail · info · heart) */
 .res-evs{display:flex;flex-direction:column;gap:8px;}
 .res-ev{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--border);border-radius:12px;
