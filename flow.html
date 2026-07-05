@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=7" />
+<link rel="stylesheet" href="flow.v5.css?v=8" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -37,7 +37,7 @@ const state = {
   acctOpen:false, drawerOpen:false, drawerSection:null, drawerMusicGroup:null, mSport:null, mComp:null,
   srOpen:false, openSheet:null,
   srQuery:'', srPhase:'idle', srSortBy:'best', srFilterSheet:false, srHearts:{},
-  aiLastMatchup:null, muFollowed:false,
+  aiLastMatchup:null, muFollowed:false, leagueTitle:'',
   srRecent:['קולדפליי','ריאל מדריד','טיילור סוויפט'],
   p1LastMinute:false, p1GenreSelected:null, p1CitySelected:null, p1DateLabel:null,
   p1SpotifyConnected:false, playing:false, playIdx:0, plCurrent:0, plPopOpen:false,
@@ -1105,12 +1105,17 @@ function sportsFaq(title,items){
    ============================================================ */
 function pageFootball(){
   const F = FOOTBALL;
+  const lg = state.leagueTitle;   // when set, this hub renders as that league's lobby
+  const crumb = lg || F.crumb;
+  const title = lg || F.title;
+  const lede  = lg ? `כל האירועים של ${lg} · מחירים all-in` : F.lede;
+  const featured = lg ? {name:lg, tag:`המשחקים הגדולים של ${lg} · העונה 2026`, price:'₪690', event:'clasico', hue:F.hue} : F.featured;
   return `
-  ${sportsCrumb(F.crumb)}
+  ${sportsCrumb(crumb)}
   <section class="cat-hero">
-    <h1>${F.title}</h1>
-    <p class="lede">${F.lede}</p>
-    ${featuredCard(F.featured,'event')}
+    <h1>${title}</h1>
+    <p class="lede">${lede}</p>
+    ${featuredCard(featured,'event')}
   </section>
 
   <div class="filterbar">
@@ -1909,7 +1914,7 @@ function categoriesDrawer(){
               if(co){
                 sub += c.teams.map(t=>`<button class="drow" data-act="team" data-team="${t}" style="font-size:12px;padding-right:48px;color:#666">${t}</button>`).join('');
                 // "לכל אירועי ה…" for this league → its events hub
-                const compAct = c.n.includes('מונדיאל') ? 'occasion' : (si===0 ? 'football' : 'allsport');
+                const compAct = c.n.includes('מונדיאל') ? 'occasion' : (si===0 ? 'leaguelobby' : 'allsport');
                 sub += `<button class="drow" data-act="${compAct}" data-title="${c.n}" style="font-size:12px;padding-right:48px;color:#ED1860;font-weight:600">לכל אירועי ${c.n}<span class="sign">›</span></button>`;
               }
             });
@@ -2290,7 +2295,8 @@ function wire(){
         if(ev==='match'){ state.evTitle=el.getAttribute('data-ev-title')||'משחק'; state.evVenue=el.getAttribute('data-ev-venue')||''; state.evDate=el.getAttribute('data-ev-date')||''; state.evPrice=el.getAttribute('data-ev-price')||''; state.evImg=el.getAttribute('data-ev-img')||''; }
         go(3); break; }
       case act==='occasion': go(4); break;
-      case act==='football': go(5); break;
+      case act==='football': state.leagueTitle=''; go(5); break;
+      case act==='leaguelobby': state.leagueTitle=a.getAttribute('data-title')||''; go(5); break;
       case act==='nba': go(6); break;
       case act==='team': { state.teamKey = a.getAttribute('data-team')||'real'; go(7); break; }
       case act==='league': { state.phTitle = a.getAttribute('data-title')||'ליגה'; state.phNote='עמוד הליגה — בקרוב'; go(8); break; }
