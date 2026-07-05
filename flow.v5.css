@@ -227,7 +227,11 @@ img{display:block;}
 
 /* video highlights block */
 .videoblock{position:relative;margin:14px 16px 0;height:170px;border-radius:14px;background:#e9e9ee;
-  display:flex;align-items:center;justify-content:center;}
+  display:flex;align-items:center;justify-content:center;overflow:hidden;}
+/* fill the video frame with a photo (sports-team lobby) — proportions unchanged */
+.videoblock--photo{background-size:cover;background-position:center;background-repeat:no-repeat;}
+.videoblock--photo::before{content:"";position:absolute;inset:0;background:rgba(5,2,12,.28);}
+.videoblock--photo .vb-play{position:relative;z-index:1;box-shadow:0 4px 14px rgba(0,0,0,.35);}
 .vb-play{width:56px;height:56px;border-radius:50%;background:var(--pink);color:#fff;border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;}
 .vb-play svg{width:22px;height:22px;margin-inline-start:3px;}
@@ -261,7 +265,8 @@ img{display:block;}
 /* squad avatars */
 .squadrow{padding-inline-start:16px;gap:14px;}
 .squad{flex-shrink:0;text-align:center;cursor:pointer;width:64px;}
-.squad-av{width:60px;height:60px;border-radius:50%;background:#e9e9ee;margin:0 auto 6px;transition:transform .15s;}
+.squad-av{width:60px;height:60px;border-radius:50%;background:#e9e9ee;margin:0 auto 6px;transition:transform .15s;overflow:hidden;}
+.squad-av img{width:100%;height:100%;object-fit:cover;display:block;}
 .squad:hover .squad-av{transform:translateY(-2px);}
 .squad-name{font-size:11px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
@@ -295,7 +300,7 @@ img{display:block;}
 .btn-orange{background:var(--orange);color:#fff;font-size:12px;padding:8px 16px;}
 
 /* filter bar */
-.filterbar{display:flex;gap:8px;overflow-x:auto;direction:rtl;padding:14px 16px 2px;scrollbar-width:none;}
+.filterbar{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;direction:rtl;padding:14px 16px 2px;scrollbar-width:none;}
 .filterbar::-webkit-scrollbar{display:none;}
 .chip{height:32px;padding:0 13px;border:1.5px solid var(--line);border-radius:16px;background:#fff;
   color:#444;font:400 12px 'Rubik',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;
@@ -426,7 +431,8 @@ img{display:block;}
 .faq-q .qi::before{top:8px;left:2px;right:2px;height:2px;}
 .faq-q .qi::after{left:8px;top:2px;bottom:2px;width:2px;transition:opacity .25s;}
 .faq-item.open .qi::after{opacity:0;}
-.faq-a{max-height:0;overflow:hidden;transition:max-height .3s;}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.faq-item.open .faq-a{max-height:360px;}
 .faq-a p{padding:0 14px 14px;font-size:13px;color:#555;line-height:1.65;text-align:right;}
 
 /* SEO text */
@@ -485,6 +491,8 @@ img{display:block;}
   border-bottom:1px solid var(--line);cursor:pointer;text-align:right;}
 .ov-row:hover{background:#fafafa;}
 .ov-row .ic{font-size:20px;flex-shrink:0;}
+.ov-thumb{width:44px;height:44px;border-radius:9px;object-fit:cover;flex-shrink:0;order:9;background:#e9e5dd;}
+.ov-row .tx .m{font-size:11px;color:var(--muted);margin-top:1px;}
 .ov-row .tx{flex:1;}
 .ov-row .tx .n{font-size:14px;color:var(--ink);font-weight:500;}
 .ov-row .tx .m{font-size:11px;color:var(--muted);}
@@ -687,19 +695,22 @@ img{display:block;}
 .eh-stats{font-size:11px;color:rgba(255,255,255,.8);text-align:left;line-height:1.5;}
 
 .ev-slim{position:fixed;top:0;left:0;right:0;max-width:375px;margin-inline:auto;z-index:25;
-  display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);
+  display:flex;flex-direction:column;gap:3px;padding:8px 14px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);
   transform:translateY(-110%);transition:transform .25s;}
 .ev-slim.show{transform:translateY(0);}
-.es-back{background:none;border:none;font-size:22px;color:var(--ink);cursor:pointer;flex-shrink:0;}
-.es-info{flex:1;text-align:right;}
-.es-info .es-t{font-size:13px;font-weight:700;color:var(--ink);}
+.ev-slim .es-row{display:flex;align-items:center;gap:9px;}
+.es-back{background:none;border:none;font-size:22px;color:var(--ink);cursor:pointer;flex-shrink:0;line-height:1;}
+.ev-slim .es-logo{display:flex;align-items:center;cursor:pointer;}
+.ev-slim .es-logo img{height:22px;}
+.es-info{text-align:right;}
+.es-info .es-t{font-size:12.5px;font-weight:700;color:var(--ink);}
 .es-info .es-d{font-size:11px;color:var(--muted);}
-.es-price{font-size:13px;font-weight:700;color:var(--pink);flex-shrink:0;}
+.es-price{margin-inline-start:auto;font-size:13px;font-weight:700;color:var(--pink);flex-shrink:0;}
 
 .ev-trust{background:#fafafa;border-bottom:1px solid var(--line);font-size:11px;color:#666;text-align:center;padding:11px 12px;letter-spacing:.1px;}
 .ev-trust .star{color:var(--orange);}.ev-trust b{color:var(--ink);font-weight:600;}
 
-.seatmap{position:sticky;top:52px;z-index:10;background:#f4f4f4;padding:16px 16px 14px;border-bottom:1px solid #e6e6e6;}
+.seatmap{position:sticky;top:62px;z-index:10;background:#f4f4f4;padding:16px 16px 14px;border-bottom:1px solid #e6e6e6;}
 .sm-head{text-align:right;}
 .sm-head .sm-t{font-size:16px;font-weight:600;color:var(--ink);}
 .sm-head .sm-s{font-size:11px;color:var(--muted);margin-top:2px;}
@@ -772,7 +783,16 @@ img{display:block;}
 .ff-check .box{width:22px;height:22px;border-radius:5px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
   color:#fff;font-size:13px;flex-shrink:0;}
 .ff-check .box.on{background:var(--pink);border-color:var(--pink);}
-.lst-cards{display:flex;flex-direction:column;gap:10px;padding:0 16px 8px;}
+.lst-cards{display:flex;flex-direction:column;gap:10px;padding:0 16px 8px;max-height:46vh;overflow-y:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;}
+.lst-cards::-webkit-scrollbar{width:0;}
+/* עוד אודות האולם — venue card */
+.venue-card{margin:12px 16px 0;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff;}
+.venue-img{width:100%;height:150px;object-fit:cover;display:block;background:var(--card-dark);}
+.venue-body{padding:14px;text-align:right;}
+.venue-name{font-size:15px;font-weight:700;color:var(--ink);}
+.venue-desc{font-size:12.5px;color:#555;line-height:1.6;margin-top:6px;}
+.venue-map{display:inline-block;margin-top:10px;font-size:13px;font-weight:600;color:var(--link);text-decoration:none;}
+.venue-map:hover{text-decoration:underline;}
 /* SeatGeek-style listing card, mirrored RTL: thumb (right) · section/row + value badge · price (left) */
 .lcard{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:10px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;}
 .lcard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08);border-color:#cfcfcf;}
@@ -904,7 +924,7 @@ img{display:block;}
 /* AI result card — reuses the event-card pattern */
 .ai-evc{display:flex;gap:10px;background:#fff;border:1px solid var(--border);border-radius:13px;padding:10px;margin-bottom:9px;cursor:pointer;transition:box-shadow .15s,border-color .15s;}
 .ai-evc:hover{box-shadow:0 6px 18px rgba(0,0,0,.08);border-color:#cfcfcf;}
-.ai-evc-img{width:58px;height:78px;border-radius:9px;object-fit:cover;background:var(--card-dark);flex:none;}
+.ai-evc-img{width:58px;height:78px;border-radius:9px;object-fit:cover;background:var(--card-dark);flex:none;order:2;}
 .ai-evc-body{flex:1;min-width:0;text-align:right;}
 .ai-evc-nm{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.25;}
 .ai-evc-mt{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.45;}
@@ -940,3 +960,25 @@ img{display:block;}
 .ai-send{width:38px;height:38px;border-radius:50%;background:var(--ai-grad);color:#fff;border:none;display:flex;
   align-items:center;justify-content:center;font-size:17px;cursor:pointer;flex:none;transition:.15s;}
 .ai-send:hover{filter:brightness(1.08);}
+
+/* ============ מונדיאל knockout bracket ============ */
+.brk-tabs{display:flex;gap:6px;overflow-x:auto;direction:rtl;padding:0 16px 12px;scrollbar-width:none;}
+.brk-tabs::-webkit-scrollbar{display:none;}
+.brk-tab{flex-shrink:0;background:#f2f2f5;border:none;border-radius:16px;padding:8px 14px;font-size:13px;font-family:inherit;color:var(--muted);cursor:pointer;white-space:nowrap;}
+.brk-tab.on{background:#fff;border:1.5px solid var(--ink);color:var(--ink);font-weight:600;}
+.bracket{display:flex;direction:rtl;gap:34px;overflow-x:auto;padding:4px 16px 10px;scrollbar-width:none;}
+.bracket::-webkit-scrollbar{display:none;}
+.brk-col{display:flex;flex-direction:column;gap:14px;flex-shrink:0;}
+.brk-col2{justify-content:space-around;}
+.brk-lbl{font-size:11px;font-weight:700;color:var(--muted);text-align:right;margin-bottom:2px;}
+.bmatch{width:190px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:9px 12px;cursor:pointer;font-family:inherit;position:relative;transition:box-shadow .15s,border-color .15s;}
+.bmatch:hover{box-shadow:0 6px 16px rgba(0,0,0,.08);border-color:#cfcfcf;}
+.bm-when{font-size:10.5px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px;justify-content:flex-end;}
+.bm-ft{background:#e6e6ea;color:#444;font-size:9px;font-weight:700;border-radius:4px;padding:1px 6px;}
+.bt-row{display:flex;align-items:center;gap:9px;padding:3px 0;}
+.bt-flag{font-size:18px;flex-shrink:0;line-height:1;}
+.bt-name{flex:1;font-size:13px;font-weight:600;color:var(--ink);text-align:right;}
+.bt-score{font-size:14px;font-weight:700;color:var(--ink);min-width:14px;text-align:left;}
+/* connector stubs from the QF column toward the R16 column (RTL: to the right) */
+.brk-col2 .bmatch::before{content:"";position:absolute;top:50%;right:-34px;width:34px;height:1px;background:#d7d7dc;}
+.brk-col2 .bmatch::after{content:"";position:absolute;top:50%;right:-34px;width:1px;height:130px;background:#d7d7dc;transform:translateY(-50%);}

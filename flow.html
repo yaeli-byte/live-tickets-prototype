@@ -333,7 +333,7 @@ const NBA = {
 
 const REAL = {
   name:'ריאל מדריד', sub:'לה ליגה · ליגת האלופות',
-  followers:'5,410', watching:'2,180',
+  followers:'5,410', watching:'2,180', highlightsImg:'rm-highlights.jpg', heroImg:'team-realmadrid.jpg',
   fixtures:[
     {d:'14',dow:"יול · ש׳",opp:'נגד ברצלונה',info:'אל קלאסיקו · אצטדיון ברנבאו',price:'₪690',ev:'clasico'},
     {d:'21',dow:"יול · ב׳",opp:'נגד אתלטיקו מדריד',info:'דרבי מדריד · ברנבאו',price:'₪620'},
@@ -345,7 +345,7 @@ const REAL = {
     {r:3,n:'אתלטיקו מדריד',pts:'70',form:'D W W L W'},
   ],
   h2h:{title:'מול ברצלונה', cells:[{v:'3',l:'ריאל'},{v:'1',l:'תיקו'},{v:'2',l:'ברצלונה'}]},
-  squad:['קורטואה','מבאפה','ויניסיוס','בלינגהאם'],
+  squad:[{name:'פראן גונזלס',img:'squad-1.jpg'},{name:'חבייר נבארו',img:'squad-2.jpg'},{name:'סרחיו מסטרה',img:'squad-3.jpg'},{name:'אלוארו פוסו',img:'squad-4.jpg'}],
   faq:[
     {q:'איך אשיג 4 מקומות צמודים?',a:'בבחירת הכמות סמנו "ישיבה יחד" ונשריין לכם מושבים צמודים באותו אזור ביציע, בכפוף לזמינות.'},
     {q:'מה קורה אם נקראתי למילואים?',a:'הכיסוי כולל ביטול כולל מילואים — בהצגת צו קריאה תקבלו החזר מלא, גם ברגע האחרון.'},
@@ -364,11 +364,16 @@ const REAL = {
 /* ---------- event pages (concert / match) — pageEvent renders by state.eventKey ---------- */
 const EVENTS = {
   coldplay:{ img:'artist1.jpg', h1:'קולדפליי', venue:'📍 אצטדיון ומבלי, לונדון', date:'📅 4 ביולי 2026 · 20:00',
-    price:'₪520', stats:'🔥 נותרו 8 · 140 צופים עכשיו', slimT:'קולדפליי · ומבלי', slimD:'4 ביולי · 20:00', type:'concert', back:2 },
+    price:'₪520', stats:'🔥 נותרו 8 · 140 צופים עכשיו', slimT:'קולדפליי · ומבלי', slimD:'4 ביולי · 20:00', type:'concert', back:2,
+    venueName:'אצטדיון ומבלי, לונדון', venueImg:'seat3.jpg', mapsQ:'Wembley Stadium London',
+    venueDesc:'האצטדיון הגדול באנגליה — 90,000 מקומות, גישה נוחה בתחבורה ציבורית (תחנת Wembley Park), ומגוון רחב של דוכני מזון ושתייה.' },
   clasico:{ img:'team-realmadrid.jpg', h1:'אל קלאסיקו · ריאל נגד ברצלונה', venue:'📍 אצטדיון סנטיאגו ברנבאו, מדריד', date:'📅 14 ביולי 2026 · 22:00',
-    price:'₪690', stats:'🔥 נותרו 12 · 320 צופים עכשיו', slimT:'אל קלאסיקו · ברנבאו', slimD:'14 ביולי · 22:00', type:'match', back:7 },
+    price:'₪690', stats:'🔥 נותרו 12 · 320 צופים עכשיו', slimT:'אל קלאסיקו · ברנבאו', slimD:'14 ביולי · 22:00', type:'match', back:7,
+    venueName:'אצטדיון סנטיאגו ברנבאו, מדריד', venueImg:'seat5.jpg', mapsQ:'Santiago Bernabeu Stadium Madrid',
+    venueDesc:'הבית של ריאל מדריד — 81,000 מקומות, אחד המגרשים המפורסמים בעולם, במרכז מדריד (רחוב Concha Espina) עם גישה נוחה במטרו.' },
   // generic match — title/venue/date/price come from the clicked card (data-ev-*)
-  match:{ img:'sport1.jpg', dynamic:true, venue:'📍 אצטדיון', date:'📅 מועד המשחק', price:'₪—', stats:'🔥 כרטיסים אחרונים · מבוקש', type:'match', back:0 },
+  match:{ img:'sport1.jpg', dynamic:true, venue:'📍 אצטדיון', date:'📅 מועד המשחק', price:'₪—', stats:'🔥 כרטיסים אחרונים · מבוקש', type:'match', back:0,
+    venueImg:'sport1.jpg', venueDesc:'אצטדיון מודרני עם מקומות ישיבה נוחים, גישה בתחבורה ציבורית, ומתחמי מזון ושתייה. פרטים מלאים בעמוד ההזמנה.' },
 };
 
 /* ---------- team directory (♡-followed teams feed the home rails) ---------- */
@@ -536,7 +541,7 @@ function pageAiChat(){
 function aiFab(){
   if(![0,1,2,3,4,5,6,7].includes(state.page)) return '';
   const homeCls = state.page===0 ? ' hide-home'+(state.headerSolid?' show':'') : '';
-  return `<button class="ai-fab${homeCls}" data-act="ai-open">✦ חיפוש עם AI</button>`;
+  return `<button class="ai-fab${homeCls}" data-act="ai-open">✦ חיפוש AI</button>`;
 }
 
 /* ---------- shared Spotify playlist component (expandable, in-page playable) ---------- */
@@ -622,7 +627,7 @@ function pageHome(){
     <h1>מה בא לכם לראות?</h1>
     <p class="sub">חברו את Spotify וקבלו המלצות מותאמות אישית לפי המוזיקה שאתם אוהבים</p>
     <div class="hh-row">
-      <button class="hh-ai" data-act="ai-open">✦ AI</button>
+      <button class="hh-ai" data-act="ai-open">✦ חיפוש AI</button>
       <div class="hh-search" data-act="search">${ICON.searchSm}<span>חפשו אמן, הופעה, עיר…</span></div>
     </div>
   </section>
@@ -686,6 +691,34 @@ function pageHome(){
   ${footer()}`;
 }
 
+/* ---------- מונדיאל knockout bracket ---------- */
+const MONDIAL_BRACKET = {
+  r16:[
+    {a:{n:'קנדה',f:'🇨🇦',s:'0'}, b:{n:'מרוקו',f:'🇲🇦',s:'3'}, when:'הסתיים', done:true},
+    {a:{n:'פרגוואי',f:'🇵🇾'}, b:{n:'צרפת',f:'🇫🇷'}, when:'מחר · 00:00'},
+    {a:{n:'ארה״ב',f:'🇺🇸'}, b:{n:'בלגיה',f:'🇧🇪'}, when:'ג׳ 7 יול · 3:00'},
+    {a:{n:'פורטוגל',f:'🇵🇹'}, b:{n:'ספרד',f:'🇪🇸'}, when:'ב׳ 6 יול · 22:00'},
+  ],
+  qf:[
+    {a:{n:'מרוקו',f:'🇲🇦'}, b:{n:'TBD',f:'🛡'}, when:'ה׳ 9 יול · 23:00'},
+    {a:{n:'TBD',f:'🛡'}, b:{n:'TBD',f:'🛡'}, when:'ו׳ 10 יול · 22:00'},
+  ],
+};
+function mondialBracket(){
+  const tr=t=>`<div class="bt-row"><span class="bt-flag">${t.f}</span><span class="bt-name">${t.n}</span><span class="bt-score">${t.s!==undefined?t.s:''}</span></div>`;
+  const card=m=>`<button class="bmatch" data-act="event" data-event="match" data-ev-title="${m.a.n} נגד ${m.b.n}" data-ev-venue="מונדיאל 2026 · ${m.when}" data-ev-price="₪760" data-ev-img="sport2.jpg">
+    <div class="bm-when">${m.done?'<span class="bm-ft">הסתיים</span>':''}${m.when}</div>${tr(m.a)}${tr(m.b)}</button>`;
+  return `
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">טבלת המשחקים</h2></div>
+    <div class="brk-tabs">${['שלב הבתים','שמינית גמר','רבע גמר','חצי גמר','גמר'].map((t,i)=>`<button class="brk-tab ${i===1?'on':''}">${t}</button>`).join('')}</div>
+    <div class="bracket">
+      <div class="brk-col"><div class="brk-lbl">שמינית גמר</div>${MONDIAL_BRACKET.r16.map(card).join('')}</div>
+      <div class="brk-col brk-col2"><div class="brk-lbl">רבע גמר</div>${MONDIAL_BRACKET.qf.map(card).join('')}</div>
+    </div>
+  </section>`;
+}
+
 /* ============================================================
    PAGE 4 — OCCASION COLLECTION  (built on the Category template)
    ============================================================ */
@@ -718,6 +751,7 @@ function pageOccasion(){
         </div>`).join('')}
     </div>
   </section>
+  ${mondialBracket()}
   <div class="trust">
     <div class="r1"><span class="star">★</span> אחריות 100% · אישור מיידי · ביטול כולל מילואים</div>
     <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · מאז 2006 · 300,000+ לקוחות</div>
@@ -1131,6 +1165,7 @@ function pageTeam(){
   return `
   <!-- Full-bleed hero + floating nav (highlight reel) -->
   <section class="lobby-hero team-hero">
+    ${T.heroImg?`<img class="lh-img" src="${IMG}${T.heroImg}" alt="${T.name}">`:''}
     <div class="lh-scrim"></div>
     <nav class="lh-crumbs">
       <span class="cur">${T.name}</span><span class="sep">›</span>
@@ -1146,7 +1181,6 @@ function pageTeam(){
     <div class="lh-info">
       <h1>${T.name}</h1>
       <div class="lh-sub">${T.sub}</div>
-      <div class="lh-trust"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
     </div>
   </section>
   <div class="live-now">👥 ${T.followers} עוקבים · ${T.watching} צפו השבוע</div>
@@ -1182,12 +1216,12 @@ function pageTeam(){
       <div class="bio-h">הרגעים הגדולים</div>
       <p class="bio-t">כל הרגעים ששינו את המשחק — גולים דרמטיים, הצלות ברגע האחרון ואווירת יציע חשמלית מהמפגשים הגדולים של ${T.name}.</p>
     </div>
-    <div class="videoblock"><button class="vb-play" data-act="watch">${ICON.play}</button></div>
+    <div class="videoblock videoblock--photo" style="background-image:url('${IMG}${T.highlightsImg||'rm-highlights.jpg'}')"><button class="vb-play" data-act="watch">${ICON.play}</button></div>
 
     <!-- הסגל (מתחת להרגעים הגדולים) -->
     <div class="sub-h">הסגל</div>
     <div class="hscroll squadrow">
-      ${T.squad.map(p=>`<div class="squad" data-act="player" data-player="${p}"><div class="squad-av"></div><div class="squad-name">${p}</div></div>`).join('')}
+      ${T.squad.map(p=>`<div class="squad" data-act="player" data-player="${p.name}"><div class="squad-av"><img src="${IMG}${p.img}" alt="${p.name}"></div><div class="squad-name">${p.name}</div></div>`).join('')}
     </div>
 
     <!-- טבלת לה ליגה · כושר אחרון -->
@@ -1258,10 +1292,9 @@ function footer(){
       <div class="row"><input type="email" placeholder="האימייל שלכם"><button>→</button></div>
     </div>
     <div class="cols">
-      <div class="col"><h4>חברה</h4><a data-act="soon">מי אנחנו</a><a data-act="soon">אמנים בהסכמה</a><a data-act="soon">קריירה</a></div>
-      <div class="col"><h4>עזרה ותמיכה</h4><a data-act="soon">שאלות נפוצות</a><a data-act="soon">תנאי ביטול</a><a data-act="soon">יצירת קשר</a></div>
-      <div class="col"><h4>ניווט מהיר</h4><a data-act="soon">הופעות</a><a data-act="soon">ספורט</a><a data-act="soon">ערים</a></div>
-      <div class="col"><h4>משפטי</h4><a data-act="soon">תנאי שימוש</a><a data-act="soon">פרטיות</a><a data-act="soon">נגישות</a></div>
+      <div class="col"><h4>חברה</h4><a data-act="soon">אודות</a><a data-act="soon">Live Tickets בתקשורת</a><a data-act="soon">קריירה</a><a data-act="soon">בלוג ומאמרים</a><a data-act="soon">שותפים / Affiliate · B2B · Brokers</a></div>
+      <div class="col"><h4>משפטי</h4><a data-act="soon">תנאי שימוש</a><a data-act="soon">מדיניות פרטיות</a><a data-act="soon">נגישות</a><a data-act="soon">Cookies</a></div>
+      <div class="col"><h4>ניווט מהיר</h4><a data-act="soon">קבוצות</a><a data-act="soon">ליגות</a><a data-act="soon">אמנים</a><a data-act="soon">ערים</a><a data-act="soon">אולמות</a><a data-act="soon">ענפים</a><a data-act="soon">אינדקס א׳–ת׳</a><a data-act="soon">מאמרים</a><a data-act="soon">מפת אתר</a></div>
     </div>
   </footer>`;
 }
@@ -1289,7 +1322,6 @@ function pageLobby(){
     <div class="lh-info">
       <h1>קולדפליי</h1>
       <div class="lh-sub">טור עולמי 2026</div>
-      <div class="lh-trust"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
     </div>
   </section>
   <div class="live-now">👁 7,802 צפו בקולדפליי בשעה האחרונה</div>
@@ -1435,6 +1467,9 @@ function pageEvent(){
   const evDate  = E.dynamic ? (state.evDate?('📅 '+state.evDate):E.date) : E.date;
   const evPrice = E.dynamic ? (state.evPrice||E.price) : E.price;
   const evImg   = E.dynamic && state.evImg ? state.evImg : E.img;
+  const venueName = E.dynamic ? (state.evVenue||'האולם') : E.venueName;
+  const venueImg = E.venueImg || 'sport1.jpg';
+  const mapsQ = E.mapsQ || venueName;
   return `
   <!-- FULL HERO -->
   <section class="ev-hero ${state.heroCollapsed?'hide':''}">
@@ -1454,11 +1489,14 @@ function pageEvent(){
       </div>
     </div>
   </section>
-  <!-- SLIM HERO (on scroll) -->
+  <!-- SLIM HERO (on scroll) — back + logo on top, event details below -->
   <div class="ev-slim ${state.heroCollapsed?'show':''}">
-    <button class="es-back" data-act="back-lobby">‹</button>
-    <div class="es-info"><div class="es-t">${E.dynamic?evTitle:E.slimT}</div><div class="es-d">${E.dynamic?evDate.replace('📅 ',''):E.slimD}</div></div>
-    <div class="es-price">מ-${evPrice} →</div>
+    <div class="es-row">
+      <button class="es-back" data-act="back-lobby">‹</button>
+      <a class="es-logo" data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
+      <div class="es-price">מ-${evPrice} →</div>
+    </div>
+    <div class="es-info"><span class="es-t">${E.dynamic?evTitle:E.slimT}</span> · <span class="es-d">${E.dynamic?evDate.replace('📅 ',''):E.slimD}</span></div>
   </div>
 
   <div class="ev-trust"><span class="star">★</span> אחריות 100% · אישור מיידי · <b>ביטול כולל מילואים</b> · <span class="star">★</span> 4.8 Google</div>
@@ -1499,15 +1537,16 @@ function pageEvent(){
     ${spotifyPlaylist('פלייליסט הטור · 20 שירים','Spotify', D.setlist, state.setlistP3Open, 'setlist3')}
   </section>` : ''}
 
-  <!-- אירועים קשורים -->
+  <!-- אודות האצטדיון (מתחת לרשימת הכרטיסים) -->
   <section class="section">
-    <div class="sec-head"><span></span><h2 class="sec-title">אירועים קשורים</h2></div>
-    <div class="hscroll">
-      ${D.related.map((r,i)=>`
-        <div class="ecard" data-act="event">
-          <div class="media"><img src="${IMG}${r.img}" alt="${r.name}"><div class="top"><button class="heart ${state.hearts['rel'+i]?'on':''}" data-heart="rel${i}">${ICON.hs}</button><span></span></div></div>
-          <div class="meta"><div class="en">${r.name}</div><div class="ep">מ-${r.price}<span class="allin"> · כולל עמלות</span></div></div>
-        </div>`).join('')}
+    <div class="sec-head"><span></span><h2 class="sec-title">${venueName.split(',')[0]}</h2></div>
+    <div class="venue-card">
+      <img class="venue-img" src="${IMG}${venueImg}" alt="${venueName}">
+      <div class="venue-body">
+        <div class="venue-name">📍 ${venueName}</div>
+        <p class="venue-desc">${E.venueDesc}</p>
+        <a class="venue-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsQ)}" target="_blank" rel="noopener">פתחו ב-Google Maps ←</a>
+      </div>
     </div>
   </section>
 
@@ -1524,6 +1563,18 @@ function pageEvent(){
         <button class="faq-q" data-faq3="${i}"><span class="qt">${f.q}</span><span class="qi"></span></button>
         <div class="faq-a"><p>${f.a}</p></div>
       </div>`).join('')}
+  </section>
+
+  <!-- אירועים קשורים -->
+  <section class="section">
+    <div class="sec-head"><span></span><h2 class="sec-title">אירועים קשורים</h2></div>
+    <div class="hscroll">
+      ${D.related.map((r,i)=>`
+        <div class="ecard" data-act="event">
+          <div class="media"><img src="${IMG}${r.img}" alt="${r.name}"><div class="top"><button class="heart ${state.hearts['rel'+i]?'on':''}" data-heart="rel${i}">${ICON.hs}</button><span></span></div></div>
+          <div class="meta"><div class="en">${r.name}</div><div class="ep">מ-${r.price}<span class="allin"> · כולל עמלות</span></div></div>
+        </div>`).join('')}
+    </div>
   </section>
 
   ${footer()}`;
@@ -1772,6 +1823,9 @@ function srResults(q){
 }
 const srSortLabel={best:'הכי משתלם',price:'מחיר',date:'תאריך'};
 const SR_EVENT_IMG={coldplay:'artist1.jpg',real:'sport1.jpg',taylor:'artist2.jpg',bts:'artist5.jpg',manchester:'sport2.jpg',formula1:'sport3.jpg',harry:'artist6.jpg',festival:'tiktok3.jpg'};
+// thumbnail lookup for search rows (image instead of emoji)
+const SR_IMG={'קולדפליי':'artist1.jpg','ריאל מדריד':'team-realmadrid.jpg','טיילור סוויפט':'artist2.jpg','BTS':'artist5.jpg','הארי סטיילס':'artist6.jpg','דואה ליפה':'artist4.jpg','מנצ׳סטר סיטי':'sport3.jpg','פורמולה 1':'sport3.jpg','מונדיאל 2026':'sport2.jpg','לונדון':'dest-spain.jpg','פריז':'dest-italy.jpg','מדריד':'team-realmadrid.jpg','אמסטרדם':'dest-italy.jpg','הופעות':'artist7.jpg','כדורגל':'sport2.jpg','NBA':'nba.jpg','פסטיבלים':'tiktok3.jpg'};
+function srThumb(name){ return (name&&SR_IMG[name.trim()]) || 'artist3.jpg'; }
 
 function searchOverlay(){
   const open=state.srOpen, q=state.srQuery;
@@ -1780,18 +1834,18 @@ function searchOverlay(){
   if(phase==='idle'){
     body=`
       <div class="ov-sec"><h4>חיפושים אחרונים</h4>${state.srRecent.length?'<button class="ov-clear" data-act="sr-clear-recent">נקה</button>':''}</div>
-      ${state.srRecent.map(t=>`<div class="ov-row" data-act="sr-setq" data-q="${t}"><div class="ic">🕘</div><div class="tx"><div class="n">${t}</div></div></div>`).join('')}
+      ${state.srRecent.map(t=>`<div class="ov-row" data-act="sr-setq" data-q="${t}"><div class="tx"><div class="n">${t}</div></div><img class="ov-thumb" src="${IMG}${srThumb(t)}" alt=""></div>`).join('')}
       <h4>עיון לפי קטגוריה</h4>
-      <div class="ov-chips">${D.srCats.map(c=>`<button class="chip" data-act="sr-setq" data-q="${c.name}">${c.icon} ${c.name}</button>`).join('')}</div>
+      ${D.srCats.map(c=>`<div class="ov-row" data-act="sr-setq" data-q="${c.name}"><div class="tx"><div class="n">${c.name}</div></div><img class="ov-thumb" src="${IMG}${srThumb(c.name)}" alt=""></div>`).join('')}
       <h4>פופולריים</h4>
-      ${D.srPopular.map(t=>`<div class="ov-row" data-act="sr-setq" data-q="${t}"><div class="ic">🔥</div><div class="tx"><div class="n">${t}</div></div></div>`).join('')}`;
+      ${D.srPopular.map(t=>`<div class="ov-row" data-act="sr-setq" data-q="${t}"><div class="tx"><div class="n">${t}</div></div><img class="ov-thumb" src="${IMG}${srThumb(t)}" alt=""></div>`).join('')}`;
   } else if(phase==='typing'){
     const tagColor={event:'#1c7a3a',top:'#ed1860',performer:'#216ca5',category:'#216ca5'};
     const tagLabel={event:'אירוע',top:'התאמה',performer:'אמן',category:'קטגוריה'};
     const act=r=> r.kind==='all'?'sr-all': r.kind==='event'?'sr-event': (r.kind==='performer'||r.kind==='top')?'sr-perf':'sr-setq';
     body=srTypeahead(q).map(r=>`
       <div class="ta-row" data-act="${act(r)}" data-q="${r.label}">
-        <div class="ic">${r.icon}</div>
+        <img class="ov-thumb" src="${IMG}${srThumb(r.label)}" alt="">
         <div class="tx"><div class="n">${r.label}</div>${r.sub?`<div class="s">${r.sub}</div>`:''}</div>
         ${tagLabel[r.kind]?`<span class="ta-tag" style="color:${tagColor[r.kind]};background:${tagColor[r.kind]}1a">${tagLabel[r.kind]}</span>`:''}
       </div>`).join('');
@@ -1811,9 +1865,9 @@ function searchOverlay(){
       </div>`;
     if(r.topMatch) out+=`
       <div class="res-top" data-act="sr-perf">
-        <div class="ic">${r.topMatch.icon}</div>
-        <div class="tx"><div class="n">${r.topMatch.name}</div><div class="s">${r.topMatch.meta||''}</div></div>
         <span class="res-cta">לאמן ›</span>
+        <div class="tx"><div class="n">${r.topMatch.name}</div><div class="s">${r.topMatch.meta||''}</div></div>
+        <img class="ov-thumb" src="${IMG}${srThumb(r.topMatch.name)}" alt="">
       </div>`;
     if(r.events.length){ out+=sec('אירועים')+`<div class="res-evs">`+r.events.map(e=>`
       <div class="res-ev" data-act="sr-event">
@@ -1825,8 +1879,8 @@ function searchOverlay(){
         </div>
         <img class="ev-thumb" src="${IMG}${SR_EVENT_IMG[e.perfKey]||'artist3.jpg'}" alt="">
       </div>`).join('')+`</div>`; }
-    if(r.performers.length){ out+=sec('אמנים')+`<div class="ov-chips">`+r.performers.map(p=>`<button class="res-chip" data-act="sr-perf">${p.icon} ${p.name}</button>`).join('')+`</div>`; }
-    if(r.cities.length){ out+=sec('מיקומים')+r.cities.map(c=>`<div class="ov-row" data-act="sr-setq" data-q="${c.name}"><div class="ic">${c.icon}</div><div class="tx"><div class="n">${c.name}</div><div class="s">${c.meta}</div></div></div>`).join(''); }
+    if(r.performers.length){ out+=sec('אמנים')+r.performers.map(p=>`<div class="ov-row" data-act="sr-perf"><div class="tx"><div class="n">${p.name}</div><div class="m">${p.meta||''}</div></div><img class="ov-thumb" src="${IMG}${srThumb(p.name)}" alt=""></div>`).join(''); }
+    if(r.cities.length){ out+=sec('מיקומים')+r.cities.map(c=>`<div class="ov-row" data-act="sr-setq" data-q="${c.name}"><div class="tx"><div class="n">${c.name}</div><div class="s">${c.meta}</div></div><img class="ov-thumb" src="${IMG}${srThumb(c.name)}" alt=""></div>`).join(''); }
     if(r.categories.length){ out+=sec('קטגוריות')+`<div class="ov-chips">`+r.categories.map(c=>`<button class="res-chip" data-act="sr-cat-nav">${c.icon} ${c.name}</button>`).join('')+`</div>`; }
     body=out;
   }
@@ -1834,7 +1888,7 @@ function searchOverlay(){
   <div class="overlay ${open?'open':''}">
     <div class="ov-head">
       <button class="ov-close" data-act="close-search">סגירה</button>
-      <div class="field"><button class="ai-pill" data-act="ai-open" data-q-field="1">✦ AI</button><input id="srInput" data-srinput placeholder="חפשו אמן, קבוצה, עיר, ז׳אנר…" value="${q.replace(/"/g,'&quot;')}" autocomplete="off">${q?'<button class="ov-x" data-act="sr-clear">✕</button>':''}${ICON.searchSm}</div>
+      <div class="field"><button class="ai-pill" data-act="ai-open" data-q-field="1">✦ חיפוש AI</button><input id="srInput" data-srinput placeholder="חפשו אמן, קבוצה, עיר, ז׳אנר…" value="${q.replace(/"/g,'&quot;')}" autocomplete="off">${q?'<button class="ov-x" data-act="sr-clear">✕</button>':''}${ICON.searchSm}</div>
     </div>
     <div class="ov-body">${body}</div>
     ${searchFilterSheet()}
@@ -1892,14 +1946,15 @@ function locate(key){
   state.highlightListing = key;
   state.selectedSection = null;   // clear any active filter so the card is in the list
   render();
-  // scroll the window manually (the .app frame is overflow:hidden, so
-  // scrollIntoView can't move it). Center the card, clearing the sticky map.
+  // scroll the CARDS SECTION internally (not the page) so the matching card
+  // becomes visible while the seat map stays on screen.
   requestAnimationFrame(()=>{
+    const cont = document.querySelector('.lst-cards');
     const el = document.querySelector('.lcard.hl');
-    if(!el) return;
-    const r = el.getBoundingClientRect();
-    const target = window.scrollY + r.top - (window.innerHeight/2 - r.height/2);
-    window.scrollTo({top: Math.max(0, target), behavior:'smooth'});
+    if(!cont || !el) return;
+    const contR = cont.getBoundingClientRect(), elR = el.getBoundingClientRect();
+    const target = cont.scrollTop + (elR.top - contR.top) - (cont.clientHeight/2 - elR.height/2);
+    cont.scrollTo({top: Math.max(0, target), behavior:'smooth'});
   });
 }
 
