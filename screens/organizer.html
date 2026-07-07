@@ -1,3 +1,11 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Tickets — מי שילם</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
 /* =====================================================================
    Live Tickets — Flow app styles
    The homepage design system, reused for the imported flow screens
@@ -785,7 +793,7 @@ img{display:block;}
 .sm-head .sm-t{font-size:16px;font-weight:600;color:var(--ink);}
 .sm-head .sm-s{font-size:11px;color:var(--muted);margin-top:2px;}
 .mapwrap{position:relative;width:264px;aspect-ratio:1018/824;margin:10px auto 8px;
-  background:url('assets/stadium-map.svg') center/contain no-repeat;}
+  background:url('https://yaeli-byte.github.io/live-tickets-prototype/assets/stadium-map.svg') center/contain no-repeat;}
 .stadium{position:absolute;inset:0;width:100%;height:100%;display:block;}
 /* price pins (SeatGeek-style tooltips) */
 .pin{position:absolute;transform:translate(50%,-50%);z-index:2;border:none;cursor:pointer;
@@ -1132,8 +1140,8 @@ img{display:block;}
 .conf-tick{width:56px;height:56px;border-radius:50%;background:var(--pgreenbg);color:var(--pgreen);font-size:30px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
 .conf-t{font-size:20px;font-weight:700;color:var(--ink);}
 .conf-s{font-size:12px;color:var(--muted);margin-top:3px;}
-.btn2{flex:1;display:block;width:100%;box-sizing:border-box;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px;font:600 13px 'Rubik',sans-serif;color:var(--ink);cursor:pointer;margin-top:8px;}
-.btn2.wapp{background:#25d366;color:#fff;border-color:#25d366;}
+.btn2{flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px;font:600 13px 'Rubik',sans-serif;color:var(--ink);cursor:pointer;margin-top:8px;}
+.btn2.wa{background:#25d366;color:#fff;border-color:#25d366;}
 .btn2.bit{border-color:#0a8fd8;color:#0a8fd8;}
 .btn2.blue,.btn2.rem{border-color:var(--link);color:var(--link);}
 .link-btn.ctr{display:block;width:100%;text-align:center;margin-top:12px;}
@@ -1246,86 +1254,22 @@ img{display:block;}
 /* summary box title */
 .sumbox2 .sb-title{font-size:18px;font-weight:700;color:var(--ink);text-align:right;margin-bottom:10px;}
 
-/* ================= Seats + Checkout redesign (Figma 261:29975 / 261:29842) ================= */
-/* --- tall seat-screen header --- */
-.pur-head.sh{flex-direction:column;align-items:stretch;gap:10px;height:auto;padding:10px 14px 12px;}
-.sh-top{display:flex;align-items:center;justify-content:flex-end;gap:10px;}
-.sh-ev{display:flex;align-items:center;gap:12px;}
-.sh-ev-i{flex:1;min-width:0;text-align:right;display:flex;flex-direction:column;gap:6px;}
-.sh-ev-t{font-size:17px;font-weight:600;color:var(--ink);}
-.sh-ev .pur-ev-s{margin-top:0;}
-.sh-ev-img{width:52px;height:52px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--card-dark);}
-/* --- 360 seat image --- */
-.seat360{position:relative;border-radius:12px;overflow:hidden;background:var(--card-dark);}
-.seat360 img{display:block;width:100%;height:208px;object-fit:cover;}
-.s360-badge{position:absolute;left:11px;bottom:11px;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.22);color:#fff;font-size:12px;padding:4px 7px;border-radius:6px;}
-.s360-badge svg{width:15px;height:15px;}
-/* --- seat card (area · price · seat details) --- */
-.pur-ev.seatcard{flex-direction:column;align-items:stretch;gap:8px;padding:13px;}
-.seatcard .pur-card{margin-top:0;}
-.seat-area{font-size:20px;font-weight:600;color:var(--ink);text-align:right;}
-.seat-price{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:-4px;}
-.seat-price .sp-num{font-size:20px;font-weight:600;color:var(--ink);white-space:nowrap;}
-.seat-price .sp-sub{font-size:12px;color:var(--muted);}
-.seat-det{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);text-align:right;margin-top:-2px;}
-/* --- seat sticky footer (single CTA) --- */
-.seat-foot{padding:16px;}
-.seat-foot .pf-cta{flex:1;padding:14px;font-size:14px;border-radius:12px;}
-/* --- 10-minute hold pop-up --- */
-.modal-scrim{position:fixed;inset:0;left:0;right:0;max-width:375px;margin-inline:auto;background:rgba(10,8,20,.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:200;}
-.hold-modal{background:#fff;border-radius:16px;padding:24px 20px;width:100%;max-width:320px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);}
-.hm-clock{display:inline-flex;align-items:center;gap:8px;background:#ffe7ef;color:var(--pink);font-weight:700;font-size:22px;padding:8px 16px;border-radius:999px;font-variant-numeric:tabular-nums;}
-.hm-clk-ic{width:22px;height:22px;display:inline-flex;color:var(--pink);}
-.hm-clk-ic svg{width:22px;height:22px;}
-.hm-t{font-size:18px;font-weight:700;color:var(--ink);margin-top:14px;}
-.hm-s{font-size:13px;color:var(--muted);line-height:1.55;margin-top:8px;}
-.hm-cta{width:100%;margin-top:18px;padding:14px;font-size:14px;border-radius:12px;}
-.hm-cancel{width:100%;margin-top:10px;background:none;border:none;color:var(--muted);font:400 13px 'Rubik',sans-serif;text-decoration:underline;cursor:pointer;}
-/* --- checkout: compact order summary --- */
-.pur-ev.sum.coz{gap:10px;padding:13px;}
-.coz-row{display:flex;align-items:center;justify-content:space-between;width:100%;}
-.coz-k{font-size:14px;font-weight:600;color:var(--ink);}
-.coz-v{font-size:12px;color:var(--muted);}
-.coz-totbox{background:var(--surface-warm,#faf7f2);border:1px solid var(--line);border-radius:11px;padding:11px 12px;display:flex;flex-direction:column;align-items:stretch;gap:2px;width:100%;}
-.coz-tot{display:flex;align-items:center;justify-content:space-between;}
-.coz-tnum{font-size:14px;font-weight:700;color:var(--ink);}
-.coz-tlbl{font-size:14px;font-weight:700;color:var(--ink);}
-.coz-detail{align-self:flex-end;background:none;border:none;color:var(--muted);font:400 12px 'Rubik',sans-serif;cursor:pointer;text-decoration:underline;}
-/* --- checkout sections --- */
-.chk-sec{margin-top:22px;}
-.chk-h{font-size:18px;font-weight:700;color:var(--ink);text-align:right;padding-top:6px;margin-bottom:12px;}
-.chk-h-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.chk-h-t{font-size:18px;font-weight:700;color:var(--ink);}
-.fld-row2{display:flex;gap:10px;margin-top:8px;}
-.fld-row2>.fld{flex:1;margin-top:0;}
-.chk-note{font-size:12px;color:var(--muted);line-height:1.5;text-align:right;margin-top:10px;}
-/* --- pay-with-friends (next to header) --- */
-.split-btn2{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--link);color:var(--link);background:none;border-radius:10px;padding:9px 12px;font:600 13px 'Rubik',sans-serif;cursor:pointer;flex-shrink:0;}
-.split-btn2 svg{width:20px;height:20px;}
-/* --- payment-method list + expanding panel --- */
-.pm-list{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
-.pm-opt{width:100%;border:1px solid var(--line);border-radius:10px;padding:13px;background:#fff;font:600 13px 'Rubik',sans-serif;color:#3c4043;cursor:pointer;text-align:center;}
-.pm-opt.on{border-color:var(--pink);background:#fff5f9;color:var(--ink);}
-.pm-panel{margin-top:10px;}
-.pm-note{font-size:13px;color:var(--muted);background:var(--surface-warm,#faf7f2);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:right;line-height:1.5;}
-.pm-accept{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;}
-.pm-accept>span:last-child{font-size:12px;color:var(--muted);white-space:nowrap;}
-.pm-brands{display:flex;gap:6px;flex-wrap:wrap;}
-.pm-brands b{font-size:10px;font-weight:700;color:#555;background:#f4f4f6;border:1px solid var(--line);border-radius:4px;padding:3px 6px;}
+</style>
+</head>
+<body>
+<div class="app" id="app">
 
-/* --- checkout sticky header + safety strip --- */
-.chk-stick{position:fixed;top:0;left:0;right:0;max-width:375px;margin-inline:auto;z-index:30;}
-.chk-body{padding-top:120px;}
-.pur-safety{justify-content:flex-end;}
-.pur-safety span{flex:1;text-align:right;}
-/* checkout summary: seat/coverage info stacked (right-aligned), not split L/R */
-.coz-blk{text-align:right;width:100%;}
-.coz-blk .coz-k{font-size:15px;font-weight:600;color:var(--ink);}
-.coz-blk .coz-v{font-size:12px;color:var(--muted);margin-top:2px;}
-/* installments row: label on the right, chips flow right-to-left (עד 12 rightmost) */
-.pm-panel .inst-row{direction:rtl;justify-content:flex-start;}
-
-/* --- two-up segmented toggle (split mode) --- */
-.seg{display:flex;gap:8px;margin-top:8px;}
-.seg .pm-opt{flex:1;width:auto;}
-.pur-ev.sum.coz+.chk-sec,.conf-hero+.pur-ev.sum.coz{margin-top:16px;}
+  <div class="pur-head">
+    <button class="circle-btn" data-act="home" aria-label="חזרה">→</button>
+    <a class="pur-logo" data-act="home"><img class="nav-logo" src="data:image/png;base64,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" alt="Live Tickets"></a>
+    <span class="pur-title">מי שילם</span>
+  </div>
+  <div class="pur">
+    <div class="pur-lbl big">מי שילם</div>
+    <div class="pur-sub">3 מתוך 4 שילמו</div>
+    <div class="fr-list"><div class="fr-row"><span class="fr-av"></span><span class="fr-n">יעל (את/ה)</span><span class="fr-pd y">שולם</span></div><div class="fr-row"><span class="fr-av"></span><span class="fr-n">דניאל</span><span class="fr-pd y">שולם</span></div><div class="fr-row"><span class="fr-av"></span><span class="fr-n">מאיה</span><span class="fr-pd y">שולם</span></div><div class="fr-row"><span class="fr-av"></span><span class="fr-n">יואב</span><span class="fr-pd n">ממתין</span></div></div>
+    <button class="btn2 rem" data-act="remind">שלחו תזכורת · נותרו 22 שעות</button><div class="pur-note">מאושר כשכולם שילמו · אחרת <b>החזר אוטומטי</b> למי ששילם.</div><button class="link-btn ctr" data-act="mark-allpaid">(דמו) סמנו שכולם שילמו ←</button>
+  </div>
+</div>
+</body>
+</html>
