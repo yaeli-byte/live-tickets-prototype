@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=10" />
+<link rel="stylesheet" href="flow.v5.css?v=23" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -42,6 +42,8 @@ const state = {
   buy:null, buyQty:1, buyCoverage:false, buyAdjacent:false, buyCoupon:'', buyCouponApplied:false,
   holdActive:false, holdSec:600, holdWarn:false, holdExpired:false, holdStep:10,
   showHoldModal:false, payMethod:'', seatSlim:false,
+  wantTogether:false, buyDelivery:false, sheetExpanded:false, seat360:0, stadiumInfo:false,
+  desktop:false, hotSec:null, dGTab:'360', dlvl:'all', qtyModal:false, qtyChosen:false, selRow:null,
   coName:'', coFirst:'', coLast:'', coPhone:'', coEmail:'', coInstall:'12', coSplitOpen:false,
   splitN:4, splitMode:'equal', orderNo:'LT-38210', splitAllPaid:false,
   buyEdge:null, // 'expired' | 'soldout' | 'tentative' | null
@@ -200,7 +202,7 @@ const D = {
   ],
   faqP3:[
     {q:'מקומות צמודים?', a:'בחרו כמות בעמוד הבחירה — אנחנו מבטיחים מקומות צמודים. מוצג בבירור לפני הרכישה.'},
-    {q:'מה מדיניות הביטולים?', a:'ניתן לבטל עד 48 שעות לפני האירוע לקבלת זיכוי מלא. בנוסף, הכיסוי כולל ביטול כולל מילואים — בהצגת צו קריאה תקבלו החזר מלא, גם ברגע האחרון.'},
+    {q:'מה מדיניות הביטולים?', a:'ניתן לבטל עד 48 שעות לפני האירוע לקבלת זיכוי מלא. ניתן להוסיף בתשלום כיסוי ביטול מורחב בשלב התשלום — 80% החזר עד 4 ימים לפני האירוע.'},
     {q:'מהם תנאי השימוש והרכישה?', a:'כל הכרטיסים מאומתים ומגובים באחריות רכישה 100%. כל המחירים כוללים את כל העמלות — אין תוספות בקופה. הרכישה כפופה לתנאי השימוש ולמדיניות הפרטיות המלאים של Live Tickets.'},
   ],
   // ---- Home (page 0) ----
@@ -303,7 +305,7 @@ const FOOTBALL = {
     {badge:'🔖 קלאסיקו',name:'ריאל נגד ברצלונה',info:'14 יול · ברנבאו',price:'₪690',event:'clasico'},
   ],
   faq:[
-    {q:'האם אפשר 4 מקומות צמודים?',a:'כן. בבחירת הכמות סמנו "ישיבה יחד" ונשריין לכם מושבים צמודים באותו אזור, בכפוף לזמינות.'},
+    {q:'האם אפשר 4 מקומות צמודים?',a:'כן. בבחירת הכמות סמנו "ישיבה יחד" ונשריין לכם מקומות באותה שורה, בכפוף לזמינות.'},
     {q:'מה קורה אם נקראתי למילואים?',a:'הכיסוי שלנו כולל ביטול כולל מילואים — בהצגת צו קריאה תקבלו החזר מלא, גם ברגע האחרון.'},
   ],
   seo:{h:'כרטיסים לכדורגל בחו״ל',p:'משחקי לה ליגה, פרמייר ליג וליגת האלופות: ריאל מדריד, ברצלונה, מנצ׳סטר סיטי ועוד. כל המחירים כוללים עמלות, עם אחריות 100% ואישור מיידי.'},
@@ -346,7 +348,7 @@ const NBA = {
     {n:'טייטום',team:'סלטיקס',role:'פורוורד',pts:'27.0',key:'tatum'},
   ],
   faq:[
-    {q:'איך בוחרים מקומות במגרש?',a:'בוחרים אזור במפת האולם — קורטסייד, טבעת ראשונה או עליונה — ואנחנו משריינים את המושבים הטובים ביותר הזמינים באותו אזור.'},
+    {q:'איך בוחרים מקומות במגרש?',a:'בוחרים אזור במפת האולם — קורטסייד, טבעת ראשונה או עליונה — ואנחנו משריינים את המקומות הטובים ביותר הזמינים באותו אזור.'},
     {q:'מתי מקבל את הכרטיסים?',a:'הכרטיסים הדיגיטליים מגיעים לאימייל תוך דקות מרגע האישור, עם אישור מיידי. כל המחירים כוללים עמלות.'},
   ],
   seo:{h:'אודות כרטיסים ל-NBA',p:'משחקי ה-NBA הגדולים — 82 משחקי עונה לכל קבוצה, פלייאוף וגמר האליפות. כל המחירים כוללים עמלות, עם אחריות 100% ואישור מיידי.'},
@@ -368,7 +370,7 @@ const REAL = {
   h2h:{title:'מול ברצלונה', cells:[{v:'3',l:'ריאל'},{v:'1',l:'תיקו'},{v:'2',l:'ברצלונה'}]},
   squad:[{name:'פראן גונזלס',img:'squad-1.jpg'},{name:'חבייר נבארו',img:'squad-2.jpg'},{name:'סרחיו מסטרה',img:'squad-3.jpg'},{name:'אלוארו פוסו',img:'squad-4.jpg'}],
   faq:[
-    {q:'איך אשיג 4 מקומות צמודים?',a:'בבחירת הכמות סמנו "ישיבה יחד" ונשריין לכם מושבים צמודים באותו אזור ביציע, בכפוף לזמינות.'},
+    {q:'איך אשיג 4 מקומות צמודים?',a:'בבחירת הכמות סמנו "ישיבה יחד" ונשריין לכם מקומות באותה שורה ביציע, בכפוף לזמינות.'},
     {q:'מה קורה אם נקראתי למילואים?',a:'הכיסוי כולל ביטול כולל מילואים — בהצגת צו קריאה תקבלו החזר מלא, גם ברגע האחרון.'},
     {q:'מתי אקבל את הכרטיסים?',a:'הכרטיסים הדיגיטליים מגיעים לאימייל תוך דקות מרגע האישור, עם אישור מיידי. כל המחירים כוללים עמלות.'},
   ],
@@ -433,22 +435,28 @@ const esc = s => s;
 function render(){
   const app = document.getElementById('app');
   const isAI = state.page===9;
+  const isEventSel = !state.desktop && state.page===3;   // mobile event page = map + drawer seat-selection
   const isPurchase = state.page>=10 && state.page<=18;
   const isBrowse = state.page>=0 && state.page<=7;
   const showBar = state.holdActive && isBrowse;   // sitewide active-order bar
-  const chrome = !isAI && !isPurchase;
+  // desktop: seat-selection screens (event listings + seat page) go wide two-pane.
+  // checkout & the rest of the purchase flow get their desktop layout next.
+  const pfWide = state.desktop && (state.page===3 || state.page===10 || state.page===11);
+  app.classList.toggle('wide', pfWide);
+  app.classList.toggle('ssframe', isEventSel);           // fixed-height frame so the map fills + drawer docks
+  const chrome = !isAI && !isPurchase && !(state.page===3);
   app.innerHTML = (chrome?header():'') + (
     state.page===0 ? pageHome() :
     state.page===1 ? pageCategory() :
     state.page===2 ? pageLobby() :
-    state.page===3 ? pageEvent() :
+    state.page===3 ? (state.desktop ? pageEventDesk() : pageEventSel()) :
     state.page===4 ? pageOccasion() :
     state.page===5 ? pageFootball() :
     state.page===6 ? pageNBA() :
     state.page===7 ? pageTeam() :
     state.page===8 ? pagePlaceholder('', state.phTitle, state.phNote) :
-    state.page===10 ? pageOrder() :
-    state.page===11 ? pageCheckout() :
+    state.page===10 ? (state.desktop ? pageSeatDesk() : pageOrder()) :
+    state.page===11 ? (state.desktop ? pageCheckoutDesk() : pageCheckout()) :
     state.page===12 ? pageConfirm() :
     state.page===13 ? pageSplitSetup() :
     state.page===14 ? pageSplitInvite() :
@@ -458,7 +466,7 @@ function render(){
     state.page===18 ? pageAccount() :
     isAI ? pageAiChat() :
     pageHome()
-  ) + ((chrome && !showBar)?whatsapp():'') + ((chrome && !showBar)?aiFab():'') + (showBar?activeOrderBar():'') + overlays();
+  ) + ((chrome && !showBar)?whatsapp():'') + ((chrome && !showBar)?aiFab():'') + (showBar?activeOrderBar():'') + overlays() + qtyModal() + holdModal();
   wire();
 }
 
@@ -1518,6 +1526,12 @@ function footer(){
       <div class="col"><h4>משפטי</h4><a data-act="soon">תנאי שימוש</a><a data-act="soon">מדיניות פרטיות</a><a data-act="soon">נגישות</a><a data-act="soon">Cookies</a></div>
       <div class="col"><h4>ניווט מהיר</h4><a data-act="soon">קבוצות</a><a data-act="soon">ליגות</a><a data-act="soon">אמנים</a><a data-act="soon">ערים</a><a data-act="soon">אולמות</a><a data-act="soon">ענפים</a><a data-act="soon">אינדקס א׳–ת׳</a><a data-act="soon">מאמרים</a><a data-act="soon">מפת אתר</a></div>
     </div>
+    <div class="footer-bottom">
+      <div class="footer-social">
+        ${SOCIALS.map(s=>`<a class="foc-btn" data-act="soon" data-title="Live Tickets · ${s.k}" aria-label="${s.k}"><svg viewBox="0 0 24 24" fill="currentColor">${s.svg}</svg></a>`).join('')}
+      </div>
+      <div class="footer-copy">© Live Tickets · כל הזכויות שמורות</div>
+    </div>
   </footer>`;
 }
 
@@ -1680,8 +1694,7 @@ function seatMapViz(){
   return `<div class="mapwrap">${seatMapSVG()}${D.listings.map(pin).join('')}</div>`;
 }
 function pageEvent(){
-  const shown = state.selectedSection ? D.listings.filter(l=>l.key===state.selectedSection || (state.selectedSection==='south'&&l.key==='south-c')) : D.listings;
-  const list = shown.length?shown:D.listings;
+  const list = eventListings();
   const secLabel = state.selectedSection ? (D.sectionLabels[state.selectedSection]||'')+' ✓' : 'לחצו על אזור';
   const sortBtn=(k,l)=>`<button class="sort-btn ${state.sortBy===k?'on':''}" data-sort="${k}">${l}</button>`;
   const activeCount = p3ActiveCount();
@@ -1713,46 +1726,32 @@ function pageEvent(){
       </div>
     </div>
   </section>
-  <!-- SLIM HERO (on scroll) — back + logo on top, event details below -->
-  <div class="ev-slim ${state.heroCollapsed?'show':''}">
-    <div class="es-row">
-      <a class="es-logo" data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
-      <button class="es-back" data-act="back-lobby">→</button>
-    </div>
-    <div class="es-info">
-      <div class="es-price">מ-${evPrice}</div>
-      <div class="es-meta"><span class="es-t">${E.dynamic?evTitle:E.slimT}</span> · <span class="es-d">${E.dynamic?evDate.replace('📅 ',''):E.slimD}</span></div>
-    </div>
+  <!-- SLIM HEADER (on scroll) — single-row bar aligned with the desktop top bar -->
+  <div class="ev-slim ev-bar ${state.heroCollapsed?'show':''}">
+    <a class="es-logo" data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
+    <div class="es-info"><div class="es-t">${evTitle}</div><div class="es-d">${evDate.replace('📅 ','')} · מ-${evPrice} כולל עמלות</div></div>
+    <button class="es-back" data-act="back-lobby">→</button>
   </div>
 
-  <div class="ev-trust"><span class="star">★</span> אחריות 100% · אישור מיידי · <b>ביטול כולל מילואים</b> · <span class="star">★</span> 4.8 Google</div>
+  <div class="ev-trust"><span class="star">★</span> אחריות 100% · אישור מיידי · <b>כל המחירים כולל עמלות</b> · <span class="star">★</span> 4.8 Google</div>
 
   <!-- STICKY SEAT MAP -->
   <div class="seatmap">
-    <div class="sm-head"><div class="sm-t">מפת המקומות</div><div class="sm-s">לחצו על מחיר כדי לראות את המושב ברשימה</div></div>
+    <div class="sm-head"><div class="sm-t">מפת המקומות</div><div class="sm-s">לחצו על מחיר כדי לראות את המקום ברשימה</div></div>
     ${seatMapViz()}
     <div class="sm-legend"><span><i style="background:#1c7a3a"></i>כלכלי</span><span><i style="background:#F57E20"></i>ביניים</span><span><i style="background:#ED1860"></i>VIP</span></div>
   </div>
 
-  <!-- LISTINGS (pull-up over map) -->
+  <!-- LISTINGS — compact bar on mobile; all filters live in the "סינון" drawer -->
   <div class="listings">
     <div class="lst-bar">
       <div class="lst-sort"><span>מיין:</span>${sortBtn('best','הכי משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div>
-      <button class="sm-filter" data-act="p3filter"><span class="cnt">${activeCount||''}</span> סינון</button>
+      <button class="sm-filter" data-act="p3filter"><span class="cnt">${p3ActiveCount()||''}</span> סינון</button>
     </div>
+    <div class="lst-count">${list.length} מקומות · ${state.buyQty||2} כרטיסים</div>
     ${state.selectedSection ? `<div class="lst-active"><button class="lst-clear" data-act="p3clear">✕</button><span class="lst-sel on">מסונן: ${secLabel.replace(' ✓','')}</span></div>` : ''}
     <div class="lst-cards">
-      ${list.map(l=>{const tier=l.score>=9?'best':l.score>=7?'good':'fair'; return `
-        <div class="lcard ${state.highlightListing===l.key?'hl':''}" data-lkey="${l.key}" data-act="buy-select" data-b-sec="${l.sec}" data-b-row="${l.row}" data-b-price="${l.price}" data-b-img="${l.img}" data-b-score="${l.score}">
-          <div class="lc-price"><span class="amt">${l.price}</span><span class="fees">כולל עמלות</span></div>
-          <div class="lc-mid">
-            <div class="lc-sec">${l.sec}</div>
-            <div class="lc-row">${l.row}</div>
-            <div class="lc-badge ${tier}"><span class="lbl">${l.val}</span><span class="box">${l.score}</span></div>
-            <div class="lc-info">${l.tog} · אישור מיידי · 🔥 נותרו ${l.left}</div>
-          </div>
-          <img class="lc-thumb" src="${IMG}${l.img}" alt="מבט מהמקום">
-        </div>`;}).join('')}
+      ${list.map(deskListingCard).join('')}
     </div>
   </div>
 
@@ -1792,7 +1791,7 @@ function pageEvent(){
   <!-- ביקורות -->
   <section class="section">
     <div class="sec-head"><a class="sec-link" data-act="soon" data-title="ביקורות">כל ${E.type==='match'?'512':'847'} הביקורות ›</a><h2 class="sec-title">${E.type==='match'?'איך היה במשחק?':'איך היה בהופעה?'}</h2></div>
-    ${reviewRecap('4.8', E.type==='match'?'512':'847', E.type==='match'?'הצופים מדגישים אווירה חשמלית ביציע, מקומות צמודים כמו שהובטח וקבלת כרטיסים מיידית — כולל אחריות מלאה וביטול כולל מילואים.':'רוב המבקרים מציינים אווירה מטורפת, סאונד מדהים ומקומות צמודים כפי שהובטח — עם שבחים על השירות בעברית ואישור מיידי.')}
+    ${reviewRecap('4.8', E.type==='match'?'512':'847', E.type==='match'?'הצופים מדגישים אווירה חשמלית ביציע, מקומות צמודים כמו שהובטח וקבלת כרטיסים מיידית — עם אחריות מלאה על הכרטיס.':'רוב המבקרים מציינים אווירה מטורפת, סאונד מדהים ומקומות צמודים כפי שהובטח — עם שבחים על השירות בעברית ואישור מיידי.')}
     <div class="reviews">
       ${(E.type==='match'?[{av:'⚽',name:'אורי מ.',meta:'מדריד · 2025',stars:5,t:'אווירה חשמלית ביציע, ישבנו צמודים כמו שהובטח. הכרטיסים הגיעו מיד — חוויה מושלמת.'},{av:'🙌',name:'דנה ק.',meta:'ברצלונה · 2025',stars:5,t:'משחק ענק! השירות בעברית עזר מאוד, ואישור מיידי. ממליצה בחום.'},{av:'🎽',name:'טל ב.',meta:'לונדון · 2025',stars:4,t:'מקומות מצוינים, קבלה מהירה של הכרטיסים לנייד. נחזור בהחלט.'}]:D.reviews).map(r=>`
         <div class="rev">
@@ -1848,14 +1847,15 @@ function overlays(){
 
 function p3ActiveCount(){
   const f=state.p3f;
-  return [state.selectedSection, state.p3Qty, f.together, f.front, f.view, f.access, state.p3Min, state.p3Max].filter(Boolean).length;
+  return [state.selectedSection, (state.dlvl&&state.dlvl!=='all'), f.together, f.front, f.view, f.access, state.p3Min, state.p3Max].filter(Boolean).length;
 }
 function p3FilterSheet(){
   const f=state.p3f;
   const cnt=p3ActiveCount();
   const resultCount = cnt===0 ? '3' : '1';
   const secBtn=s=>`<button class="ff-sec ${state.selectedSection===s.key?'on':''}" data-fsec="${s.key}" style="--dot:${s.dot}"><i style="background:${s.dot}"></i>${s.label}</button>`;
-  const qtyBtn=n=>`<button class="ff-qty ${state.p3Qty===n?'on':''}" data-fqty="${n}">${n}</button>`;
+  const qtyBtn=n=>`<button class="ff-qty ${(state.buyQty||2)===n?'on':''}" data-act="qty-pick" data-q="${n}">${n}</button>`;
+  const dlvlBtn=(k,l)=>`<button class="ff-dlvl ${state.dlvl===k?'on':''}" data-act="dlvl-desk" data-k="${k}">${l}</button>`;
   const chk=(k,l)=>`<button class="ff-check" data-fchar="${k}"><span class="box ${f[k]?'on':''}">${f[k]?'✓':''}</span>${l}</button>`;
   return `
   <div class="sheet-backdrop open" data-act="close-sheet"></div>
@@ -1863,11 +1863,13 @@ function p3FilterSheet(){
     <div class="grab"></div>
     <div class="sh-head"><button class="ff-clear" data-act="p3clear">נקה</button><h3>כל הסינונים</h3><button class="x" data-act="close-sheet">×</button></div>
     <div class="sh-body">
+      <div class="ff-label">כמות כרטיסים</div>
+      <div class="ff-qtys">${[1,2,3,4,5,6].map(qtyBtn).join('')}</div>
+      <div class="ff-label">רמת פירוט</div>
+      <div class="ff-dlvls">${dlvlBtn('all','הכול')}${dlvlBtn('row','עם שורה')}${dlvlBtn('seat','עם שורה מדויקת')}</div>
       <div class="ff-label">קטע</div>
       <div class="ff-secs">${D.sections.map(secBtn).join('')}</div>
-      <div class="ff-label">כמות</div>
-      <div class="ff-qtys">${[1,2,3,4,5,6].map(qtyBtn).join('')}</div>
-      <div class="ff-label">מחיר לכרטיס</div>
+      <div class="ff-label">מחיר לכרטיס · כולל עמלות</div>
       <div class="ff-price">
         <label>מקסימום <span>₪</span><input type="number" inputmode="numeric" data-fprice="max" value="${state.p3Max}"></label>
         <label>מינימום <span>₪</span><input type="number" inputmode="numeric" data-fprice="min" value="${state.p3Min}"></label>
@@ -2204,17 +2206,17 @@ function go(page){ stopPlaylistAudio(); state.playing=false; state.headerSolid=f
 
 /* ============================================================
    FLOW 2 — PURCHASE  (Order → Checkout → Confirmation + Split + timer + edges)
-   Guests-first · ₪ all-in "כולל עמלות" unbroken · מילואים included · fixed 375 frame
+   Guests-first · price shown "כולל עמלות" (fees included, itemized) · guest-first · fixed 375 frame
    Pages: 10 Order · 11 Checkout · 12 Confirmation · 13 Split setup ·
           14 Invite · 15 Friend pay · 16 Organizer · 17 Edge state
    ============================================================ */
 function nis(n){ return '₪'+Number(n||0).toLocaleString('en-US'); }
-function buyUnit(){ return state.buy ? state.buy.unit : 0; }
+function buyUnit(){ return state.buy ? state.buy.unit : 0; }        // per-ticket price · fees already included ("כולל עמלות")
 function buyTicketsTotal(){ return buyUnit()*state.buyQty; }
-function buyServiceFee(){ return 0; }                 // דמי טיפול
-function buyDeliveryFee(){ return 100; }              // כרטיס אלקטרוני/טלפוני
-function buyCoverageAmt(){ return state.buyCoverage ? Math.round(buyTicketsTotal()*0.10) : 0; }
-function buyTotal(){ return buyTicketsTotal() + buyServiceFee() + buyDeliveryFee() + buyCoverageAmt(); }
+function buyDeliveryFee(){ return 20; }                            // כרטיס דיגיטלי
+function buyTogetherAmt(){ return state.buyAdjacent ? 90*state.buyQty : 0; }   // ישיבה יחד (paid add-on)
+function buyCoverageAmt(){ return state.buyCoverage ? Math.round(buyTicketsTotal()*0.10) : 0; } // כיסוי ביטול
+function buyTotal(){ return buyTicketsTotal() + buyDeliveryFee() + buyTogetherAmt() + buyCoverageAmt(); }
 function splitPer(){ return Math.round(buyTotal()/Math.max(1,state.splitN)); }
 function fmtClock(s){ s=Math.max(0,s); const m=Math.floor(s/60), ss=s%60; return m+':'+String(ss).padStart(2,'0'); }
 /* card number: auto-format (spaces), auto-detect brand, Luhn check */
@@ -2245,7 +2247,7 @@ function startHold(step){
 function tickHold(){
   if(!state.holdActive) return;
   state.holdSec--;
-  document.querySelectorAll('.aob-clk,.obar2 .clk').forEach(el=>el.textContent=fmtClock(state.holdSec));
+  document.querySelectorAll('.aob-clk,.obar2 .clk,.otimer .ot-clk').forEach(el=>el.textContent=fmtClock(state.holdSec));
   const warn=state.holdSec<=120 && state.holdSec>0, exp=state.holdSec<=0;
   if(warn!==state.holdWarn || exp!==state.holdExpired){
     state.holdWarn=warn; state.holdExpired=exp;
@@ -2272,9 +2274,9 @@ function orderBar2(){
 }
 function purHead(title,backAct){
   return `<div class="pur-head">
-    <button class="circle-btn" data-act="${backAct}" aria-label="חזרה">→</button>
-    <a class="pur-logo" data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
     <span class="pur-title">${title}</span>
+    <a class="pur-logo" data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
+    <button class="circle-btn" data-act="${backAct}" aria-label="חזרה">→</button>
   </div>`;
 }
 
@@ -2284,8 +2286,8 @@ const LOCK_SVG='<svg class="ic-lock" viewBox="0 0 24 24" fill="currentColor" ari
 /* pink hold-timer bar (order screen) */
 function orderTimer(){
   const cls=state.holdExpired?'exp':(state.holdWarn?'warn':'hold');
-  const main=state.holdExpired?'ההחזקה פגה':(state.holdWarn?'נותר זמן קצר להשלמה':'הכרטיסים שמורים עבורך לעוד');
-  const sub=state.holdExpired?'בדקו זמינות מחדש · באותו מחיר כולל־הכל':'השלם/י את ההזמנה כדי לא לאבד אותם.';
+  const main=state.holdExpired?'ההחזקה פגה':(state.holdWarn?'נותר זמן קצר להשלמה':'המחיר שלך נעול');
+  const sub=state.holdExpired?'בדקו זמינות מחדש · באותו מחיר כולל עמלות':'הכרטיסים שמורים עבורך — השלימו כדי לא לאבד אותם.';
   return `<div class="otimer ${cls}">
     <div class="ot-txt"><div class="ot-row"><span class="ot-clk">${fmtClock(state.holdSec)}</span><span class="ot-main">${main}</span></div><div class="ot-sub">${sub}</div></div>
     ${LOCK_SVG}
@@ -2296,13 +2298,13 @@ const PC_SHIELD='<svg class="pc-shield" viewBox="0 0 24 24" fill="none" stroke="
 const PANO_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 15l5-4 4 3 3-3 8 6"/><circle cx="8" cy="9" r="1.4"/></svg>';
 const USERS_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.5M21 20a6 6 0 0 0-4-5.7"/></svg>';
 
-/* shared all-in breakdown rows (seat summary + checkout detail) */
+/* shared price breakdown — fees are already inside the ticket price ("כולל עמלות"), itemized below */
 function buySummaryRows(){
-  return `<div class="sr"><span>${nis(buyTicketsTotal())}</span><span>כרטיסים (${state.buyQty})</span></div>
-      <div class="sr"><span>${nis(buyServiceFee())}</span><span>דמי טיפול</span></div>
-      <div class="sr"><span>${nis(buyDeliveryFee())}</span><span>כרטיס אלקטרוני/טלפוני</span></div>
-      ${state.buyCoverage?`<div class="sr"><span>${nis(buyCoverageAmt())}</span><span>כיסוי למקרה ביטול 10%</span></div>`:''}
-      <div class="sr tot"><span>${nis(buyTotal())}</span><span>סה״כ כולל הכל</span></div>`;
+  return `<div class="sr"><span>${nis(buyTicketsTotal())}</span><span>${state.buyQty} כרטיסים · ${nis(buyUnit())} · כולל עמלות</span></div>
+      <div class="sr"><span>${nis(buyDeliveryFee())}</span><span>כרטיס דיגיטלי</span></div>
+      ${state.buyAdjacent?`<div class="sr"><span>${nis(buyTogetherAmt())}</span><span>ישיבה יחד · אותה שורה</span></div>`:''}
+      ${state.buyCoverage?`<div class="sr"><span>${nis(buyCoverageAmt())}</span><span>כיסוי ביטול</span></div>`:''}
+      <div class="sr tot"><span>${nis(buyTotal())}</span><span>סה״כ לתשלום</span></div>`;
 }
 
 /* tall seat-screen header: logo + back on top, event context below */
@@ -2327,78 +2329,200 @@ function holdModal(){
   return `<div class="modal-scrim" data-act="close-hold-modal">
     <div class="hold-modal" data-act="noop">
       <div class="hm-clock"><span class="hm-clk-ic">${LOCK_SVG}</span>10:00</div>
-      <div class="hm-t">יש לך 10 דקות להשלים את הרכישה</div>
-      <div class="hm-s">הכרטיסים נשמרים עבורך באופן זמני. השלם/י את התשלום תוך 10 דקות כדי להבטיח אותם — אחרת הם ישוחררו חזרה למכירה.</div>
-      <button class="btn btn-pink hm-cta" data-act="start-checkout">הבנתי · ממשיכים לתשלום</button>
-      <button class="hm-cancel" data-act="close-hold-modal">חזרה לבחירת המושבים</button>
+      <div class="hm-t">המחיר שלך נעול ל-10 דקות</div>
+      <div class="hm-s">הכרטיסים והמחיר נשמרים עבורך למשך 10 דקות. השלם/י את התהליך בזמן — אחרת הם ישוחררו חזרה למכירה.</div>
+      <button class="btn btn-pink hm-cta" data-act="hold-proceed">הבנתי · ממשיכים</button>
+      <button class="hm-cancel" data-act="close-hold-modal">${state.page===3?'חזרה לבחירת המקומות':'חזרה'}</button>
+    </div>
+  </div>`;
+}
+/* quantity picker — appears between the lobby and the event page; applies a seat-count filter */
+function qtyModal(){
+  if(!state.qtyModal) return '';
+  const E=EVENTS[state.eventKey]||EVENTS.coldplay;
+  const title=E.dynamic?(state.evTitle||'משחק'):E.h1;
+  const date=(E.dynamic?(state.evDate||''):E.date||'').replace('📅 ','');
+  const img=E.dynamic&&state.evImg?state.evImg:E.img;
+  const cur=state.buyQty||2;
+  const opt=(q,lbl)=>`<button class="qm-opt${cur===q?' on':''}" data-act="qty-pick" data-q="${q}">${lbl||q}</button>`;
+  return `<div class="modal-scrim qm-scrim" data-act="qty-modal-close">
+    <div class="qm" data-act="noop">
+      <div class="qm-head"><img class="qm-img" src="${IMG}${img}" alt=""><div class="qm-ev"><div class="qm-t">${title}</div><div class="qm-d">${date}</div></div></div>
+      <div class="qm-body">
+        <div class="qm-q">כמה כרטיסים?</div>
+        <div class="qm-sub">כל המקומות יהיו צמודים · יושבים יחד</div>
+        <div class="qm-grid">${opt(1)}${opt(2)}${opt(3)}${opt(4)}${opt(5)}${opt(6,'6+')}</div>
+        <div class="qm-note"><b>⚡ מסירה מיידית</b><div>חפשו את תג הברק — הכרטיסים נמסרים תוך דקות מרגע הרכישה.</div></div>
+      </div>
     </div>
   </div>`;
 }
 
-/* ---- 10 · Seats (choose seats · quantity · add-ons · live total) ---- */
+/* seat detail level per section (seat | row | section/GA) */
+const DDETAIL_SEL={south:'seat',vip:'seat','south-c':'row',east:'row',west:'section',north:'section'};
+function selDetail(l){ return DDETAIL_SEL[l.key]||'seat'; }
+/* row / general-admission line shown on each drawer card — shows the actual row number */
+function selRowLine(l){
+  const d=selDetail(l);
+  const rn=(l.row||'').replace(/\D/g,'')||l.row;
+  if(d==='section') return {t:l.sec, s:'אזור פתוח · מספר שורה יימסר עם הכרטיס'};
+  if(d==='row')     return {t:l.sec, s:`שורה ${rn} (משוער) · יושבים יחד`};
+  return {t:l.sec, s:`שורה ${rn} · יושבים יחד`};
+}
+function selCard(l){
+  const rl=selRowLine(l);
+  const sel=state.buy&&state.buy.key===l.key, hot=state.hotSec===l.key;
+  const tier=l.score>=9?'best':l.score>=7?'good':'fair';
+  return `<div class="lc${sel?' sel':''}${hot?' hov':''}" data-lkey="${l.key}" data-act="buy-select" data-b-sec="${l.sec}" data-b-row="${l.row}" data-b-price="${l.price}" data-b-img="${l.img}" data-b-score="${l.score}">
+    <div class="pr"><div class="price">${l.price}</div><div class="allin">כולל עמלות</div></div>
+    <div class="g">
+      <div class="nm"><span class="sec-dot" style="background:${areaColorFor(l.key)}"></span>${rl.t}</div>
+      <div class="rs">${rl.s}</div>
+      <div class="lc-b"><span class="badge ${tier}">${l.val}</span><span class="lc-left">🔥 נותרו ${l.left}</span></div>
+    </div>
+    <span class="vt" style="background-image:url(${IMG}${l.img})"></span>
+  </div>`;
+}
+/* mobile map pins — clicking a price focuses its card in the drawer (doesn't navigate) */
+function mapPinsSel(){
+  const L={}; D.listings.forEach(l=>L[l.key]=l);
+  const pins=[
+    {x:450,y:116,l:L.north,hot:1},{x:452,y:232,l:L.vip},{x:735,y:252,l:L.east},
+    {x:165,y:252,l:L.west},{x:450,y:486,l:L.south,hot:1},{x:352,y:400,l:L['south-c']},
+    {x:612,y:146,p:'₪1,640'},{x:288,y:150,p:'₪1,700'},{x:778,y:368,p:'₪1,180'},
+    {x:138,y:368,p:'₪1,240'},{x:566,y:498,p:'₪560',hot:1},{x:244,y:482,p:'₪590'},
+    {x:692,y:438,p:'₪720'},{x:224,y:174,p:'₪1,480'},{x:640,y:330,p:'₪980'},{x:270,y:330,p:'₪1,050'}
+  ];
+  return pins.map(pn=>{
+    const l=pn.l, price=l?l.price:pn.p; if(!price) return '';
+    const hot=pn.hot||(l&&l.score>=9), sel=l&&state.buy&&state.buy.key===l.key, hov=l&&state.hotSec===l.key;
+    const attrs=l?`data-act="pin-focus" data-lkey="${l.key}"`:'';
+    const w=price.length>4?70:58;
+    return `<g class="mpin${l?' click':''}${hot?' hot':''}${sel?' sel':''}${hov?' hov':''}" ${attrs} transform="translate(${pn.x},${pn.y})">
+      <rect class="mpin-bg" x="${-w/2}" y="-14" width="${w}" height="28" rx="14"></rect>
+      <circle class="mpin-dot" cx="${w/2-11}" cy="0" r="4.5"${l?` style="fill:${areaColorFor(l.key)};stroke:rgba(30,42,66,.4);stroke-width:.8"`:''}></circle>
+      <text class="mpin-t" x="-4" y="4">${price}</text>
+    </g>`;
+  }).join('');
+}
+function stadiumInfoPop(){
+  if(!state.stadiumInfo) return '';
+  const E=EVENTS[state.eventKey]||EVENTS.coldplay;
+  const venueName=E.dynamic?(state.evVenue||'האצטדיון'):(E.venueName||'האצטדיון');
+  return `<div class="modal-scrim" data-act="stadium-close">
+    <div class="stad-info" data-act="noop">
+      <div class="si-head"><span class="si-t">${venueName.split(',')[0]}</span><button class="si-x" data-act="stadium-close" aria-label="סגירה">✕</button></div>
+      <div class="si-sub">${E.venueDesc||'אצטדיון מוביל · מקומות ישיבה מקורים · נגישות מלאה'}</div>
+      <div class="si-grid"><div><b>הגעה</b><span>תחבורה ציבורית · חניה</span></div><div><b>שערים</b><span>פתיחה שעתיים לפני</span></div><div><b>נגישות</b><span>מעליות · מקומות מונגשים</span></div><div><b>שירותים</b><span>דוכני אוכל · חנות</span></div></div>
+      <a class="si-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(E.mapsQ||venueName)}" target="_blank" rel="noopener">מפת הגעה ←</a>
+    </div>
+  </div>`;
+}
+/* ---- 3 · Event page (mobile) — refined map + draggable seat-list drawer (wireframe 102) ---- */
+function pageEventSel(){
+  const E=EVENTS[state.eventKey]||EVENTS.coldplay;
+  const evTitle=E.dynamic?(state.evTitle||'משחק'):E.h1;
+  const evDate=(E.dynamic?(state.evDate||''):E.date||'').replace('📅 ','');
+  const evVenue=(E.dynamic?(state.evVenue||''):E.venue||'').replace('📍 ','');
+  const evImg=E.dynamic&&state.evImg?state.evImg:E.img;
+  const list=eventListings();
+  const q=state.buyQty||2;
+  const ac=p3ActiveCount();
+  const sortBtn=(k,l)=>`<button class="sort-btn ${state.sortBy===k?'on':''}" data-sort="${k}">${l}</button>`;
+  return `<div class="ss">
+    <div class="ss-stk">
+      <div class="mhdr"><span class="mh-sp"></span><img class="mh-logo nav-logo" src="assets/logo.png" alt="Live Tickets"><button class="circle-btn" data-act="back-lobby" aria-label="חזרה">→</button></div>
+      <div class="nhero"><button class="nh-info" data-act="stadium-open">ⓘ אצטדיון</button><div class="nh-g"><div class="nh-t">${evTitle}</div><div class="nh-m">${[evDate,evVenue].filter(Boolean).join(' · ')}</div></div><span class="nh-th" style="background-image:url(${IMG}${evImg})"></span></div>
+      <div class="ss-filters">
+        <button class="fchip qty" data-act="qty-desk">${q} כרטיסים ⌄</button>
+        <button class="ff-open${ac?' on':''}" data-act="p3filter"><svg class="ff-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>סינון${ac?` · ${ac}`:''}</button>
+      </div>
+    </div>
+    <div class="ss-map">
+      <svg class="ss-stad" viewBox="0 0 900 620" preserveAspectRatio="xMidYMin meet">
+        <defs><pattern id="ssdots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.5" fill="rgba(30,42,66,.16)"></circle></pattern></defs>
+        <ellipse cx="450" cy="300" rx="406" ry="286" fill="#eef1f6"></ellipse>
+        ${stadiumBowl().replace(/url\(#seatdots\)/g,'url(#ssdots)')}
+        <g class="pitch"><ellipse cx="450" cy="300" rx="138" ry="90" fill="#3f9152"></ellipse>
+          <ellipse cx="450" cy="300" rx="138" ry="90" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"></ellipse>
+          <line x1="450" y1="210" x2="450" y2="390" stroke="rgba(255,255,255,.5)" stroke-width="2"></line>
+          <circle cx="450" cy="300" r="26" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"></circle></g>
+        ${mapPinsSel()}
+      </svg>
+      <div class="ss-maphint">לחצו על מחיר במפה כדי לראות את המקום ברשימה</div>
+    </div>
+    <div class="ss-drawer${state.sheetExpanded?' up':''}" id="ssDrawer">
+      <div class="ss-handle" id="ssHandle"><span></span></div>
+      <div class="ss-meta"><span>${list.length} מקומות · ${q} יחד · כולל עמלות</span><div class="ss-sort">${sortBtn('best','משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
+      <div class="ss-list">${list.map(selCard).join('')}</div>
+    </div>
+    ${stadiumInfoPop()}
+  </div>`;
+}
+
+/* ---- 10 · Seat screen — the CONFIRMED result (wireframe 103) ---- */
+/* No picker here: the seat is chosen. Rich conversion info · price-lock timer
+   starts here · paid add-ons live at checkout. */
+function seatMiniHead(b, backAct){
+  const sub=[b.date,b.venue].filter(Boolean).join(' · ');
+  return `<div class="seat-stk">
+    <div class="mhdr"><span class="mh-sp"></span><img class="mh-logo nav-logo" src="assets/logo.png" alt="Live Tickets"><button class="circle-btn" data-act="${backAct||'back-event'}" aria-label="חזרה">→</button></div>
+    <div class="nhero"><div class="nh-g"><div class="nh-t">${[b.title,b.sec].filter(Boolean).join(' · ')}</div><div class="nh-m">${sub}</div></div><span class="nh-th" style="background-image:url(${IMG}${b.img||'team-realmadrid.jpg'})"></span></div>
+    <div class="pur-safety"><span>הכרטיסים שלך מוגנים ב־100% בהתאם לתו התקן לרכישה בטוחה</span>${SHIELD_SVG}</div>
+    <div class="seat-tw">${orderTimer()}</div>
+  </div>`;
+}
 function pageOrder(){
   const b=state.buy||{};
-  const detLines=[b.row||'טור 24','כניסה 4 · שער B','קו ראייה מלא למגרש'];
-  const slimT=(b.title||'אירוע').split(' · ')[0];
+  const det=DDETAIL_SEL[b.key]||'seat';
+  const q=state.buyQty||2;
+  const seatTitle = det==='section' ? `${b.sec||'איזור'}` : `${b.sec} · ${b.row}`;
+  const seatSub   = det==='section' ? 'אזור פתוח · מספר שורה יימסר עם הכרטיס' : det==='row' ? 'שורה משוערת · יושבים יחד' : `${q} כרטיסים · יושבים יחד`;
+  const L=D.listings.find(x=>x.key===b.key)||{};
+  const sc=Number(b.score)||8;
+  const valNum = sc>=10?'9.6':sc>=9?'9.4':sc>=8?'8.9':sc>=7?'8.3':'7.6';
+  const valTxt = sc>=9?'מעולה':sc>=7?'טוב מאוד':'סביר';
+  const left = L.left||2;
+  const gallery=['seat1.jpg','seat6.jpg','seat7.jpg'];
+  const gi=state.seat360%gallery.length;
   return `
-  ${seatHead(b)}
-  <!-- SLIM HEADER (on scroll) — narrow + sticky, like the event page -->
-  <div class="ev-slim seat-slim ${state.seatSlim?'show':''}">
-    <div class="es-row">
-      <a class="es-logo" data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
-      <button class="es-back" data-act="back-event">→</button>
-    </div>
-    <div class="es-info">
-      <div class="es-price">${nis(buyTotal())}</div>
-      <div class="es-meta"><span class="es-t">${slimT}</span> · <span class="es-d">${b.date||''}</span></div>
-    </div>
-  </div>
-  <div class="pur pur-pad">
-    <div class="seat360"><img src="${IMG}seat1.jpg" alt="תצוגת מושב"><span class="s360-badge">${PANO_SVG}360°</span></div>
+  ${seatMiniHead(b)}
+  <div class="pur pur-pad seat-body">
+    <button class="seat-view" data-act="seat360">
+      <img src="${IMG}${gallery[gi]}" alt="מבט מהמקום">
+      <span class="sv-badge">${PANO_SVG} מבט מהמקום · 360°</span>
+      <span class="sv-dots">${gallery.map((_,i)=>`<i class="${i===gi?'on':''}"></i>`).join('')}</span>
+    </button>
 
-    <!-- איזור · מחיר · מושבים · תוספות -->
-    <div class="pur-ev seatcard">
-      <div class="seat-area">${b.sec||'איזור'}</div>
-      <div class="seat-price"><span class="sp-sub">לכרטיס יחיד · כולל עמלות</span><span class="sp-num">${nis(buyUnit())}</span></div>
-      <div class="seat-det">${detLines.map(x=>`<div>${x}</div>`).join('')}</div>
+    <div class="seat-title"><span class="sec-dot" style="background:${areaColorFor(b.key)}"></span>${seatTitle}</div>
+    <div class="seat-subt">${seatSub}</div>
+    ${state.wantTogether?`<div class="seat-together">ביקשתם ישיבה יחד ✓ · תוספת בתשלום</div>`:''}
 
-      <div class="pur-card">
-        <div class="qstep"><button class="qbtn" data-act="qty-inc" aria-label="הוסף">+</button><span class="qnum">${state.buyQty}</span><button class="qbtn" data-act="qty-dec" aria-label="הפחת">−</button></div>
-        <div class="pc-g"><div class="pc-t">כמות מושבים</div></div>
-      </div>
-      <div class="pur-card${state.buyAdjacent?' on':''}">
-        <button class="add-btn${state.buyAdjacent?' on':''}" data-act="toggle-adjacent">${state.buyAdjacent?'נוסף ✓':'הוסף'}</button>
-        <div class="pc-g"><div class="pc-t">מושבים צמודים</div><div class="pc-s">הוסף את האפשרות למושבים צמודים</div></div>
-      </div>
-
-      <div class="sum-div"></div>
-      <div class="sum-label">תוספות להזמנה</div>
-      <div class="pur-card${state.buyCoverage?' on':''}">
-        <button class="add-btn${state.buyCoverage?' on':''}" data-act="toggle-coverage">${state.buyCoverage?'נוסף ✓':'הוסף'}</button>
-        <div class="pc-g"><div class="pc-t">כיסוי למקרה ביטול</div><div class="pc-s">הוספת כיסוי למקרה ביטול · <a class="pc-link" data-act="soon" data-title="כיסוי למקרה ביטול">לפרטים</a></div></div>
-        ${PC_SHIELD}
-      </div>
+    <div class="seat-valrow">
+      <span class="sv-score">${valNum} <small>${valTxt}</small></span>
+      ${sc>=8?`<span class="sv-cheap">💲 הזול באזור</span>`:''}
+      <span class="sv-scarce">נותרו ${left} במחיר הזה</span>
     </div>
 
-    <!-- קוד / שובר הנחה -->
-    <div class="pur-ev cpn">
-      <div class="cpn-t">הוסף קוד או שובר הנחה</div>
-      <input class="fld cpn-in" placeholder="קוד הנחה או שובר" data-fld="buyCoupon" value="${(state.buyCoupon||'').replace(/"/g,'&quot;')}">
-      <button class="acc-cont cpn-btn" data-act="apply-coupon">החל הנחה</button>
+    <div class="seat-info">
+      <div class="si-r"><span class="si-ic">👁</span><div><b>שדה ראייה נקי</b> · ללא הסתרת מבט</div></div>
+      <div class="si-r"><span class="si-ic">🔥</span><div><b>פופולרי</b> · 340 צפו באירוע</div></div>
+      <div class="si-r"><span class="si-ic">📱</span><div><b>כרטיס דיגיטלי</b> · יימסר עד 24ש׳ לפני — בזמן לטיסה</div></div>
+      <div class="si-r nob"><span class="si-ic">🛡</span><div><b>אחריות מלאה</b> · כרטיס מאומת · אפשר למכור מחדש</div></div>
     </div>
 
-    <!-- סכום לתשלום (מתעדכן לפי הבחירות) -->
-    <div class="sumbox2">
-      <div class="sb-title">סכום לתשלום</div>
-      ${buySummaryRows()}
-    </div>
+    <button class="seat-change" data-act="back-event">‹ שינוי מקום</button>
 
-    <div class="pur-trust"><span class="star">★</span> אחריות 100% · ביטול כולל מילואים · תשלום מאובטח</div>
+    <div class="seat-priceblk">
+      <div><div class="sp-num">${nis(buyUnit())}</div><div class="sp-sub">לכרטיס · כולל עמלות</div></div>
+      <a class="sp-brk" data-act="soon" data-title="פירוט מחיר">פירוט מחיר ›</a>
+    </div>
+    <div class="seat-inst">החל מ-${nis(Math.round(buyUnit()/6))} ×6 תשלומים · או Apple / Google Pay</div>
   </div>
   <div class="pur-foot seat-foot">
-    <button class="btn btn-pink pf-cta" data-act="proceed-checkout">${state.buyQty} כרטיסים · המשך לביצוע ההזמנה</button>
-  </div>
-  ${holdModal()}`;
+    <button class="btn btn-pink pf-cta" data-act="to-checkout">המשך לתשלום</button>
+    <div class="seat-addnote">כיסוי ביטול ותוספות בתשלום → בשלב הצ׳ק-אאוט</div>
+  </div>`;
 }
 
 /* payment-method option button (checkout) */
@@ -2427,95 +2551,123 @@ function pageAccount(){
   </div>`;
 }
 
-/* ---- 11 · Order summary + Checkout (payer details · payment method) ---- */
-function pageCheckout(){
-  const b=state.buy||{}, pm=state.payMethod, v=s=>(state[s]||'').replace(/"/g,'&quot;');
+/* ---- 11 · Checkout — shared sections (mobile + desktop) ---- */
+function chkPayer(){
+  const v=s=>(state[s]||'').replace(/"/g,'&quot;');
+  return `<div class="chk-sec">
+    <div class="chk-h">פרטי המשלם</div>
+    <button class="acc-guest" data-act="soon" data-title="התחברות משתמש">התחברות משתמש</button>
+    <div class="acc-or"><span>או</span></div>
+    <label class="acc-lbl">פרטים לתשלום ולקבלת הכרטיסים</label>
+    <div class="fld-row2">
+      <input class="fld" placeholder="שם משפחה" data-fld="coLast" value="${v('coLast')}">
+      <input class="fld" placeholder="שם פרטי" data-fld="coFirst" value="${v('coFirst')}">
+    </div>
+    <input class="fld" placeholder="אימייל · לשליחת הכרטיסים" inputmode="email" data-fld="coEmail" value="${v('coEmail')}">
+    <input class="fld" placeholder="טלפון" inputmode="tel" data-fld="coPhone" value="${v('coPhone')}">
+    <div class="chk-note">הכרטיסים יישלחו לכתובת המייל של מזמין הכרטיסים עד 24 שעות לפני מועד האירוע.</div>
+  </div>`;
+}
+function chkPayment(opts){
+  opts=opts||{};
+  const pm=state.payMethod;
   const pmNote={apple:'תעברו לאישור מהיר ומאובטח דרך Apple Pay.',gpay:'תעברו לאישור מהיר ומאובטח דרך Google Pay.',cash:'פרטי ההעברה יישלחו במייל. הכרטיסים ישוחררו עם קליטת התשלום.'};
+  return `<div class="chk-sec">
+    <div class="chk-h chk-h-row">${opts.noSplit?'':`<button class="split-btn2" data-act="to-split">${USERS_SVG}<span>חלוקת תשלום עם חברים</span></button>`}<span class="chk-h-t">${opts.title||'פרטי תשלום'}</span></div>
+    <label class="acc-lbl">בחירת אמצעי תשלום</label>
+    <div class="pm-wallets">${payOpt('apple','Apple Pay',pm)}${payOpt('gpay','G Pay',pm)}</div>
+    <div class="pm-or"><span>או</span></div>
+    <div class="pm-list">
+      ${payOpt('card','כרטיס אשראי',pm)}
+      ${payOpt('cash','מזומן/העברה בנקאית',pm)}
+    </div>
+    ${pm==='card'?`
+    <div class="pm-panel">
+      <div class="cc-wrap"><input class="fld cc" placeholder="מספר כרטיס" inputmode="numeric" maxlength="19" data-ccnum><span class="cc-brand" data-ccbrand></span></div>
+      <div class="fld-row"><input class="fld" placeholder="תוקף MM/YY" inputmode="numeric" maxlength="5" data-ccexp><input class="fld" placeholder="CVV" inputmode="numeric" maxlength="4"></div>
+      <input class="fld" placeholder="שם בעל/ת הכרטיס">
+      <input class="fld" placeholder="ת.ז של בעל/ת הכרטיס" inputmode="numeric" maxlength="9">
+      <div class="inst-row"><span class="inst-l">תשלומים</span>${['12','6','3','1'].map(n=>`<button class="chip2 ${state.coInstall===n?'on':''}" data-act="install" data-n="${n}">${n==='12'?'עד 12':n}</button>`).join('')}</div>
+    </div>`:''}
+    ${(pm&&pm!=='card')?`<div class="pm-panel pm-note">${pmNote[pm]||''}</div>`:''}
+    <div class="pm-accept"><span class="pm-brands"><b>VISA</b><b>MC</b><b>AMEX</b><b>PayPal</b><b>GPay</b></span><span>אנחנו מקבלים</span></div>
+  </div>`;
+}
+function chkTerms(){
+  return `<label class="terms-row"><input type="checkbox" class="cbx"><span>אני מאשר שקראתי את תנאי השימוש באתר, מסכים להם ומבין כי מחירי הכרטיסים נקבעים בהתאם להיצע והביקוש בשוק המשני והמחיר הנקוב על הכרטיסים אינו רלוונטי. כמו כן, אני מאשר שההזמנה הינה סופית ולא ניתנת לביטול, למעט אם רכשתי שירות ביטול הזמנה.</span></label>
+    <label class="terms-row"><input type="checkbox" class="cbx"><span>אני מעוניין לקבל דברי פרסום ועדכונים על אירועים עתידיים בכל אמצעי תקשורת.</span></label>`;
+}
+/* discount / voucher code — top of checkout, before the summary */
+function chkCoupon(){
+  return `<div class="chk-sec chk-coupon">
+    <div class="chk-h">קוד הנחה או שובר</div>
+    <div class="coupon-row">
+      <input class="fld coupon-in" placeholder="הזינו קוד הנחה" data-fld="buyCoupon" value="${(state.buyCoupon||'').replace(/"/g,'&quot;')}">
+      <button class="coupon-btn" data-act="apply-coupon">החל</button>
+    </div>
+    ${state.buyCouponApplied?`<div class="coupon-ok">✓ הקוד הוחל · ההנחה תופיע בתשלום</div>`:''}
+  </div>`;
+}
+/* paid add-ons — checkout only · ישיבה יחד is opt-in (NOT pre-checked / not auto-charged) */
+function chkAddons(){
+  const want=state.wantTogether;
+  const cov=Math.round(buyTicketsTotal()*0.10);
+  return `<div class="chk-sec">
+    <div class="chk-h">תוספות</div>
+    <div class="addon${state.buyAdjacent?' on':''}${want?' want':''}">
+      <button class="add-btn${state.buyAdjacent?' on':''}" data-act="toggle-adjacent">${state.buyAdjacent?'נוסף ✓':'הוסף'}</button>
+      <div class="ao-g"><div class="ao-t">ישיבה יחד${want?` <span class="ao-flag">ביקשתם ✦</span>`:''}</div><div class="ao-s">המקומות שיוקצו יהיו באותה שורה · +${nis(90*state.buyQty)}</div></div>
+    </div>
+    <div class="addon${state.buyCoverage?' on':''}">
+      <button class="add-btn${state.buyCoverage?' on':''}" data-act="toggle-coverage">${state.buyCoverage?'נוסף ✓':`+${nis(cov)}`}</button>
+      <div class="ao-g"><div class="ao-t">כיסוי ביטול (ביטוח)</div><div class="ao-s">80% החזר עד 4 ימים לפני · אופציונלי · <a class="pc-link" data-act="soon" data-title="כיסוי ביטול">לפרטים</a></div></div>
+    </div>
+    <div class="ao-note">${want?'סימנתם ״ישיבה יחד״ באירוע · ':''}הוספה בנגיעה — לא מחויב אוטומטית</div>
+  </div>`;
+}
+function pageCheckout(){
   return `
   <div class="chk-stick">
     ${purHead('הזמנה','back-order')}
     <div class="pur-safety"><span>הכרטיסים שלך מוגנים ב־100% בהתאם לתו התקן לרכישה בטוחה</span>${SHIELD_SVG}</div>
+    <div class="chk-tw">${orderTimer()}</div>
   </div>
   <div class="pur chk-body">
-    ${orderTimer()}
-
-    <!-- סיכום הזמנה (מקוצר) -->
-    <div class="pur-ev sum coz">
-      <div class="sum-label">סיכום הזמנה</div>
-      <div class="sum-ev">
-        <img class="pur-ev-img" src="${IMG}${b.img||'team-realmadrid.jpg'}" alt="">
-        <div class="pur-ev-i"><div class="pur-ev-t">${b.title||'אירוע'}</div>
-          <div class="pur-ev-s">${[b.date,b.venue].filter(Boolean).map(x=>`<div>${x}</div>`).join('')}</div>
-        </div>
-      </div>
-      <div class="sum-div"></div>
-      <div class="coz-blk"><div class="coz-k">${b.sec||'איזור'}</div><div class="coz-v">${state.buyQty} מושבים · יושבים יחד</div></div>
-      ${state.buyCoverage?`<div class="sum-div"></div><div class="coz-blk"><div class="coz-k">תוספת כיסוי למקרה ביטול</div><div class="coz-v">${state.buyQty} מבוטחים</div></div>`:''}
-      <div class="coz-totbox">
-        <div class="coz-tot"><span class="coz-tnum">${nis(buyTotal())}</span><span class="coz-tlbl">סה״כ לתשלום</span></div>
-        <button class="coz-detail" data-act="to-order">פירוט</button>
-      </div>
-    </div>
-
-    <!-- פרטי המשלם -->
-    <div class="chk-sec">
-      <div class="chk-h">פרטי המשלם</div>
-      <button class="acc-guest" data-act="soon" data-title="התחברות משתמש">התחברות משתמש</button>
-      <div class="acc-or"><span>או</span></div>
-      <label class="acc-lbl">פרטים לתשלום ולקבלת הכרטיסים</label>
-      <div class="fld-row2">
-        <input class="fld" placeholder="שם משפחה" data-fld="coLast" value="${v('coLast')}">
-        <input class="fld" placeholder="שם פרטי" data-fld="coFirst" value="${v('coFirst')}">
-      </div>
-      <input class="fld" placeholder="אימייל · לשליחת הכרטיסים" inputmode="email" data-fld="coEmail" value="${v('coEmail')}">
-      <input class="fld" placeholder="טלפון" inputmode="tel" data-fld="coPhone" value="${v('coPhone')}">
-      <div class="chk-note">הכרטיסים יישלחו לכתובת המייל של מזמין הכרטיסים עד 24 שעות לפני מועד האירוע.</div>
-    </div>
-
-    <!-- פרטי תשלום -->
-    <div class="chk-sec">
-      <div class="chk-h chk-h-row"><button class="split-btn2" data-act="to-split">${USERS_SVG}<span>חלוקת תשלום עם חברים</span></button><span class="chk-h-t">פרטי תשלום</span></div>
-      <label class="acc-lbl">בחירת אמצעי תשלום</label>
-      <div class="pm-list">
-        ${payOpt('card','כרטיס אשראי',pm)}
-        ${payOpt('apple','Apple Pay',pm)}
-        ${payOpt('gpay','G Pay',pm)}
-        ${payOpt('cash','מזומן/העברה בנקאית',pm)}
-      </div>
-      ${pm==='card'?`
-      <div class="pm-panel">
-        <div class="cc-wrap"><input class="fld cc" placeholder="מספר כרטיס" inputmode="numeric" maxlength="19" data-ccnum><span class="cc-brand" data-ccbrand></span></div>
-        <div class="fld-row"><input class="fld" placeholder="תוקף MM/YY" inputmode="numeric" maxlength="5" data-ccexp><input class="fld" placeholder="CVV" inputmode="numeric" maxlength="4"></div>
-        <input class="fld" placeholder="שם בעל/ת הכרטיס">
-        <input class="fld" placeholder="ת.ז של בעל/ת הכרטיס" inputmode="numeric" maxlength="9">
-        <div class="inst-row"><span class="inst-l">תשלומים</span>${['12','6','3','1'].map(n=>`<button class="chip2 ${state.coInstall===n?'on':''}" data-act="install" data-n="${n}">${n==='12'?'עד 12':n}</button>`).join('')}</div>
-      </div>`:''}
-      ${(pm&&pm!=='card')?`<div class="pm-panel pm-note">${pmNote[pm]||''}</div>`:''}
-      <div class="pm-accept"><span class="pm-brands"><b>VISA</b><b>MC</b><b>AMEX</b><b>PayPal</b><b>GPay</b></span><span>אנחנו מקבלים</span></div>
-    </div>
-
-    <label class="terms-row"><input type="checkbox" class="cbx"><span>אני מאשר שקראתי את תנאי השימוש באתר, מסכים להם ומבין כי מחירי הכרטיסים נקבעים בהתאם להיצע והביקוש בשוק המשני והמחיר הנקוב על הכרטיסים אינו רלוונטי. כמו כן, אני מאשר שההזמנה הינה סופית ולא ניתנת לביטול, למעט אם רכשתי שירות ביטול הזמנה.</span></label>
-    <label class="terms-row"><input type="checkbox" class="cbx"><span>אני מעוניין לקבל דברי פרסום ועדכונים על אירועים עתידיים בכל אמצעי תקשורת.</span></label>
-
-    <button class="btn btn-pink pur-cta" data-act="pay">המשך לתשלום · ${nis(buyTotal())}</button>
-    <div class="pur-trust"><span class="star">★</span> אחריות 100% · ביטול כולל מילואים · תשלום מאובטח</div>
+    ${orderSummaryCard({})}
+    ${chkAddons()}
+    ${chkCoupon()}
+    <div class="sumbox2"><div class="sb-title">פירוט מחיר</div>${buySummaryRows()}</div>
+    ${chkPayer()}
+    ${chkPayment()}
+    ${chkTerms()}
+    <button class="btn btn-pink pur-cta" data-act="pay">אישור ותשלום · ${nis(buyTotal())}</button>
+    <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>
   </div>`;
 }
 
 /* compact event summary card — reused across confirmation / split / friend-pay */
-function orderSummaryCard(showTotal){
+/* single, consistent order-summary card — full event title · date+time · location ·
+   seat details (area · row · seats) · added services. Used across the whole flow. */
+function orderSummaryCard(opts){
+  opts = opts||{};
   const b=state.buy||{};
+  const evLines=[b.date, b.venue].filter(Boolean);
+  const seatLine=[b.row, `${state.buyQty} כרטיסים · יושבים יחד`].filter(Boolean).join(' · ');
+  const svc=[];
+  if(state.buyAdjacent) svc.push("ישיבה יחד · אותה שורה");
+  if(state.buyCoverage) svc.push(`כיסוי למקרה ביטול · ${state.buyQty} מבוטחים`);
   return `<div class="pur-ev sum coz">
     <div class="sum-label">סיכום הזמנה</div>
     <div class="sum-ev">
       <img class="pur-ev-img" src="${IMG}${b.img||'team-realmadrid.jpg'}" alt="">
       <div class="pur-ev-i"><div class="pur-ev-t">${b.title||'אירוע'}</div>
-        <div class="pur-ev-s">${[b.date,b.venue].filter(Boolean).map(x=>`<div>${x}</div>`).join('')}</div>
+        <div class="pur-ev-s">${evLines.map(x=>`<div>${x}</div>`).join('')}</div>
       </div>
     </div>
     <div class="sum-div"></div>
-    <div class="coz-blk"><div class="coz-k">${b.sec||'איזור'}</div><div class="coz-v">${state.buyQty} מושבים · יושבים יחד</div></div>
-    ${showTotal?`<div class="coz-totbox"><div class="coz-tot"><span class="coz-tnum">${nis(buyTotal())}</span><span class="coz-tlbl">סה״כ לתשלום</span></div></div>`:''}
+    <div class="coz-blk"><div class="coz-k"><span class="sec-dot" style="background:${areaColorFor(b.key)}"></span>${b.sec||'איזור'}</div><div class="coz-v">${seatLine}</div></div>
+    ${svc.length?`<div class="sum-div"></div><div class="coz-blk"><div class="coz-sh">תוספות שנבחרו</div>${svc.map(s=>`<div class="coz-svc"><span class="coz-ok">✓</span><span>${s}</span></div>`).join('')}</div>`:''}
+    ${opts.total?`<div class="coz-totbox"><div class="coz-tot"><span class="coz-tnum">${nis(buyTotal())}</span><span class="coz-tlbl">סה״כ לתשלום</span></div>${opts.detail?`<button class="coz-detail" data-act="to-order">פירוט</button>`:''}</div>`:''}
   </div>`;
 }
 
@@ -2525,15 +2677,15 @@ function pageConfirm(){
   ${purHead('אישור הזמנה','home')}
   <div class="pur">
     <div class="conf-hero"><div class="conf-tick">✓</div><div class="conf-t">ההזמנה אושרה!</div><div class="conf-s">מספר הזמנה · ${state.orderNo}</div></div>
-    ${orderSummaryCard(true)}
+    <div class="conf-callback">📞 בשעות הקרובות נציג מטעמנו ייצור איתך קשר לסגירת פרטי העסקה.</div>
+    ${orderSummaryCard({total:true})}
     <div class="chk-sec">
-      <div class="chk-h">הכרטיסים שלכם</div>
       <div class="pur-card col"><div class="pc-t">מתי מקבלים את הכרטיסים?</div><div class="pc-s">כרטיס דיגיטלי · יישלח למייל עד 24 שעות לפני האירוע ✓</div></div>
       <div class="fld-row"><button class="btn2" data-act="wallet">הוסף לארנק</button><button class="btn2" data-act="share">שיתוף</button></div>
-      <div class="pur-card col"><div class="pc-t">מה עכשיו?</div><div class="pc-s">מעקב מסירה · ביטול כולל מילואים · תמיכה 24/7</div></div>
+      <div class="pur-card col"><div class="pc-t">מה עכשיו?</div><div class="pc-s">מעקב מסירה · אחריות מלאה על הכרטיס · תמיכה 24/7</div></div>
     </div>
     <button class="btn btn-pink pur-cta" data-act="mytickets">הכרטיסים שלי</button>
-    <div class="pur-trust"><span class="star">★</span> אחריות 100% · ביטול כולל מילואים · תשלום מאובטח</div>
+    <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>
   </div>`;
 }
 
@@ -2542,9 +2694,10 @@ function pageSplitSetup(){
   return `
   ${purHead('חלוקת תשלום','back-checkout')}
   <div class="pur">
-    ${orderSummaryCard(true)}
+    ${orderSummaryCard({total:true})}
     <div class="chk-sec">
       <div class="chk-h">חלוקה עם חברים</div>
+      <div class="pur-note plain">קודם משלמים את חלקכם — ורק לאחר התשלום הראשוני <b>המקומות מאובטחים</b>. לחברים חלון של 24 שעות לשלם את חלקם, אחרת החזר אוטומטי.</div>
       <div class="pur-card">
         <div class="qstep"><button class="qbtn" data-act="split-inc" aria-label="הוסף">+</button><span class="qnum">${state.splitN}</span><button class="qbtn" data-act="split-dec" aria-label="הפחת">−</button></div>
         <div class="pc-g"><div class="pc-t">מספר משתתפים</div><div class="pc-s">כולל אותך</div></div>
@@ -2555,14 +2708,15 @@ function pageSplitSetup(){
       </div>
     </div>
     <div class="sumbox2">
-      <div class="sb-title">התשלום שלכם עכשיו</div>
+      <div class="sb-title">התשלום הראשוני שלכם</div>
       <div class="sr"><span>${nis(buyTotal())}</span><span>סה״כ ההזמנה</span></div>
       <div class="sr"><span>${state.splitN} משתתפים</span><span>חלוקה</span></div>
       <div class="sr tot"><span>${nis(splitPer())}</span><span>החלק שלך · לתשלום עכשיו</span></div>
     </div>
-    <div class="pur-note">אתם משלמים את חלקכם ו<b>מאבטחים את כל המקומות מיד</b>. לחברים חלון של 24 שעות לשלם — אחרת החזר אוטומטי.</div>
-    <button class="btn btn-pink pur-cta" data-act="split-pay">שלמו את חלקכם + הזמינו · ${nis(splitPer())}</button>
-    <div class="pur-trust"><span class="star">★</span> המקומות ננעלים מיד · תשלום מאובטח</div>
+    ${chkPayer()}
+    ${chkPayment({noSplit:true, title:'פרטי תשלום · תשלום ראשוני'})}
+    <button class="btn btn-pink pur-cta" data-act="split-pay">שלמו ${nis(splitPer())} ואבטחו את המקומות</button>
+    <div class="pur-trust"><span class="star">★</span> המקומות מאובטחים לאחר התשלום הראשוני · תשלום מאובטח</div>
   </div>`;
 }
 
@@ -2572,11 +2726,10 @@ function pageSplitInvite(){
   ${purHead('הזמנת חברים','back-checkout')}
   <div class="pur">
     <div class="conf-hero"><div class="conf-tick">✓</div><div class="conf-t">המקומות אובטחו!</div><div class="conf-s">לחברים 24 שעות לשלם את חלקם</div></div>
+    <div class="pur-note">כל חבר מקבל קישור "שלמו את חלקכם" ומשלם באשראי / ארנק — ללא צורך בחשבון.</div>
     <div class="sum-label">שתפו את הקישור לתשלום</div>
     <div class="linkbox2"><span class="lb-url" dir="ltr">livetickets.co.il/split/xR4k…</span><button class="lb-cp" data-act="copy-link">${state.linkCopied?'הועתק ✓':'העתק'}</button></div>
     <button class="btn2 wapp" data-act="share">שיתוף בוואטסאפ</button>
-    <button class="btn2 bit" data-act="bit">שליחת בקשת ביט (Bit)</button>
-    <div class="pur-note">כל חבר מקבל קישור "שלמו את חלקכם" ומשלם באשראי / ארנק / ביט — ללא צורך בחשבון.</div>
     <button class="btn btn-pink pur-cta" data-act="to-organizer">סיום — למעקב סטטוס</button>
     <button class="link-btn ctr" data-act="preview-friend">תצוגת מסך החבר ←</button>
   </div>`;
@@ -2584,21 +2737,18 @@ function pageSplitInvite(){
 
 /* ---- 15 · Friend pay (opened via the link) ---- */
 function pageFriendPay(){
+  const b=state.buy||{};
+  const sub=[b.date, b.venue].filter(Boolean).join(' · ');
   return `
   ${purHead('שלמו את חלקכם','back-invite')}
   <div class="pur pur-pad">
-    <div class="sum-label">יעל הזמינה אתכם</div>
-    ${orderSummaryCard(false)}
-    <div class="pur-card"><span class="badge-ok">כלול</span><div class="pc-g"><div class="pc-t">ביטול כולל מילואים</div><div class="pc-s">כבר כלול · ללא תוספת</div></div></div>
+    <h1 class="fp-invite">יעל הזמינה אתכם ל${b.title||'האירוע'}</h1>
+    ${sub?`<div class="fp-invite-sub">${sub}</div>`:''}
+    ${orderSummaryCard({})}
+    <div class="pur-card"><span class="badge-ok">מאומת</span><div class="pc-g"><div class="pc-t">כרטיס מאומת · אחריות מלאה</div><div class="pc-s">מגובה באחריות רכישה 100%</div></div></div>
     <div class="sumbox2"><div class="sr tot"><span>${nis(splitPer())}</span><span>החלק שלך</span></div></div>
-    <div class="chk-sec">
-      <div class="chk-h">אמצעי תשלום</div>
-      <div class="pm-list">
-        ${payOpt('card','כרטיס אשראי',state.payMethod)}
-        ${payOpt('apple','Apple Pay',state.payMethod)}
-        ${payOpt('bit','ביט (Bit)',state.payMethod)}
-      </div>
-    </div>
+    ${chkPayer()}
+    ${chkPayment({noSplit:true})}
     <div class="pur-note ctr">רק החלק שלכם · ללא צורך בחשבון.</div>
   </div>
   <div class="pur-foot"><div class="pf-sum">החלק שלך<b>${nis(splitPer())}</b></div><button class="btn btn-pink pf-cta" data-act="friend-paid">שלמו ${nis(splitPer())}</button></div>`;
@@ -2613,6 +2763,7 @@ function pageOrganizer(){
   return `
   ${purHead('מעקב תשלומים','home')}
   <div class="pur">
+    <div class="pur-note">${all?'כל המשתתפים שילמו — ההזמנה מאושרת ✓':'ההזמנה תאושר כשכל המשתתפים ישלמו את חלקם · אחרת <b>החזר אוטומטי</b> למי ששילם.'}</div>
     ${all?`<div class="conf-hero"><div class="conf-tick">✓</div><div class="conf-t">כולם שילמו!</div><div class="conf-s">ההזמנה מאושרת</div></div>`:''}
     <div class="chk-sec"${all?' style="margin-top:6px"':''}>
       <div class="chk-h">מי שילם</div>
@@ -2621,7 +2772,7 @@ function pageOrganizer(){
     </div>
     ${all
       ? `<button class="btn btn-pink pur-cta" data-act="split-confirm">לאישור ההזמנה</button>`
-      : `<button class="btn2 rem" data-act="remind">שלחו תזכורת לממתינים</button><div class="pur-note">מאושר כשכולם שילמו · אחרת <b>החזר אוטומטי</b> למי ששילם.</div><button class="link-btn ctr" data-act="mark-allpaid">(דמו) סמנו שכולם שילמו ←</button>`}
+      : `<button class="btn2 rem" data-act="remind">שלחו תזכורת לממתינים</button><button class="link-btn ctr" data-act="mark-allpaid">(דמו) סמנו שכולם שילמו ←</button>`}
   </div>`;
 }
 
@@ -2633,19 +2784,321 @@ function pageEdge(){
     <div class="pur">
       <div class="conf-hero"><div class="edge-ic">😕</div><div class="conf-t">הקטגוריה אזלה</div><div class="conf-s">מצאנו חלופות קרובות באותה רמת מחיר</div></div>
       <div class="sum-label">חלופות מומלצות</div>
-      <div class="pur-card" data-act="alt-pick" data-sec="דרום · שורה 15" data-price="1290"><div class="pc-g"><div class="pc-t">דרום · שורה 15</div><div class="pc-s">אותה רמה · ביטול כולל מילואים</div></div><span class="alt-price">₪1,290</span></div>
-      <div class="pur-card" data-act="alt-pick" data-sec="תאריך אחר · 23 אוג׳" data-price="1150"><div class="pc-g"><div class="pc-t">תאריך אחר · 23 אוג׳</div><div class="pc-s">אותו אזור · ביטול כולל מילואים</div></div><span class="alt-price">₪1,150</span></div>
+      <div class="pur-card" data-act="alt-pick" data-sec="דרום · שורה 15" data-price="1290"><span class="alt-price">₪1,290</span><div class="pc-g"><div class="pc-t">דרום · שורה 15</div><div class="pc-s">אותה רמה · כולל עמלות</div></div></div>
+      <div class="pur-card" data-act="alt-pick" data-sec="תאריך אחר · 23 אוג׳" data-price="1150"><span class="alt-price">₪1,150</span><div class="pc-g"><div class="pc-t">תאריך אחר · 23 אוג׳</div><div class="pc-s">אותו אזור · כולל עמלות</div></div></div>
       <button class="btn2 blue" data-act="notify">התראה כשמתפנה במחיר שלי</button>
     </div>`;
   // expired (default)
   return `
     ${purHead('ההחזקה פגה','back-event')}
     <div class="pur ctr-col">
-      <div class="conf-hero"><div class="edge-ic">⏳</div><div class="conf-t">ההחזקה על המקומות פגה</div><div class="conf-s">בדקנו מחדש — המקום זמין <b>באותו מחיר כולל־הכל</b>${state.buy?' · '+nis(buyTotal()):''}</div></div>
+      <div class="conf-hero"><div class="edge-ic">⏳</div><div class="conf-t">ההחזקה על המקומות פגה</div><div class="conf-s">בדקנו מחדש — המקום זמין <b>באותו מחיר · כולל עמלות</b>${state.buy?' · '+nis(buyTotal()):''}</div></div>
       <button class="btn btn-pink pur-cta" data-act="rehold">החזיקו שוב והמשיכו</button>
       <button class="btn2" data-act="edge-soldout">מקומות דומים</button>
     </div>`;
 }
+
+/* ============================================================
+   DESKTOP (≥1000px) — purchase-flow goes wide + two-pane.
+   Same core data as mobile (D.listings + state.buy); the only
+   desktop-exclusive extra is the interactive zoomable map.
+   Mobile screens (pageEvent / pageOrder) are untouched.
+   ============================================================ */
+const DDETAIL={south:'seat',vip:'seat','south-c':'row',east:'row',west:'section',north:'section'};
+function deskDetail(l){ return DDETAIL[l.key]||'seat'; }
+function deskPasses(l){ const d=deskDetail(l);
+  if(state.dlvl==='row') return d==='seat'||d==='row';
+  if(state.dlvl==='seat') return d==='seat';
+  return true; }
+function deskSections(){
+  const W=900,H=560,w=150,h=86;
+  return D.listings.map(l=>{ const cx=l.pin.l/100*W, cy=l.pin.t/100*H;
+    return {key:l.key,l,name:l.sec,price:l.price,cx,cy,x:cx-w/2,y:cy-h/2,w,h}; });
+}
+/* desktop top bar — behaves like the mobile header: step title (left) · logo · back arrow (right); no menu */
+function deskTop(title, backAct, sub){
+  return `<div class="dtop">
+    <div class="dtop-ev"><div class="t">${title}</div>${sub?`<div class="d">${sub}</div>`:''}</div>
+    <a class="dtop-logo" data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
+    <button class="circle-btn" data-act="${backAct||'home'}" aria-label="חזרה">→</button>
+  </div>`;
+}
+function deskTrust(){ return `<div class="dtrust">🛡 אחריות 100% · <b>אחריות מלאה על הכרטיס</b> · כל המחירים כולל עמלות · תשלום מאובטח</div>`; }
+function deskListingCard(l){
+  const tier=l.score>=9?'best':l.score>=7?'good':'fair', d=deskDetail(l);
+  const hot=state.hotSec===l.key?' hot':'';
+  const rowLine = d==='section' ? 'מספר שורה יימסר עם הכרטיס'
+               : d==='row' ? 'שורה משוערת · יושבים יחד' : l.row;
+  return `<div class="lcard${hot}${(state.buy&&state.buy.key===l.key)?' hl':''}" data-lkey="${l.key}" data-act="buy-select" data-b-sec="${l.sec}" data-b-row="${l.row}" data-b-price="${l.price}" data-b-img="${l.img}" data-b-score="${l.score}">
+    <div class="lc-price"><span class="amt">${l.price}</span><span class="fees">כולל עמלות</span></div>
+    <div class="lc-mid">
+      <div class="lc-sec"><span class="sec-dot" style="background:${areaColorFor(l.key)}"></span>${l.sec}</div>
+      <div class="lc-row${d!=='seat'?' soft':''}">${rowLine}</div>
+      <div class="lc-badge ${tier}"><span class="lbl">${l.val}</span><span class="box">${l.score}</span></div>
+      <div class="lc-info">${l.tog} · אישור מיידי · 🔥 נותרו ${l.left}</div>
+    </div>
+    <img class="lc-thumb" src="${IMG}${l.img}" alt="מבט מהמקום">
+  </div>`;
+}
+/* shared filter bar — identical on mobile + desktop event pages */
+function eventFilterBar(n){
+  const sortBtn=(k,l)=>`<button class="sort-btn ${state.sortBy===k?'on':''}" data-sort="${k}">${l}</button>`;
+  const ac=p3ActiveCount();
+  return `<div class="dflt">
+    <div class="dflt-row">
+      <button class="chip dark" data-act="qty-desk">${state.buyQty||2} כרטיסים ⌄</button>
+      <button class="chip act">מחיר · כולל עמלות</button>
+      <button class="chip${ac?' on':''}" data-act="p3filter">מאפייני מקום${ac?` · ${ac}`:''}</button>
+      <button class="chip">מסירה מיידית</button>
+    </div>
+    <div class="dlvl" title="רמת פירוט">${[['all','הכול'],['row','עם שורה'],['seat','עם שורה מדויקת']].map(([k,t])=>`<button class="${state.dlvl===k?'on':''}" data-act="dlvl-desk" data-k="${k}">${t}</button>`).join('')}</div>
+    <div class="dflt-count"><span>${n} מקומות · ${state.buyQty||2} יחד</span><div class="dflt-sort">${sortBtn('best','הכי משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
+  </div>`;
+}
+/* shared listing set — detail-level (רמת פירוט) filter + section filter + sort */
+function eventListings(){
+  const pnum=s=>parseInt((s||'').replace(/\D/g,''))||0;
+  let list=D.listings.filter(deskPasses);
+  const q=state.buyQty||1;                                   // seat-count filter: only listings that seat this many together
+  const fq=list.filter(l=>pnum(l.tog)>=q); if(fq.length) list=fq;
+  if(state.selectedSection){ const f=list.filter(l=>l.key===state.selectedSection || (state.selectedSection==='south'&&l.key==='south-c')); if(f.length) list=f; }
+  list = state.sortBy==='price' ? list.slice().sort((a,b)=>pnum(a.price)-pnum(b.price))
+       : state.sortBy==='qty'   ? list.slice().sort((a,b)=>pnum(b.tog)-pnum(a.tog))
+       : list.slice().sort((a,b)=>b.score-a.score);
+  return list;
+}
+/* realistic stadium bowl — color-coded ring sections + seat-dot texture + section numbers */
+/* shared bowl geometry so the overview map and the zoomed seat map share exact shapes */
+const BOWL={cx:450, cy:300, RX:398, RY:274,
+  rings:[{s0:.50,s1:.65,n0:100,segs:20},{s0:.67,s1:.82,n0:200,segs:22},{s0:.84,s1:.99,n0:300,segs:24}]};
+const bowlPt=(a,s)=>[BOWL.cx+s*BOWL.RX*Math.cos(a), BOWL.cy+s*BOWL.RY*Math.sin(a)];
+/* which bowl section each listing sits in — [ringIndex, segIndex] */
+const SECTION_GEO={ north:[0,0], vip:[0,2], east:[0,5], south:[0,10], west:[0,15], 'south-c':[1,11] };
+const BOWL_AC={infield:'#cdeed7',club:'#d7d4f1',view:'#d3e4f8',premium:'#f4e9cf',baseline:'#e7d7f3',bleach:'#f8dce9',home:'#bfead9'};
+/* the exact fill a listing's section gets on the map — so cards/pins can match it */
+function areaColorFor(key){
+  const geo=SECTION_GEO[key]; if(!geo) return BOWL_AC.view;
+  const ring=BOWL.rings[geo[0]]; if(!ring) return BOWL_AC.view;
+  const step=(2*Math.PI)/ring.segs, a1=-Math.PI/2+geo[1]*step, a2=a1+step*0.9, mid=(a1+a2)/2;
+  const deg=((mid*180/Math.PI)%360+360)%360;
+  let area;
+  if(deg>250&&deg<290) area=ring.n0===100?'home':(ring.n0===200?'premium':'view');
+  else if(deg>75&&deg<105) area=ring.n0===300?'bleach':(ring.n0===100?'infield':'club');
+  else if(ring.n0===100 && ((deg<=75)||(deg>=105&&deg<=250)||(deg>=290))) area='baseline';
+  else area=ring.n0===100?'infield':(ring.n0===200?'club':'view');
+  return BOWL_AC[area];
+}
+function stadiumBowl(){
+  const P=(a,s)=>{const q=bowlPt(a,s); return [q[0].toFixed(1),q[1].toFixed(1)];};
+  const rings=BOWL.rings;
+  const AC=BOWL_AC;
+  const areaOf=(ring,deg)=>{
+    if(deg>250&&deg<290) return ring.n0===100?'home':(ring.n0===200?'premium':'view');
+    if(deg>75&&deg<105)  return ring.n0===300?'bleach':(ring.n0===100?'infield':'club');
+    if(ring.n0===100 && ((deg<=75)||(deg>=105&&deg<=250)||(deg>=290))) return 'baseline';
+    return ring.n0===100?'infield':(ring.n0===200?'club':'view');
+  };
+  let out='';
+  rings.forEach(ring=>{
+    const step=(2*Math.PI)/ring.segs;
+    for(let i=0;i<ring.segs;i++){
+      const a1=-Math.PI/2+i*step, a2=a1+step*0.9;
+      const p1=P(a1,ring.s0),p2=P(a2,ring.s0),p3=P(a2,ring.s1),p4=P(a1,ring.s1);
+      const mid=(a1+a2)/2, deg=((mid*180/Math.PI)%360+360)%360;
+      const pts=`${p1[0]},${p1[1]} ${p2[0]},${p2[1]} ${p3[0]},${p3[1]} ${p4[0]},${p4[1]}`;
+      const c=P(mid,(ring.s0+ring.s1)/2);
+      out+=`<g class="bsec"><polygon points="${pts}" fill="${AC[areaOf(ring,deg)]}" stroke="#fff" stroke-width="1.4"></polygon><polygon points="${pts}" fill="url(#seatdots)"></polygon><text class="bsec-n" x="${c[0]}" y="${(+c[1]+3).toFixed(1)}">${ring.n0+i}</text></g>`;
+    }
+  });
+  return out;
+}
+/* SeatGeek-style price pins (our listings are clickable; the rest are ambience) */
+function mapPins(){
+  const L={}; D.listings.forEach(l=>L[l.key]=l);
+  const pins=[
+    {x:450,y:116,l:L.north,hot:1},{x:452,y:232,l:L.vip},{x:735,y:252,l:L.east},
+    {x:165,y:252,l:L.west},{x:450,y:486,l:L.south,hot:1},{x:352,y:400,l:L['south-c']},
+    {x:612,y:146,p:'₪1,640'},{x:288,y:150,p:'₪1,700'},{x:778,y:368,p:'₪1,180'},
+    {x:138,y:368,p:'₪1,240'},{x:566,y:498,p:'₪560',hot:1},{x:244,y:482,p:'₪590'},
+    {x:692,y:438,p:'₪720'},{x:224,y:174,p:'₪1,480'},{x:640,y:330,p:'₪980'},{x:270,y:330,p:'₪1,050'}
+  ];
+  return pins.map(pn=>{
+    const l=pn.l, price=l?l.price:pn.p; if(!price) return '';
+    const hot=pn.hot||(l&&l.score>=9), sel=l&&state.buy&&state.buy.key===l.key, hov=l&&state.hotSec===l.key;
+    const attrs=l?`data-act="buy-select" data-lkey="${l.key}" data-b-sec="${l.sec}" data-b-row="${l.row}" data-b-price="${l.price}" data-b-img="${l.img}" data-b-score="${l.score}"`:'';
+    const w=price.length>4?70:58;
+    return `<g class="mpin${l?' click':''}${hot?' hot':''}${sel?' sel':''}${hov?' hov':''}" ${attrs} transform="translate(${pn.x},${pn.y})">
+      <rect class="mpin-bg" x="${-w/2}" y="-14" width="${w}" height="28" rx="14"></rect>
+      <circle class="mpin-dot" cx="${w/2-11}" cy="0" r="4.5"${l?` style="fill:${areaColorFor(l.key)};stroke:rgba(30,42,66,.4);stroke-width:.8"`:''}></circle>
+      <text class="mpin-t" x="-4" y="4">${price}</text>
+    </g>`;
+  }).join('');
+}
+function deskMapOverview(){
+  return `<div class="map-note">מפת המקומות · גררו · גלגלת לזום · לחצו על מחיר</div>
+    <div class="map-zoom"><button class="mz" data-act="map-zoom" data-dir="in" aria-label="הגדל">+</button><button class="mz" data-act="map-zoom" data-dir="out" aria-label="הקטן">−</button></div>
+    <div class="mapwrap2 tilt"><svg class="stadium" id="dStadium" viewBox="0 0 900 620" preserveAspectRatio="xMidYMid meet">
+      <defs><pattern id="seatdots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.5" fill="rgba(30,42,66,.16)"></circle></pattern></defs>
+      <g id="dStadiumG">
+        <ellipse cx="450" cy="300" rx="406" ry="286" fill="#eef1f6"></ellipse>
+        ${stadiumBowl()}
+        <g class="pitch"><ellipse cx="450" cy="300" rx="138" ry="90" fill="#3f9152"></ellipse>
+          <ellipse cx="450" cy="300" rx="138" ry="90" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"></ellipse>
+          <line x1="450" y1="210" x2="450" y2="390" stroke="rgba(255,255,255,.5)" stroke-width="2"></line>
+          <circle cx="450" cy="300" r="26" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"></circle></g>
+        ${mapPins()}
+      </g></svg></div>
+    <div class="venue-areas"><div class="va-h">אזורי האולם</div>
+      <span><i style="background:#bfead9"></i>מאחורי השער</span><span><i style="background:#cdeed7"></i>Infield</span><span><i style="background:#e7d7f3"></i>Baseline · צד</span><span><i style="background:#d7d4f1"></i>Club Level</span><span><i style="background:#d3e4f8"></i>יציע עליון</span><span><i style="background:#f8dce9"></i>Bleachers</span></div>`;
+}
+/* zoom toward the map centre by a factor */
+function mapZoomBy(factor){
+  const svg=document.getElementById('dStadium'); if(!svg) return;
+  let [x,y,w,h]=(svg.getAttribute('viewBox')||'0 0 900 620').split(' ').map(Number);
+  const cx=x+w/2, cy=y+h/2;
+  let nw=Math.min(1000,Math.max(240,w*factor)), nh=nw*(620/900);
+  svg.setAttribute('viewBox',[cx-nw/2, cy-nh/2, nw, nh].join(' '));
+}
+/* drag-to-pan + wheel-zoom on the overview map (bound once per rendered svg) */
+function bindMap(){
+  const svg=document.getElementById('dStadium'); if(!svg||svg.__bound) return; svg.__bound=true;
+  const vb=()=>(svg.getAttribute('viewBox')||'0 0 900 620').split(' ').map(Number);
+  svg.addEventListener('wheel',e=>{ e.preventDefault(); mapZoomBy(e.deltaY>0?1.12:0.9); },{passive:false});
+  let drag=null;
+  svg.addEventListener('mousedown',e=>{ if(e.target.closest('.mz'))return; drag={sx:e.clientX,sy:e.clientY,v:vb(),moved:false}; svg.style.cursor='grabbing'; });
+  window.addEventListener('mousemove',e=>{ if(!drag)return; const [x,y,w,h]=drag.v; const r=svg.getBoundingClientRect(); if(Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)>3)drag.moved=true; svg.setAttribute('viewBox',[x-(e.clientX-drag.sx)*(w/r.width), y-(e.clientY-drag.sy)*(h/r.height), w, h].join(' ')); });
+  window.addEventListener('mouseup',()=>{ if(drag){ if(drag.moved) svg.__suppressClick=Date.now(); drag=null; svg.style.cursor=''; } });
+  svg.addEventListener('click',e=>{ if(svg.__suppressClick && Date.now()-svg.__suppressClick<250){ e.stopPropagation(); e.preventDefault(); svg.__suppressClick=0; } }, true);
+}
+function pageEventDesk(){
+  const E=EVENTS[state.eventKey]||EVENTS.coldplay;
+  const evTitle=E.dynamic?(state.evTitle||'משחק'):E.h1;
+  const parts=[(E.dynamic?(state.evDate||''):E.date||'').replace('📅 ',''),(E.dynamic?(state.evVenue||''):E.venue||'').replace('📍 ','')].filter(Boolean);
+  const list=eventListings();
+  return `${deskTop(evTitle, 'back-lobby', parts.join(' · '))}${deskTrust()}
+    <div class="dsplit">
+      <div class="dmap" id="dmap">${deskMapOverview()}</div>
+      <div class="dside">${eventFilterBar(list.length)}<div class="dlist">${list.map(deskListingCard).join('')}</div></div>
+    </div>`;
+}
+/* --- seat page (desktop): left = zoomed real section · ROW selection (seats are assigned, not chosen) --- */
+function seatBaseRow(){ return parseInt((state.buy&&state.buy.row||'').replace(/\D/g,''))||12; }
+function deskSectionMap(){
+  const b=state.buy||{};
+  const [ringIdx,segIdx]=SECTION_GEO[b.key]||[0,10];
+  const ring=BOWL.rings[ringIdx], step=(2*Math.PI)/ring.segs;
+  const a1=-Math.PI/2+segIdx*step, a2=a1+step*0.9;
+  const corners=[bowlPt(a1,ring.s0),bowlPt(a2,ring.s0),bowlPt(a2,ring.s1),bowlPt(a1,ring.s1)];
+  const xs=corners.map(c=>c[0]), ys=corners.map(c=>c[1]), pad=95;
+  const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  let vw=(maxx-minx)+pad*2, vh=(maxy-miny)+pad*2, vx=minx-pad, vy=miny-pad;
+  const ar=1.18; if(vw/vh<ar){ const nw=vh*ar; vx-=(nw-vw)/2; vw=nw; } else { const nh=vw/ar; vy-=(nh-vh)/2; vh=nh; }
+  const rowN=seatBaseRow(), selRow=state.selRow||rowN, nRows=6, nSeats=11;
+  const ds=(ring.s1-ring.s0)/nRows*0.44;
+  let rowsSvg='';
+  for(let r=0;r<nRows;r++){
+    const s=ring.s0+(ring.s1-ring.s0)*(r+0.5)/nRows, rn=rowN-6+r*2, sel=rn===selRow;
+    const N=10, band=[];
+    for(let j=0;j<=N;j++){ const q=bowlPt(a1+(a2-a1)*j/N, s+ds); band.push(q[0].toFixed(1)+','+q[1].toFixed(1)); }
+    for(let j=N;j>=0;j--){ const q=bowlPt(a1+(a2-a1)*j/N, s-ds); band.push(q[0].toFixed(1)+','+q[1].toFixed(1)); }
+    let dots='';
+    for(let k=0;k<nSeats;k++){ const q=bowlPt(a1+(a2-a1)*(k+0.7)/(nSeats+0.4), s);
+      dots+=`<circle class="sdot${sel?' sel':''}" cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="3.4"></circle>`; }
+    const lab=bowlPt(a1-0.03, s);
+    rowsSvg+=`<g class="srow-g${sel?' sel':''}" data-act="pick-row-geo" data-r="${rn}"><polygon class="rowband" points="${band.join(' ')}"></polygon>${dots}<text class="srow-l" x="${lab[0].toFixed(1)}" y="${(lab[1]+4).toFixed(1)}">${rn}</text></g>`;
+  }
+  const selPoly=`<polygon class="sel-sec" points="${corners.map(c=>c[0].toFixed(1)+','+c[1].toFixed(1)).join(' ')}"></polygon>`;
+  return `<button class="back-map" data-act="back-to-event">‹ חזרה לכל המפה</button>
+    <div class="mapwrap2 tilt secmapwrap"><svg class="stadium" viewBox="${vx.toFixed(0)} ${vy.toFixed(0)} ${vw.toFixed(0)} ${vh.toFixed(0)}" preserveAspectRatio="xMidYMid meet">
+      <defs><pattern id="seatdots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.5" fill="rgba(30,42,66,.10)"></circle></pattern></defs>
+      <g class="bowl-dim">${stadiumBowl()}</g>
+      ${selPoly}
+      <g class="seatrows">${rowsSvg}</g>
+    </svg></div>
+    <div class="secmap-tag">${b.sec||'האזור שלך'} · שורה ${selRow} <span class="tag-hint">(לחצו על שורה · המקומות מוקצים באותה שורה)</span></div>
+    <div class="mlegend"><span><i style="background:var(--seat-open)"></i>שורה פנויה</span><span><i style="background:var(--pink)"></i>השורה שלכם</span></div>`;
+}
+function deskSeatContent(){
+  const b=state.buy||{}, g=state.dGTab, selRow=state.selRow||seatBaseRow();
+  const detLines=[`שורה ${selRow} · ${state.buyQty} מקומות · יושבים יחד`,'כניסה 4 · שער B','קו ראייה מלא למגרש'];
+  const gv = g==='360' ? `<div class="view360"><div class="crowd"></div><div class="cap">מבט מהמקום · ${b.sec||''} ▸ 360°</div><div class="dots"><i></i><i class="on"></i><i></i></div></div>`
+           : g==='map' ? `<div class="viewmap">מפת האזור · ${b.sec||''}</div>`
+           : `<div class="viewphoto"><img src="${IMG}${b.img||'seat1.jpg'}" alt=""></div>`;
+  return `<div class="dgallery"><div class="g-tabs">
+      <button class="g-tab${g==='map'?' on':''}" data-act="dgtab" data-g="map">מפה</button>
+      <button class="g-tab${g==='360'?' on':''}" data-act="dgtab" data-g="360">360°</button>
+      <button class="g-tab${g==='photo'?' on':''}" data-act="dgtab" data-g="photo">תמונה</button></div>
+    <div class="g-view">${gv}</div></div>
+  <div class="dseat-body">
+    <div class="seat-area"><span class="sec-dot" style="background:${areaColorFor(b.key)}"></span>${b.sec||'איזור'}</div>
+    <div class="seat-price"><span class="sp-sub">לכרטיס יחיד · כולל עמלות</span><span class="sp-num">${nis(buyUnit())}</span></div>
+    <div class="seat-det">${detLines.map(x=>`<div>${x}</div>`).join('')}</div>
+    <div class="pur-card"><div class="qstep"><button class="qbtn" data-act="qty-inc" aria-label="הוסף">+</button><span class="qnum">${state.buyQty}</span><button class="qbtn" data-act="qty-dec" aria-label="הפחת">−</button></div><div class="pc-g"><div class="pc-t">כמות כרטיסים</div></div></div>
+    <div class="pur-card${state.buyAdjacent?' on':''}"><button class="add-btn${state.buyAdjacent?' on':''}" data-act="toggle-adjacent">${state.buyAdjacent?'נוסף ✓':'הוסף'}</button><div class="pc-g"><div class="pc-t">ישיבה יחד</div><div class="pc-s">הוסף את האפשרות למקומות באותה שורה</div></div></div>
+    <div class="sum-label" style="margin-top:8px">תוספות להזמנה</div>
+    <div class="pur-card${state.buyCoverage?' on':''}"><button class="add-btn${state.buyCoverage?' on':''}" data-act="toggle-coverage">${state.buyCoverage?'נוסף ✓':'הוסף'}</button><div class="pc-g"><div class="pc-t">כיסוי למקרה ביטול</div><div class="pc-s">הוספת כיסוי למקרה ביטול · <a class="pc-link" data-act="soon" data-title="כיסוי למקרה ביטול">לפרטים</a></div></div>${PC_SHIELD}</div>
+    <div class="milu"><span class="ok">כלול</span><div class="mg"><div class="mt">אחריות מלאה על הכרטיס</div><div class="ms">כרטיס מאומת · מגובה 100%</div></div></div>
+    <div class="sumbox2"><div class="sb-title">סכום לתשלום</div>${buySummaryRows()}</div>
+  </div>`;
+}
+function pageSeatDesk(){
+  const b=state.buy||{};
+  return `${deskTop(b.title||'הזמנה', 'back-event', [b.date,b.venue].filter(Boolean).join(' · '))}${deskTrust()}
+    <div class="dsplit">
+      <div class="dmap" id="dmap">${deskSectionMap()}</div>
+      <div class="dside dside-seat">
+        ${deskSeatContent()}
+        <div class="dseat-foot">
+          <button class="btn btn-pink dseat-cta" data-act="proceed-checkout">המשך לתשלום · ${nis(buyTotal())}</button>
+          <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>
+        </div>
+      </div>
+    </div>`;
+}
+/* ---- 11 · Checkout (desktop) — summary sticky on the left, form on the right ---- */
+function pageCheckoutDesk(){
+  const b=state.buy||{};
+  return `${deskTop('הזמנה', 'back-order')}${deskTrust()}
+    <div class="dsplit dchk">
+      <div class="dchk-sum">
+        <div class="dchk-sum-in">
+          <div class="chk-tw2">${orderTimer()}</div>
+          ${orderSummaryCard({total:true})}
+          <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>
+        </div>
+      </div>
+      <div class="dchk-form"><div class="dchk-form-in">
+        ${chkPayer()}
+        ${chkPayment()}
+        <div class="dchk-terms">${chkTerms()}</div>
+        <button class="btn btn-pink dchk-cta" data-act="pay">המשך לתשלום · ${nis(buyTotal())}</button>
+      </div></div>
+    </div>`;
+}
+/* smooth viewBox zoom into a section (event map) before opening the seat page.
+   Navigation is driven by a setTimeout (not rAF) so it fires even if the
+   animation frames are throttled; the rAF tween is a visual nice-to-have. */
+function deskZoom(key,then){
+  const svg=document.getElementById('dStadium'); if(!svg){ then(); return; }
+  const pin=svg.querySelector('.mpin[data-lkey="'+key+'"]'); let tx=450, ty=305;
+  if(pin){ const m=/translate\(([-\d.]+),\s*([-\d.]+)\)/.exec(pin.getAttribute('transform')||''); if(m){ tx=+m[1]; ty=+m[2]; } }
+  const from=(svg.getAttribute('viewBox')||'0 0 900 620').split(' ').map(Number);
+  const nw=from[2]*0.42, nh=from[3]*0.42, to=[tx-nw/2, ty-nh/2, nw, nh];
+  const dur=460, t0=performance.now();
+  function step(now){ const k=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-k,3);
+    svg.setAttribute('viewBox', from.map((f,i)=>f+(to[i]-f)*e).join(' ')); if(k<1) requestAnimationFrame(step); }
+  requestAnimationFrame(step);
+  setTimeout(then, dur+120);
+}
+/* list ↔ map hover sync (desktop event page) — one document-level listener */
+document.addEventListener('mouseover', e=>{
+  if(!state.desktop || state.page!==3) return;
+  const el=e.target.closest('[data-lkey]'); const key=el?el.getAttribute('data-lkey'):null;
+  if(key===state.hotSec) return;
+  state.hotSec=key;
+  document.querySelectorAll('.lcard').forEach(c=>c.classList.toggle('hot',c.getAttribute('data-lkey')===key));
+  document.querySelectorAll('.mpin').forEach(g=>g.classList.toggle('hov', g.getAttribute('data-lkey')===key));
+});
 
 /* ---- Spotify playlist: real in-page audio (Web Audio API) ---- */
 let audioCtx=null, audioTimer=null;
@@ -2688,9 +3141,21 @@ function locate(key){
   });
 }
 
+/* draggable bottom-sheet on the seat-selection screen — snap peek ⇄ expanded (tap or drag) */
+/* draggable bottom-sheet on the event page — snap peek ⇄ expanded (tap or drag) */
+function bindSheet(){
+  const d=document.getElementById('ssDrawer'), h=document.getElementById('ssHandle'); if(!h) return;
+  const setS=v=>{ state.sheetExpanded=v; d.classList.toggle('up',v); };
+  let sy=0, drag=false, moved=false;
+  h.addEventListener('pointerdown',e=>{ try{h.setPointerCapture(e.pointerId);}catch(_){}; sy=e.clientY; drag=true; moved=false; });
+  h.addEventListener('pointermove',e=>{ if(!drag) return; const dy=e.clientY-sy; if(Math.abs(dy)>8) moved=true; if(Math.abs(dy)>28){ setS(dy<0); drag=false; } });
+  h.addEventListener('pointerup',()=>{ if(drag&&!moved) setS(!state.sheetExpanded); drag=false; });
+}
 function wire(){
   // rails: drag + wheel
   document.querySelectorAll('.hscroll').forEach(enableDrag);
+  if(state.desktop && state.page===3) bindMap();   // pan/zoom on the interactive map
+  if(!state.desktop && state.page===3) bindSheet();   // draggable seat-list drawer on the mobile event page
   // inputs: price fields (no re-render) + live search (re-render + refocus)
   document.getElementById('app').oninput = (e)=>{
     const fp = e.target.closest('[data-fprice]');
@@ -2807,17 +3272,37 @@ function wire(){
         const venue = (E.dynamic ? (state.evVenue||'') : E.venue||'').replace('📍 ','');
         const date  = (E.dynamic ? (state.evDate||'') : E.date||'').replace('📅 ','');
         const price = parseInt((a.getAttribute('data-b-price')||'0').replace(/[^\d]/g,''))||0;
-        state.buy={title, venue, date, sec:a.getAttribute('data-b-sec')||'', row:a.getAttribute('data-b-row')||'', unit:price, score:a.getAttribute('data-b-score')||'8', img:(E.dynamic&&state.evImg?state.evImg:E.img), abroad:true, tentative:(E.type==='match')};
-        state.buyQty=2; state.buyEdge=null; state.buyCoverage=false; state.buyAdjacent=false; state.payMethod=''; state.showHoldModal=false; go(10); break;
+        state.buy={title, venue, date, sec:a.getAttribute('data-b-sec')||'', row:a.getAttribute('data-b-row')||'', unit:price, score:a.getAttribute('data-b-score')||'8', img:(E.dynamic&&state.evImg?state.evImg:E.img), key:a.getAttribute('data-lkey')||null, abroad:true, tentative:(E.type==='match')};
+        state.buyEdge=null; state.buyCoverage=false; state.buyAdjacent=false; state.buyDelivery=false; state.payMethod=''; state.showHoldModal=false; state.selRow=null; state.seat360=0;
+        state.wantTogether = !!(state.p3f && state.p3f.together);   // carry the "ישיבה יחד" filter to checkout
+        if(state.desktop && state.page===3){ deskZoom(state.buy.key, ()=>go(10)); }
+        else { set({showHoldModal:true}); }   // mobile: 10-min price-lock popup before the seat screen
+        break;
       }
+      case act==='qty-desk': set({qtyModal:true}); break;   // open the "how many tickets?" picker
+      case act==='toggle-want': set({wantTogether:!state.wantTogether}); break;
+      case act==='stadium-open': set({stadiumInfo:true}); break;
+      case act==='stadium-close': set({stadiumInfo:false}); break;
+      case act==='pin-focus': {
+        const k=a.getAttribute('data-lkey'); state.hotSec=k; state.sheetExpanded=true; render();
+        requestAnimationFrame(()=>{ const el=document.querySelector('.ss-list .lc[data-lkey="'+k+'"]'); const box=document.querySelector('.ss-list'); if(el&&box){ box.scrollTo({top:Math.max(0,el.offsetTop-box.offsetTop-8),behavior:'smooth'}); } });
+        break;
+      }
+      case act==='seat360': set({seat360:(state.seat360+1)%3}); break;
+      case act==='map-zoom': mapZoomBy(a.getAttribute('data-dir')==='in'?0.78:1.28); break;
+      case act==='pick-row-geo': set({selRow:parseInt(a.getAttribute('data-r'))||null}); break;
+      case act==='dlvl-desk': set({dlvl:a.getAttribute('data-k')}); break;
+      case act==='dgtab': set({dGTab:a.getAttribute('data-g')}); break;
+      case act==='back-to-event': go(3); break;
       case act==='qty-inc': set({buyQty:Math.min(8,state.buyQty+1)}); break;
       case act==='qty-dec': set({buyQty:Math.max(1,state.buyQty-1)}); break;
       case act==='toggle-coverage': set({buyCoverage:!state.buyCoverage}); break;
       case act==='toggle-adjacent': set({buyAdjacent:!state.buyAdjacent}); break;
       case act==='apply-coupon': { const v=(state.buyCoupon||'').trim(); if(!v){ toast('הזינו קוד הנחה'); break; } set({buyCouponApplied:true}); toast('הקוד הוחל · ההנחה תופיע בתשלום'); break; }
-      case act==='proceed-checkout': set({showHoldModal:true}); break;               // seat screen → 10-min popup
+      case act==='proceed-checkout': set({showHoldModal:true}); break;               // desktop seat screen → 10-min popup
       case act==='close-hold-modal': set({showHoldModal:false}); break;
-      case act==='start-checkout': state.showHoldModal=false; startHold(10); go(11); break;  // popup → checkout, hold starts
+      case act==='hold-proceed': { const next=state.page===3?10:11; state.showHoldModal=false; startHold(10); go(next); break; }  // popup → next step, hold starts
+      case act==='start-checkout': state.showHoldModal=false; startHold(10); go(11); break;  // (legacy) popup → checkout
       case act==='pay-method': set({payMethod:a.getAttribute('data-m')||''}); break;
       case act==='to-order': go(10); break;
       case act==='to-checkout': go(11); break;
@@ -2846,7 +3331,6 @@ function wire(){
       case act==='wallet': toast('נוסף לארנק ✓'); break;
       case act==='remind': toast('תזכורת נשלחה ✓'); break;
       case act==='notify': toast('נרשמתם להתראה — נעדכן כשמתפנה במחיר שלכם'); break;
-      case act==='bit': toast('בקשת ביט נשלחה (דמו)'); break;
       case act==='hold-back': go(state.holdStep||10); break;
       case act==='edge-expired': state.buyEdge='expired'; go(17); break;
       case act==='edge-soldout': set({buyEdge:'soldout'}); break;
@@ -2872,7 +3356,10 @@ function wire(){
       case act==='lobby': go(2); break;
       case act==='event': { const el=a.closest('[data-event]'); const ev=el?.getAttribute('data-event')||'coldplay'; state.eventKey=ev;
         if(ev==='match'){ state.evTitle=el.getAttribute('data-ev-title')||'משחק'; state.evVenue=el.getAttribute('data-ev-venue')||''; state.evDate=el.getAttribute('data-ev-date')||''; state.evPrice=el.getAttribute('data-ev-price')||''; state.evImg=el.getAttribute('data-ev-img')||''; }
+        state.qtyChosen=false; state.qtyModal=true;   // "כמה כרטיסים?" popup between the lobby and the event page
         go(3); break; }
+      case act==='qty-pick': set({buyQty:parseInt(a.getAttribute('data-q'))||1, qtyModal:false, qtyChosen:true}); break;
+      case act==='qty-modal-close': set({qtyModal:false, qtyChosen:true}); break;
       case act==='occasion': go(4); break;
       case act==='football': state.leagueTitle=''; go(5); break;
       case act==='leaguelobby': state.leagueTitle=a.getAttribute('data-title')||''; go(5); break;
@@ -2897,7 +3384,7 @@ function wire(){
       case act==='back-lobby': go((EVENTS[state.eventKey]||EVENTS.coldplay).back); break;
       case act==='setlist3': set({setlistP3Open:!state.setlistP3Open}); break;
       case act==='p3filter': set({openSheet:'p3-filter'}); break;
-      case act==='p3clear': set({selectedSection:null, p3Qty:null, p3Min:'', p3Max:'', p3f:{together:false,front:false,view:false,access:false}}); break;
+      case act==='p3clear': set({selectedSection:null, p3Qty:null, p3Min:'', p3Max:'', dlvl:'all', p3f:{together:false,front:false,view:false,access:false}}); break;
       case act==='fav-feature': state.hearts.feature=!state.hearts.feature; render(); break;
       case act==='follow': { const on=!state.following; state.favCount=Math.max(0,state.favCount+(on?1:-1)); set({following:on}); break; }
       case act==='together': set({p2Together:!state.p2Together}); break;
@@ -2992,6 +3479,10 @@ function applyHash(){
   else state.page=0;
 }
 window.addEventListener('hashchange', ()=>{ applyHash(); render(); });
+/* desktop detection — purchase-flow screens become wide two-pane at ≥1000px */
+const MQ_DESK = window.matchMedia('(min-width:1000px)');
+state.desktop = MQ_DESK.matches;
+MQ_DESK.addEventListener('change', e=>{ state.desktop = e.matches; render(); });
 applyHash();
 render();
 </script>
