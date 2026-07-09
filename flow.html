@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=36" />
+<link rel="stylesheet" href="flow.v5.css?v=37" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2265,8 +2265,8 @@ function activeOrderBar(){
   const cta=state.holdExpired?'בדקו שוב':'חזרה';
   const act=state.holdExpired?'edge-expired':'hold-back';
   return `<div class="aob ${cls}" data-act="${act}">
+    <span class="aob-go"><span class="aob-arr">→</span><span>${cta}</span></span>
     <div class="aob-main"><span class="aob-txt">${txt}</span><span class="aob-clk">${fmtClock(state.holdSec)}</span></div>
-    <span class="aob-go"><span>${cta}</span><span class="aob-arr">→</span></span>
   </div>`;
 }
 /* in-page timer bar shown on Order + Checkout */
@@ -2718,7 +2718,7 @@ function orderSummaryCard(opts){
     <div class="sum-div"></div>
     <div class="coz-blk"><div class="coz-k"><span class="sec-dot" style="background:${areaColorFor(b.key)}"></span>${b.sec||'איזור'}</div><div class="coz-v">${seatLine}</div></div>
     ${svc.length?`<div class="sum-div"></div><div class="coz-blk"><div class="coz-sh">תוספות שנבחרו</div>${svc.map(s=>`<div class="coz-svc"><span class="coz-ok">✓</span><span>${s}</span></div>`).join('')}</div>`:''}
-    ${opts.total?`<div class="coz-totbox"><div class="coz-tot"><span class="coz-tnum">${nis(buyTotal())}</span><span class="coz-tlbl">${opts.paid?'סה״כ שולם':'סה״כ לתשלום'}</span></div>${opts.detail?`<button class="coz-detail" data-act="to-order">פירוט</button>`:''}</div>`:''}
+    ${opts.total?`<div class="coz-totbox"><div class="coz-tot"><span class="coz-tnum">${nis(buyTotal())}</span><span class="coz-tlbl">${opts.paid?'סה״כ שולם':'סה״כ לתשלום'}</span></div>${opts.detail?`<button class="coz-detail" data-act="to-order">פירוט</button>`:''}${opts.splitPaid?`<div class="coz-split"><div class="coz-split-h">חלוקת תשלום · כל ${SPLIT_FRIENDS.length} המשתתפים שילמו</div>${SPLIT_FRIENDS.map(f=>`<div class="coz-split-row"><span>${f.n}</span><span class="coz-split-ok">שולם ✓</span></div>`).join('')}</div>`:''}</div>`:''}
   </div>`;
 }
 
@@ -2730,8 +2730,7 @@ function pageConfirm(){
     <div class="conf-hero"><div class="conf-tick">✓</div><div class="conf-t">ההזמנה אושרה!</div><div class="conf-s">מספר הזמנה · ${state.orderNo}</div></div>
     <div class="pur-card col"><div class="pc-t">מתי מקבלים את הכרטיסים?</div><div class="pc-s">כרטיס דיגיטלי · יישלח למייל עד 24 שעות לפני האירוע ✓</div></div>
     <div class="conf-callback">📞 בשעות הקרובות נציג מטעמנו ייצור איתך קשר לסגירת פרטי העסקה.</div>
-    ${orderSummaryCard({total:true, paid:true})}
-    ${state.splitConfirmed?splitPaidList(true):''}
+    ${orderSummaryCard({total:true, paid:true, splitPaid:state.splitConfirmed})}
     <button class="btn2 share-cta" data-act="share">${ICON.share} שתפו את הכרטיס</button>
     <button class="btn btn-pink pur-cta" data-act="mytickets">הכרטיסים שלי</button>
     <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>

@@ -1290,7 +1290,12 @@ img{display:block;}
 .hm-cta{width:100%;margin-top:18px;padding:14px;font-size:14px;border-radius:12px;}
 .hm-cancel{width:100%;margin-top:10px;background:none;border:none;color:var(--muted);font:400 13px 'Rubik',sans-serif;text-decoration:underline;cursor:pointer;}
 /* --- checkout: compact order summary --- */
-.pur-ev.sum.coz{gap:10px;padding:13px;}
+.pur-ev.sum.coz{gap:10px;padding:13px;box-shadow:0 6px 18px rgba(39,50,74,.08);}
+/* split-payment "who paid" — small details under the paid total */
+.coz-split{border-top:1px dashed var(--line);margin-top:9px;padding-top:9px;}
+.coz-split-h{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px;unicode-bidi:plaintext;}
+.coz-split-row{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:#4a5262;padding:3px 0;}
+.coz-split-ok{color:var(--pgreen);font-weight:600;}
 .coz-row{display:flex;align-items:center;justify-content:space-between;width:100%;}
 .coz-k{font-size:14px;font-weight:600;color:var(--ink);}
 .coz-v{font-size:12px;color:var(--muted);}
@@ -1731,6 +1736,7 @@ svg.stadium{width:100%;height:100%;}
 .share-dests .sd-ic.wapp{background:#25D366;border:none;}
 .share-dests .sd-l{font-size:12px;color:var(--ink);font-weight:500;}
 .share-cta{display:flex;align-items:center;justify-content:center;gap:8px;}
+.share-cta svg{width:32px;height:32px;flex-shrink:0;}
 
 /* frame consistency: below 640px the .app fills the screen — the fixed/sticky bars must too
    (placed at end so it overrides the individual max-width:375px base rules) */
