@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=33" />
+<link rel="stylesheet" href="flow.v5.css?v=36" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -45,7 +45,7 @@ const state = {
   wantTogether:false, buyDelivery:false, sheetExpanded:false, seat360:0, stadiumInfo:false, sharePop:false,
   desktop:false, hotSec:null, dGTab:'360', dlvl:'all', qtyModal:false, qtyChosen:false, selRow:null,
   coName:'', coFirst:'', coLast:'', coPhone:'', coEmail:'', coInstall:'12', coSplitOpen:false,
-  splitN:4, splitMode:'equal', orderNo:'LT-38210', splitAllPaid:false,
+  splitN:4, splitMode:'equal', orderNo:'LT-38210', splitAllPaid:false, splitConfirmed:false,
   buyEdge:null, // 'expired' | 'soldout' | 'tentative' | null
   srRecent:['קולדפליי','ריאל מדריד','טיילור סוויפט'],
   p1LastMinute:false, p1GenreSelected:null, p1CitySelected:null, p1DateLabel:null,
@@ -2247,7 +2247,7 @@ function startHold(step){
 function tickHold(){
   if(!state.holdActive) return;
   state.holdSec--;
-  document.querySelectorAll('.aob-clk,.obar2 .clk,.otimer .ot-clk').forEach(el=>el.textContent=fmtClock(state.holdSec));
+  document.querySelectorAll('.aob-clk,.obar2 .clk,.ot-clk').forEach(el=>el.textContent=fmtClock(state.holdSec));
   const warn=state.holdSec<=120 && state.holdSec>0, exp=state.holdSec<=0;
   if(warn!==state.holdWarn || exp!==state.holdExpired){
     state.holdWarn=warn; state.holdExpired=exp;
@@ -2397,7 +2397,6 @@ function qtyModal(){
         <div class="qm-q">כמה כרטיסים?</div>
         <div class="qm-sub">כל המקומות יהיו צמודים · יושבים יחד</div>
         <div class="qm-grid">${opt(1)}${opt(2)}${opt(3)}${opt(4)}${opt(5)}${opt(6,'6+')}</div>
-        <div class="qm-note"><b>⚡ מסירה מיידית</b><div>חפשו את תג הברק — הכרטיסים נמסרים תוך דקות מרגע הרכישה.</div></div>
       </div>
     </div>
   </div>`;
@@ -2509,17 +2508,24 @@ function pageEventSel(){
 /* ---- 10 · Seat screen — the CONFIRMED result (wireframe 103) ---- */
 /* No picker here: the seat is chosen. Rich conversion info · price-lock timer
    starts here · paid add-ons live at checkout. */
-function seatMiniHead(b, backAct){
+const ALARM_SVG='<svg class="nh-clk-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.5"/><path d="M5 3.5L2.5 6"/><path d="M21.5 6L19 3.5"/></svg>';
+/* collapsing sticky header (seat + checkout): logo/back + narrow event hero with a
+   compact price-lock timer that appears (left of the text) once you scroll past the banner */
+function collapsingHead(b, backAct){
   const sub=[b.date,b.venue].filter(Boolean).join(' · ');
-  return `<div class="seat-stk">
-    <div class="mhdr"><span class="mh-sp"></span><img class="mh-logo nav-logo" src="assets/logo.png" alt="Live Tickets"><button class="circle-btn" data-act="${backAct||'back-event'}" aria-label="חזרה">→</button></div>
-    <div class="nhero"><div class="nh-g"><div class="nh-t">${[b.title,b.sec].filter(Boolean).join(' · ')}</div><div class="nh-m">${sub}</div></div><span class="nh-th" style="background-image:url(${IMG}${b.img||'team-realmadrid.jpg'})"></span></div>
-    <div class="pur-safety"><span>הכרטיסים שלך מוגנים ב־100% בהתאם לתו התקן לרכישה בטוחה</span>${SHIELD_SVG}</div>
-    <div class="seat-tw">${orderTimer()}</div>
-  </div>`;
+  return `<div class="mhdr"><span class="mh-sp"></span><img class="mh-logo nav-logo" src="assets/logo.png" alt="Live Tickets"><button class="circle-btn" data-act="${backAct}" aria-label="חזרה">→</button></div>
+    <div class="nhero"><span class="nh-clk">${ALARM_SVG}<b class="ot-clk">${fmtClock(state.holdSec)}</b></span><div class="nh-g"><div class="nh-t">${[b.title,b.sec].filter(Boolean).join(' · ')}</div><div class="nh-m">${sub}</div></div><span class="nh-th" style="background-image:url(${IMG}${b.img||'team-realmadrid.jpg'})"></span></div>`;
 }
-function pageOrder(){
-  const b=state.buy||{};
+function seatMiniHead(b, backAct){
+  return `<div class="seat-stk">${collapsingHead(b, backAct||'back-event')}</div>`;
+}
+/* trust strip + price-lock banner — sit at the top of the scrollable body so they scroll away */
+function holdBanner(){
+  return `<div class="pur-safety"><span>הכרטיסים שלך מוגנים ב־100% בהתאם לתו התקן לרכישה בטוחה</span>${SHIELD_SVG}</div>
+    <div class="seat-tw">${orderTimer()}</div>`;
+}
+/* shared rich seat body (mobile seat screen + desktop seat pane) — title, value, info, price */
+function seatRichBody(b){
   const det=DDETAIL_SEL[b.key]||'seat';
   const q=state.buyQty||2;
   const seatTitle = det==='section' ? `${b.sec||'איזור'}` : `${b.sec} · ${b.row}`;
@@ -2529,41 +2535,42 @@ function pageOrder(){
   const valNum = sc>=10?'9.6':sc>=9?'9.4':sc>=8?'8.9':sc>=7?'8.3':'7.6';
   const valTxt = sc>=9?'מעולה':sc>=7?'טוב מאוד':'סביר';
   const left = L.left||2;
-  const gallery=['seat1.jpg','seat6.jpg','seat7.jpg'];
-  const gi=state.seat360%gallery.length;
   return `
-  ${seatMiniHead(b)}
-  <div class="pur pur-pad seat-body">
-    <button class="seat-view" data-act="seat360">
-      <img src="${IMG}${gallery[gi]}" alt="מבט מהמקום">
-      <span class="sv-badge">${PANO_SVG} מבט מהמקום · 360°</span>
-      <span class="sv-dots">${gallery.map((_,i)=>`<i class="${i===gi?'on':''}"></i>`).join('')}</span>
-    </button>
-
     <div class="seat-title"><span class="sec-dot" style="background:${areaColorFor(b.key)}"></span>${seatTitle}</div>
     <div class="seat-subt">${seatSub}</div>
     ${state.wantTogether?`<div class="seat-together">ביקשתם ישיבה יחד ✓ · תוספת בתשלום</div>`:''}
-
     <div class="seat-valrow">
       <span class="sv-score">${valNum} <small>${valTxt}</small></span>
       ${sc>=8?`<span class="sv-cheap">💲 הזול באזור</span>`:''}
       <span class="sv-scarce">נותרו ${left} במחיר הזה</span>
     </div>
-
     <div class="seat-info">
       <div class="si-r"><span class="si-ic">👁</span><div><b>שדה ראייה נקי</b> · ללא הסתרת מבט</div></div>
       <div class="si-r"><span class="si-ic">🔥</span><div><b>פופולרי</b> · 340 צפו באירוע</div></div>
       <div class="si-r"><span class="si-ic">📱</span><div><b>כרטיס דיגיטלי</b> · יימסר עד 24ש׳ לפני — בזמן לטיסה</div></div>
       <div class="si-r nob"><span class="si-ic">🛡</span><div><b>אחריות מלאה</b> · כרטיס מאומת · אפשר למכור מחדש</div></div>
     </div>
-
     <button class="seat-change" data-act="back-event">‹ שינוי מקום</button>
-
     <div class="seat-priceblk">
       <div><div class="sp-num">${nis(buyUnit())}</div><div class="sp-sub">לכרטיס · כולל עמלות</div></div>
       <a class="sp-brk" data-act="soon" data-title="פירוט מחיר">פירוט מחיר ›</a>
     </div>
-    <div class="seat-inst">החל מ-${nis(Math.round(buyUnit()/6))} ×6 תשלומים · או Apple / Google Pay</div>
+    <div class="seat-inst">החל מ-${nis(Math.round(buyUnit()/6))} ×6 תשלומים · או Apple / Google Pay</div>`;
+}
+function pageOrder(){
+  const b=state.buy||{};
+  const gallery=['seat1.jpg','seat6.jpg','seat7.jpg'];
+  const gi=state.seat360%gallery.length;
+  return `
+  ${seatMiniHead(b)}
+  <div class="pur pur-pad seat-body">
+    ${holdBanner()}
+    <button class="seat-view" data-act="seat360">
+      <img src="${IMG}${gallery[gi]}" alt="מבט מהמקום">
+      <span class="sv-badge">${PANO_SVG} מבט מהמקום · 360°</span>
+      <span class="sv-dots">${gallery.map((_,i)=>`<i class="${i===gi?'on':''}"></i>`).join('')}</span>
+    </button>
+    ${seatRichBody(b)}
   </div>
   <div class="pur-foot seat-foot">
     <button class="btn btn-pink pf-cta" data-act="to-checkout">המשך לתשלום</button>
@@ -2673,12 +2680,9 @@ function chkAddons(){
 }
 function pageCheckout(){
   return `
-  <div class="chk-stick">
-    ${purHead('הזמנה','back-order')}
-    <div class="pur-safety"><span>הכרטיסים שלך מוגנים ב־100% בהתאם לתו התקן לרכישה בטוחה</span>${SHIELD_SVG}</div>
-    <div class="chk-tw">${orderTimer()}</div>
-  </div>
+  <div class="chk-stick">${collapsingHead(state.buy||{}, 'back-order')}</div>
   <div class="pur chk-body">
+    ${holdBanner()}
     ${orderSummaryCard({})}
     ${chkAddons()}
     ${chkCoupon()}
@@ -2727,6 +2731,7 @@ function pageConfirm(){
     <div class="pur-card col"><div class="pc-t">מתי מקבלים את הכרטיסים?</div><div class="pc-s">כרטיס דיגיטלי · יישלח למייל עד 24 שעות לפני האירוע ✓</div></div>
     <div class="conf-callback">📞 בשעות הקרובות נציג מטעמנו ייצור איתך קשר לסגירת פרטי העסקה.</div>
     ${orderSummaryCard({total:true, paid:true})}
+    ${state.splitConfirmed?splitPaidList(true):''}
     <button class="btn2 share-cta" data-act="share">${ICON.share} שתפו את הכרטיס</button>
     <button class="btn btn-pink pur-cta" data-act="mytickets">הכרטיסים שלי</button>
     <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>
@@ -2799,24 +2804,26 @@ function pageFriendPay(){
 }
 
 /* ---- 16 · Organizer status ---- */
+const SPLIT_FRIENDS=[{n:'יעל (את/ה)'},{n:'דניאל'},{n:'מאיה'},{n:'יואב'}];
+/* the "מי שילם" participants list — shown while waiting (organizer) and, all-paid, on the confirmation */
+function splitPaidList(all){
+  const paid=state.splitAllPaid;
+  const rows=SPLIT_FRIENDS.map((f,i)=>{ const p = all || paid || i<3; return `<div class="fr-row"><span class="fr-av"></span><span class="fr-n">${f.n}</span><span class="fr-pd ${p?'y':'n'}">${p?'שולם ✓':'ממתין'}</span></div>`; });
+  const paidN=all?SPLIT_FRIENDS.length:(paid?SPLIT_FRIENDS.length:3);
+  return `<div class="chk-sec">
+    <div class="chk-h">מי שילם</div>
+    <div class="pur-sub">${paidN} מתוך ${SPLIT_FRIENDS.length} שילמו · ${all?'חלוקת התשלום הושלמה':'נותרו 22 שעות'}</div>
+    <div class="fr-list">${rows.join('')}</div>
+  </div>`;
+}
 function pageOrganizer(){
-  const base=[{n:'יעל (את/ה)',p:1},{n:'דניאל',p:1},{n:'מאיה',p:1},{n:'יואב',p:0}];
-  const all=state.splitAllPaid;
-  const friends=base.map(f=>({...f,p:all?1:f.p}));
-  const paidN=friends.filter(f=>f.p).length;
   return `
   ${purHead('מעקב תשלומים','home')}
   <div class="pur">
-    <div class="pur-note">${all?'כל המשתתפים שילמו — ההזמנה מאושרת ✓':'ההזמנה תאושר כשכל המשתתפים ישלמו את חלקם · אחרת <b>החזר אוטומטי</b> למי ששילם.'}</div>
-    ${all?`<div class="conf-hero"><div class="conf-tick">✓</div><div class="conf-t">כולם שילמו!</div><div class="conf-s">ההזמנה מאושרת</div></div>`:''}
-    <div class="chk-sec"${all?' style="margin-top:6px"':''}>
-      <div class="chk-h">מי שילם</div>
-      <div class="pur-sub">${paidN} מתוך ${friends.length} שילמו · נותרו 22 שעות</div>
-      <div class="fr-list">${friends.map(f=>`<div class="fr-row"><span class="fr-av"></span><span class="fr-n">${f.n}</span><span class="fr-pd ${f.p?'y':'n'}">${f.p?'שולם ✓':'ממתין'}</span></div>`).join('')}</div>
-    </div>
-    ${all
-      ? `<button class="btn btn-pink pur-cta" data-act="split-confirm">לאישור ההזמנה</button>`
-      : `<button class="btn2 rem" data-act="remind">שלחו תזכורת לממתינים</button><button class="link-btn ctr" data-act="mark-allpaid">(דמו) סמנו שכולם שילמו ←</button>`}
+    <div class="pur-note">ההזמנה תאושר כשכל המשתתפים ישלמו את חלקם · אחרת <b>החזר אוטומטי</b> למי ששילם.</div>
+    ${splitPaidList(false)}
+    <button class="btn2 rem" data-act="remind">שלחו תזכורת לממתינים</button>
+    <button class="link-btn ctr" data-act="mark-allpaid">(דמו) סמנו שכולם שילמו ←</button>
   </div>`;
 }
 
@@ -2871,8 +2878,7 @@ function deskTrust(){ return `<div class="dtrust">🛡 אחריות 100% · <b>�
 function deskListingCard(l){
   const tier=l.score>=9?'best':l.score>=7?'good':'fair', d=deskDetail(l);
   const hot=state.hotSec===l.key?' hot':'';
-  const rowLine = d==='section' ? 'מספר שורה יימסר עם הכרטיס'
-               : d==='row' ? 'שורה משוערת · יושבים יחד' : l.row;
+  const rowLine = selRowLine(l).s;   // same row-number line as the mobile cards
   return `<div class="lcard${hot}${(state.buy&&state.buy.key===l.key)?' hl':''}" data-lkey="${l.key}" data-act="buy-select" data-b-sec="${l.sec}" data-b-row="${l.row}" data-b-price="${l.price}" data-b-img="${l.img}" data-b-score="${l.score}">
     <div class="lc-price"><span class="amt">${l.price}</span><span class="fees">כולל עמלות</span></div>
     <div class="lc-mid">
@@ -2884,19 +2890,17 @@ function deskListingCard(l){
     <img class="lc-thumb" src="${IMG}${l.img}" alt="מבט מהמקום">
   </div>`;
 }
-/* shared filter bar — identical on mobile + desktop event pages */
+/* filter bar — matches mobile: quantity chip + a single "סינון" button opening the drawer */
+const FILTER_ICON='<svg class="ff-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>';
 function eventFilterBar(n){
   const sortBtn=(k,l)=>`<button class="sort-btn ${state.sortBy===k?'on':''}" data-sort="${k}">${l}</button>`;
   const ac=p3ActiveCount();
   return `<div class="dflt">
     <div class="dflt-row">
       <button class="chip dark" data-act="qty-desk">${state.buyQty||2} כרטיסים ⌄</button>
-      <button class="chip act">מחיר · כולל עמלות</button>
-      <button class="chip${ac?' on':''}" data-act="p3filter">מאפייני מקום${ac?` · ${ac}`:''}</button>
-      <button class="chip">מסירה מיידית</button>
+      <button class="chip ff-open${ac?' on':''}" data-act="p3filter">${FILTER_ICON}סינון${ac?` · ${ac}`:''}</button>
     </div>
-    <div class="dlvl" title="רמת הידע על המושב">${[['all','הכל'],['row','שורה'],['section','איזור']].map(([k,t])=>`<button class="${state.dlvl===k?'on':''}" data-act="dlvl-desk" data-k="${k}">${t}</button>`).join('')}</div>
-    <div class="dflt-count"><span>${n} מקומות · ${state.buyQty||2} יחד</span><div class="dflt-sort">${sortBtn('best','הכי משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
+    <div class="dflt-count"><span>${n} מקומות · ${state.buyQty||2} יחד · כולל עמלות</span><div class="dflt-sort">${sortBtn('best','משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
   </div>`;
 }
 /* shared listing set — detail-level (רמת פירוט) filter + section filter + sort */
@@ -3078,8 +3082,7 @@ function deskSectionMap(){
     <div class="mlegend"><span><i style="background:var(--seat-open)"></i>שורה פנויה</span><span><i style="background:var(--pink)"></i>השורה שלכם</span></div>`;
 }
 function deskSeatContent(){
-  const b=state.buy||{}, g=state.dGTab, selRow=state.selRow||seatBaseRow();
-  const detLines=[`שורה ${selRow} · ${state.buyQty} מקומות · יושבים יחד`,'כניסה 4 · שער B','קו ראייה מלא למגרש'];
+  const b=state.buy||{}, g=state.dGTab;
   const gv = g==='360' ? `<div class="view360"><div class="crowd"></div><div class="cap">מבט מהמקום · ${b.sec||''} ▸ 360°</div><div class="dots"><i></i><i class="on"></i><i></i></div></div>`
            : g==='map' ? `<div class="viewmap">מפת האזור · ${b.sec||''}</div>`
            : `<div class="viewphoto"><img src="${IMG}${b.img||'seat1.jpg'}" alt=""></div>`;
@@ -3089,26 +3092,19 @@ function deskSeatContent(){
       <button class="g-tab${g==='photo'?' on':''}" data-act="dgtab" data-g="photo">תמונה</button></div>
     <div class="g-view">${gv}</div></div>
   <div class="dseat-body">
-    <div class="seat-area"><span class="sec-dot" style="background:${areaColorFor(b.key)}"></span>${b.sec||'איזור'}</div>
-    <div class="seat-price"><span class="sp-sub">לכרטיס יחיד · כולל עמלות</span><span class="sp-num">${nis(buyUnit())}</span></div>
-    <div class="seat-det">${detLines.map(x=>`<div>${x}</div>`).join('')}</div>
-    <div class="pur-card"><div class="qstep"><button class="qbtn" data-act="qty-inc" aria-label="הוסף">+</button><span class="qnum">${state.buyQty}</span><button class="qbtn" data-act="qty-dec" aria-label="הפחת">−</button></div><div class="pc-g"><div class="pc-t">כמות כרטיסים</div></div></div>
-    <div class="pur-card${state.buyAdjacent?' on':''}"><button class="add-btn${state.buyAdjacent?' on':''}" data-act="toggle-adjacent">${state.buyAdjacent?'נוסף ✓':'הוסף'}</button><div class="pc-g"><div class="pc-t">ישיבה יחד</div><div class="pc-s">הוסף את האפשרות למקומות באותה שורה</div></div></div>
-    <div class="sum-label" style="margin-top:8px">תוספות להזמנה</div>
-    <div class="pur-card${state.buyCoverage?' on':''}"><button class="add-btn${state.buyCoverage?' on':''}" data-act="toggle-coverage">${state.buyCoverage?'נוסף ✓':'הוסף'}</button><div class="pc-g"><div class="pc-t">כיסוי למקרה ביטול</div><div class="pc-s">הוספת כיסוי למקרה ביטול · <a class="pc-link" data-act="soon" data-title="כיסוי למקרה ביטול">לפרטים</a></div></div>${PC_SHIELD}</div>
-    <div class="milu"><span class="ok">כלול</span><div class="mg"><div class="mt">אחריות מלאה על הכרטיס</div><div class="ms">כרטיס מאומת · מגובה 100%</div></div></div>
-    <div class="sumbox2"><div class="sb-title">סכום לתשלום</div>${buySummaryRows()}</div>
+    ${seatRichBody(b)}
   </div>`;
 }
 function pageSeatDesk(){
   const b=state.buy||{};
   return `${deskTop(b.title||'הזמנה', 'back-event', [b.date,b.venue].filter(Boolean).join(' · '))}${deskTrust()}
+    <div class="dseat-tw">${orderTimer()}</div>
     <div class="dsplit">
       <div class="dmap" id="dmap">${deskSectionMap()}</div>
       <div class="dside dside-seat">
         ${deskSeatContent()}
         <div class="dseat-foot">
-          <button class="btn btn-pink dseat-cta" data-act="proceed-checkout">המשך לתשלום · ${nis(buyTotal())}</button>
+          <button class="btn btn-pink dseat-cta" data-act="to-checkout">המשך לתשלום · ${nis(buyTotal())}</button>
           <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>
         </div>
       </div>
@@ -3122,15 +3118,19 @@ function pageCheckoutDesk(){
       <div class="dchk-sum">
         <div class="dchk-sum-in">
           <div class="chk-tw2">${orderTimer()}</div>
-          ${orderSummaryCard({total:true})}
+          ${orderSummaryCard({})}
+          <div class="chk-h">סיכום הזמנה</div>
+          <div class="sumbox2"><div class="sb-title">פירוט מחיר</div>${buySummaryRows()}</div>
           <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>
         </div>
       </div>
       <div class="dchk-form"><div class="dchk-form-in">
+        ${chkAddons()}
+        ${chkCoupon()}
         ${chkPayer()}
         ${chkPayment()}
         <div class="dchk-terms">${chkTerms()}</div>
-        <button class="btn btn-pink dchk-cta" data-act="pay">המשך לתשלום · ${nis(buyTotal())}</button>
+        <button class="btn btn-pink dchk-cta" data-act="pay">אישור ותשלום · ${nis(buyTotal())}</button>
       </div></div>
     </div>`;
 }
@@ -3332,9 +3332,9 @@ function wire(){
         const date  = (E.dynamic ? (state.evDate||'') : E.date||'').replace('📅 ','');
         const price = parseInt((a.getAttribute('data-b-price')||'0').replace(/[^\d]/g,''))||0;
         state.buy={title, venue, date, sec:a.getAttribute('data-b-sec')||'', row:a.getAttribute('data-b-row')||'', unit:price, score:a.getAttribute('data-b-score')||'8', img:(E.dynamic&&state.evImg?state.evImg:E.img), key:a.getAttribute('data-lkey')||null, abroad:true, tentative:(E.type==='match')};
-        state.buyEdge=null; state.buyCoverage=false; state.buyAdjacent=false; state.buyDelivery=false; state.payMethod=''; state.showHoldModal=false; state.selRow=null; state.seat360=0;
+        state.buyEdge=null; state.buyCoverage=false; state.buyAdjacent=false; state.buyDelivery=false; state.payMethod=''; state.showHoldModal=false; state.selRow=null; state.seat360=0; state.splitConfirmed=false; state.splitAllPaid=false;
         state.wantTogether = !!(state.p3f && state.p3f.together);   // carry the "ישיבה יחד" filter to checkout
-        if(state.desktop && state.page===3){ deskZoom(state.buy.key, ()=>go(10)); }
+        if(state.desktop && state.page===3){ deskZoom(state.buy.key, ()=>set({showHoldModal:true})); }   // zoom → 10-min price-lock popup (like mobile)
         else { set({showHoldModal:true}); }   // mobile: 10-min price-lock popup before the seat screen
         break;
       }
@@ -3381,7 +3381,7 @@ function wire(){
       case act==='to-organizer': go(16); break;
       case act==='preview-friend': go(15); break;
       case act==='friend-paid': toast('התשלום שלך התקבל · תודה!'); go(16); break;
-      case act==='mark-allpaid': set({splitAllPaid:true}); break;
+      case act==='mark-allpaid': state.splitAllPaid=true; state.splitConfirmed=true; stopHold(); go(12); break;  // everyone paid → straight to success (with the "מי שילם" list)
       case act==='split-confirm': stopHold(); go(12); break;
       case act==='confirm-pay': stopHold(); go(12); break;
       case act==='pay': stopHold(); go(12); break;
@@ -3503,14 +3503,10 @@ window.addEventListener('scroll', ()=>{
   }
   // AI FAB appears on the homepage after scrolling
   if(state.page===0){ const fab=document.querySelector('.ai-fab.hide-home'); if(fab) fab.classList.toggle('show', window.scrollY>40); }
-  // seat screen: tall header → narrow slim header on scroll
-  if(state.page===10){
-    const c = window.scrollY > 80;
-    if(c!==state.seatSlim){
-      state.seatSlim = c;
-      const slim = document.querySelector('.seat-slim');
-      if(slim) slim.classList.toggle('show', c);
-    }
+  // seat + checkout: the trust/price-lock banner scrolls away; a compact timer appears in the sticky hero
+  if(state.page===10 || state.page===11){
+    const stk = document.querySelector(state.page===10 ? '.seat-stk' : '.chk-stick');
+    if(stk) stk.classList.toggle('scrolled', window.scrollY > 130);
     return;
   }
   if(state.page!==3) return;

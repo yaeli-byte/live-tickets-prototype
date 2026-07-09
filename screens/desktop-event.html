@@ -1331,7 +1331,7 @@ img{display:block;}
 
 /* --- checkout sticky header + safety strip --- */
 .chk-stick{position:fixed;top:0;left:0;right:0;max-width:375px;margin-inline:auto;z-index:30;}
-.chk-body{padding-top:203px;}
+.chk-body{padding-top:114px;}
 .pur-safety{justify-content:flex-end;}
 .pur-safety span{flex:1;text-align:right;}
 /* checkout summary: seat/coverage info stacked (right-aligned), not split L/R */
@@ -1587,7 +1587,7 @@ svg.stadium{width:100%;height:100%;}
 .seat-tw{background:#fff;padding:9px 14px 11px;border-bottom:1px solid var(--line);}
 .seat-tw .otimer{margin:0;}
 .seat-body{padding-top:14px;padding-bottom:104px;}
-.app:not(.wide) .seat-body{margin-top:252px;}
+.app:not(.wide) .seat-body{margin-top:114px;}
 .seat-view{display:block;width:100%;position:relative;border-radius:13px;overflow:hidden;border:none;padding:0;cursor:pointer;background:var(--card-dark);}
 .seat-view img{display:block;width:100%;height:150px;object-fit:cover;}
 .seat-view .sv-badge{position:absolute;bottom:9px;inset-inline-start:10px;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.94);color:var(--ink);font-size:10.5px;font-weight:700;border-radius:8px;padding:4px 9px;}
@@ -1650,7 +1650,7 @@ svg.stadium{width:100%;height:100%;}
 .ss-map{flex:1;min-height:0;position:relative;overflow:hidden;padding-top:8px;}
 .ss-map .ss-stad{width:100%;height:100%;display:block;}
 .ss-maphint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:10.5px;font-weight:600;color:#41485c;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.08);pointer-events:none;}
-.ss-drawer{position:absolute;left:0;right:0;bottom:0;height:366px;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -8px 24px rgba(39,50,74,.16);z-index:14;display:flex;flex-direction:column;transition:height .26s cubic-bezier(.4,0,.2,1);}
+.ss-drawer{position:absolute;left:0;right:0;bottom:0;height:314px;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -8px 24px rgba(39,50,74,.16);z-index:14;display:flex;flex-direction:column;transition:height .26s cubic-bezier(.4,0,.2,1);}
 .ss-drawer.up{height:72%;}
 .ss-handle{padding:9px 0 5px;cursor:grab;flex-shrink:0;display:flex;justify-content:center;}
 .ss-handle span{width:40px;height:4px;border-radius:2px;background:#cfc9bf;display:block;}
@@ -1747,6 +1747,19 @@ svg.stadium{width:100%;height:100%;}
   .wa,.ai-fab{left:14px;}
 }
 
+/* desktop parity: seat-page timer strip + "סינון" filter button (matches mobile) */
+.dseat-tw{flex-shrink:0;padding:12px 20px 0;}
+.dflt .ff-open{display:inline-flex;align-items:center;gap:6px;}
+.dflt .ff-open .ff-ic{width:15px;height:15px;}
+
+/* compact price-lock timer in the sticky hero (shown after scrolling past the banner) */
+.nhero .nh-clk{display:none;align-items:center;gap:5px;flex-shrink:0;background:#fde8ef;color:var(--pink);border-radius:8px;padding:4px 9px;font-weight:700;font-size:13px;}
+.nhero .nh-clk .nh-clk-ic{width:15px;height:15px;}
+.nhero .nh-clk .ot-clk{font-variant-numeric:tabular-nums;}
+.seat-stk.scrolled .nh-clk,.chk-stick.scrolled .nh-clk{display:inline-flex;}
+/* checkout sticky header now holds only the collapsing event hero */
+.chk-stick .nhero,.chk-stick .mhdr{background:#fff;}
+
 </style>
 </head>
 <body style="margin:0">
@@ -1839,17 +1852,14 @@ svg.stadium{width:100%;height:100%;}
       <div class="dside"><div class="dflt">
     <div class="dflt-row">
       <button class="chip dark" data-act="qty-desk">2 כרטיסים ⌄</button>
-      <button class="chip act">מחיר · כולל עמלות</button>
-      <button class="chip" data-act="p3filter">מאפייני מקום</button>
-      <button class="chip">מסירה מיידית</button>
+      <button class="chip ff-open" data-act="p3filter"><svg class="ff-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>סינון</button>
     </div>
-    <div class="dlvl" title="רמת הידע על המושב"><button class="on" data-act="dlvl-desk" data-k="all">הכל</button><button class="" data-act="dlvl-desk" data-k="row">שורה</button><button class="" data-act="dlvl-desk" data-k="section">איזור</button></div>
-    <div class="dflt-count"><span>6 מקומות · 2 יחד</span><div class="dflt-sort"><button class="sort-btn on" data-sort="best">הכי משתלם</button><button class="sort-btn " data-sort="price">מחיר</button><button class="sort-btn " data-sort="qty">כמות</button></div></div>
+    <div class="dflt-count"><span>6 מקומות · 2 יחד · כולל עמלות</span><div class="dflt-sort"><button class="sort-btn on" data-sort="best">משתלם</button><button class="sort-btn " data-sort="price">מחיר</button><button class="sort-btn " data-sort="qty">כמות</button></div></div>
   </div><div class="dlist"><div class="lcard hl" data-lkey="south" data-act="buy-select" data-b-sec="יציע דרום" data-b-row="טור 24" data-b-price="₪520" data-b-img="seat1.jpg" data-b-score="10">
     <div class="lc-price"><span class="amt">₪520</span><span class="fees">כולל עמלות</span></div>
     <div class="lc-mid">
       <div class="lc-sec"><span class="sec-dot" style="background:#cdeed7"></span>יציע דרום</div>
-      <div class="lc-row">טור 24</div>
+      <div class="lc-row">שורה 24 · יושבים יחד</div>
       <div class="lc-badge best"><span class="lbl">ערך מעולה</span><span class="box">10</span></div>
       <div class="lc-info">עד 4 יחד · אישור מיידי · 🔥 נותרו 6</div>
     </div>
@@ -1858,7 +1868,7 @@ svg.stadium{width:100%;height:100%;}
     <div class="lc-price"><span class="amt">₪890</span><span class="fees">כולל עמלות</span></div>
     <div class="lc-mid">
       <div class="lc-sec"><span class="sec-dot" style="background:#e7d7f3"></span>VIP</div>
-      <div class="lc-row">שורה 3</div>
+      <div class="lc-row">שורה 3 · יושבים יחד</div>
       <div class="lc-badge best"><span class="lbl">ערך מעולה</span><span class="box">9</span></div>
       <div class="lc-info">עד 2 יחד · אישור מיידי · 🔥 נותרו 3</div>
     </div>
@@ -1867,7 +1877,7 @@ svg.stadium{width:100%;height:100%;}
     <div class="lc-price"><span class="amt">₪540</span><span class="fees">כולל עמלות</span></div>
     <div class="lc-mid">
       <div class="lc-sec"><span class="sec-dot" style="background:#d7d4f1"></span>דרום תחתון</div>
-      <div class="lc-row soft">שורה משוערת · יושבים יחד</div>
+      <div class="lc-row soft">שורה 12 (משוער) · יושבים יחד</div>
       <div class="lc-badge good"><span class="lbl">ערך טוב</span><span class="box">8</span></div>
       <div class="lc-info">עד 2 יחד · אישור מיידי · 🔥 נותרו 4</div>
     </div>
@@ -1876,7 +1886,7 @@ svg.stadium{width:100%;height:100%;}
     <div class="lc-price"><span class="amt">₪650</span><span class="fees">כולל עמלות</span></div>
     <div class="lc-mid">
       <div class="lc-sec"><span class="sec-dot" style="background:#e7d7f3"></span>מזרח</div>
-      <div class="lc-row soft">שורה משוערת · יושבים יחד</div>
+      <div class="lc-row soft">שורה 15 (משוער) · יושבים יחד</div>
       <div class="lc-badge good"><span class="lbl">ערך טוב</span><span class="box">7</span></div>
       <div class="lc-info">עד 6 יחד · אישור מיידי · 🔥 נותרו 5</div>
     </div>
@@ -1885,7 +1895,7 @@ svg.stadium{width:100%;height:100%;}
     <div class="lc-price"><span class="amt">₪690</span><span class="fees">כולל עמלות</span></div>
     <div class="lc-mid">
       <div class="lc-sec"><span class="sec-dot" style="background:#bfead9"></span>יציע צפון</div>
-      <div class="lc-row soft">מספר שורה יימסר עם הכרטיס</div>
+      <div class="lc-row soft">אזור פתוח · מספר שורה יימסר עם הכרטיס</div>
       <div class="lc-badge good"><span class="lbl">ערך טוב</span><span class="box">7</span></div>
       <div class="lc-info">עד 4 יחד · אישור מיידי · 🔥 נותרו 7</div>
     </div>
@@ -1894,7 +1904,7 @@ svg.stadium{width:100%;height:100%;}
     <div class="lc-price"><span class="amt">₪640</span><span class="fees">כולל עמלות</span></div>
     <div class="lc-mid">
       <div class="lc-sec"><span class="sec-dot" style="background:#e7d7f3"></span>מערב</div>
-      <div class="lc-row soft">מספר שורה יימסר עם הכרטיס</div>
+      <div class="lc-row soft">אזור פתוח · מספר שורה יימסר עם הכרטיס</div>
       <div class="lc-badge fair"><span class="lbl">ערך סביר</span><span class="box">6</span></div>
       <div class="lc-info">עד 4 יחד · אישור מיידי · 🔥 נותרו 8</div>
     </div>
