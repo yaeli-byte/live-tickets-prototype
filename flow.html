@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=23" />
+<link rel="stylesheet" href="flow.v5.css?v=33" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -42,7 +42,7 @@ const state = {
   buy:null, buyQty:1, buyCoverage:false, buyAdjacent:false, buyCoupon:'', buyCouponApplied:false,
   holdActive:false, holdSec:600, holdWarn:false, holdExpired:false, holdStep:10,
   showHoldModal:false, payMethod:'', seatSlim:false,
-  wantTogether:false, buyDelivery:false, sheetExpanded:false, seat360:0, stadiumInfo:false,
+  wantTogether:false, buyDelivery:false, sheetExpanded:false, seat360:0, stadiumInfo:false, sharePop:false,
   desktop:false, hotSec:null, dGTab:'360', dlvl:'all', qtyModal:false, qtyChosen:false, selRow:null,
   coName:'', coFirst:'', coLast:'', coPhone:'', coEmail:'', coInstall:'12', coSplitOpen:false,
   splitN:4, splitMode:'equal', orderNo:'LT-38210', splitAllPaid:false,
@@ -466,7 +466,7 @@ function render(){
     state.page===18 ? pageAccount() :
     isAI ? pageAiChat() :
     pageHome()
-  ) + ((chrome && !showBar)?whatsapp():'') + ((chrome && !showBar)?aiFab():'') + (showBar?activeOrderBar():'') + overlays() + qtyModal() + holdModal();
+  ) + ((chrome && !showBar)?whatsapp():'') + ((chrome && !showBar)?aiFab():'') + (showBar?activeOrderBar():'') + overlays() + qtyModal() + holdModal() + sharePop();
   wire();
 }
 
@@ -1865,8 +1865,8 @@ function p3FilterSheet(){
     <div class="sh-body">
       <div class="ff-label">כמות כרטיסים</div>
       <div class="ff-qtys">${[1,2,3,4,5,6].map(qtyBtn).join('')}</div>
-      <div class="ff-label">רמת פירוט</div>
-      <div class="ff-dlvls">${dlvlBtn('all','הכול')}${dlvlBtn('row','עם שורה')}${dlvlBtn('seat','עם שורה מדויקת')}</div>
+      <div class="ff-label">רמת הידע על המושב</div>
+      <div class="ff-dlvls">${dlvlBtn('all','הכל')}${dlvlBtn('row','שורה')}${dlvlBtn('section','איזור')}</div>
       <div class="ff-label">קטע</div>
       <div class="ff-secs">${D.sections.map(secBtn).join('')}</div>
       <div class="ff-label">מחיר לכרטיס · כולל עמלות</div>
@@ -2261,10 +2261,13 @@ function stopHold(){ state.holdActive=false; state.holdWarn=false; state.holdExp
 function activeOrderBar(){
   if(!state.holdActive) return '';
   const cls=state.holdExpired?'exp':(state.holdWarn?'warn':'hold');
-  const txt=state.holdExpired?'ההחזקה פגה':(state.holdWarn?'נותר זמן קצר להשלמה':'ההזמנה שלך שמורה');
-  const cta=state.holdExpired?'בדקו שוב →':'חזרה →';
+  const txt=state.holdExpired?'ההחזקה פגה':(state.holdWarn?'נותר זמן קצר להשלמה':'הכרטיסים שמורים עבורך לעוד');
+  const cta=state.holdExpired?'בדקו שוב':'חזרה';
   const act=state.holdExpired?'edge-expired':'hold-back';
-  return `<div class="aob ${cls}" data-act="${act}"><span class="aob-clk">${fmtClock(state.holdSec)}</span><span class="aob-txt">${txt}</span><span class="aob-go">${cta}</span></div>`;
+  return `<div class="aob ${cls}" data-act="${act}">
+    <div class="aob-main"><span class="aob-txt">${txt}</span><span class="aob-clk">${fmtClock(state.holdSec)}</span></div>
+    <span class="aob-go"><span>${cta}</span><span class="aob-arr">→</span></span>
+  </div>`;
 }
 /* in-page timer bar shown on Order + Checkout */
 function orderBar2(){
@@ -2333,6 +2336,48 @@ function holdModal(){
       <div class="hm-s">הכרטיסים והמחיר נשמרים עבורך למשך 10 דקות. השלם/י את התהליך בזמן — אחרת הם ישוחררו חזרה למכירה.</div>
       <button class="btn btn-pink hm-cta" data-act="hold-proceed">הבנתי · ממשיכים</button>
       <button class="hm-cancel" data-act="close-hold-modal">${state.page===3?'חזרה לבחירת המקומות':'חזרה'}</button>
+    </div>
+  </div>`;
+}
+/* share sheet — a shareable "I have a ticket" story card + destinations (opened by any שיתוף button) */
+function shareData(){
+  const b=state.buy, E=EVENTS[state.eventKey]||EVENTS.coldplay;
+  const clean=s=>(s||'').replace('📅 ','').replace('📍 ','');
+  return {
+    title: (b&&b.title) ? b.title : (E.dynamic?(state.evTitle||'ההופעה'):E.h1),
+    date:  (b&&b.date)  ? b.date  : clean(E.dynamic?(state.evDate||''):E.date),
+    venue: (b&&b.venue) ? b.venue : clean(E.dynamic?(state.evVenue||''):E.venue),
+    img:   (b&&b.img)   ? b.img   : (E.dynamic&&state.evImg?state.evImg:E.img)
+  };
+}
+function shareDest(to,label,svg,cls){
+  return `<button class="sd" data-act="share-do" data-to="${to}"><span class="sd-ic ${cls||''}">${svg}</span><span class="sd-l">${label}</span></button>`;
+}
+const IG_SVG='<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zm0 10.16A4 4 0 1 1 16 12a4 4 0 0 1-4 4zm6.41-10.4a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0 0-1.44-1.44z"/></svg>';
+const DL_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>';
+const LINK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5l5-5"/><path d="M8 12H6a4 4 0 0 1 0-8h3"/><path d="M16 12h2a4 4 0 0 1 0 8h-3"/></svg>';
+const WA_SVG='<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.8.9.9-2.7-.2-.3A8 8 0 1 1 12 20zm4.5-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2.1-.2 0-.3 0-.5s-.5-1.3-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3A2.8 2.8 0 0 0 6 9.4c0 1.7 1.2 3.3 1.4 3.5s2.4 3.6 5.7 5c2.1.9 2.9.9 4 .8.6-.1 1.4-.6 1.6-1.2.2-.6.2-1 .1-1.2z"/></svg>';
+function sharePop(){
+  if(!state.sharePop) return '';
+  const d=shareData();
+  const dv=[d.date,d.venue].filter(Boolean).join(' · ');
+  return `<div class="modal-scrim share-scrim" data-act="share-close">
+    <div class="share-sheet" data-act="noop">
+      <div class="sh-bar"><button class="sh-x" data-act="share-close" aria-label="סגירה">✕</button><div class="sh-ttl">שיתוף</div><span class="sh-sp"></span></div>
+      <div class="share-card">
+        <div class="shc-media"><img class="shc-img" src="${IMG}${d.img}" alt=""><div class="shc-grad"></div></div>
+        <div class="shc-body">
+          <div class="shc-h">יש לי כרטיס ל${d.title}!</div>
+          ${dv?`<div class="shc-sub">נתראה ב${dv}</div>`:''}
+          <div class="shc-foot"><span class="shc-tag">#LiveTickets</span><span class="shc-brand"><img src="assets/logo.png" alt="Live Tickets"></span></div>
+        </div>
+      </div>
+      <div class="share-dests">
+        ${shareDest('stories','סטורי',IG_SVG,'ig')}
+        ${shareDest('save','שמירה',DL_SVG,'dl')}
+        ${shareDest('copy','העתק קישור',LINK_SVG,'ln')}
+        ${shareDest('wa','וואטסאפ',WA_SVG,'wapp')}
+      </div>
     </div>
   </div>`;
 }
@@ -2439,7 +2484,8 @@ function pageEventSel(){
       </div>
     </div>
     <div class="ss-map">
-      <svg class="ss-stad" viewBox="0 0 900 620" preserveAspectRatio="xMidYMin meet">
+      <div class="map-zoom"><button class="mz" data-act="map-zoom" data-dir="in" aria-label="הגדל">+</button><button class="mz" data-act="map-zoom" data-dir="out" aria-label="הקטן">−</button></div>
+      <svg class="ss-stad" id="ssStadium" viewBox="0 0 900 620" preserveAspectRatio="xMidYMin meet">
         <defs><pattern id="ssdots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.5" fill="rgba(30,42,66,.16)"></circle></pattern></defs>
         <ellipse cx="450" cy="300" rx="406" ry="286" fill="#eef1f6"></ellipse>
         ${stadiumBowl().replace(/url\(#seatdots\)/g,'url(#ssdots)')}
@@ -2636,6 +2682,7 @@ function pageCheckout(){
     ${orderSummaryCard({})}
     ${chkAddons()}
     ${chkCoupon()}
+    <div class="chk-h">סיכום הזמנה</div>
     <div class="sumbox2"><div class="sb-title">פירוט מחיר</div>${buySummaryRows()}</div>
     ${chkPayer()}
     ${chkPayment()}
@@ -2667,7 +2714,7 @@ function orderSummaryCard(opts){
     <div class="sum-div"></div>
     <div class="coz-blk"><div class="coz-k"><span class="sec-dot" style="background:${areaColorFor(b.key)}"></span>${b.sec||'איזור'}</div><div class="coz-v">${seatLine}</div></div>
     ${svc.length?`<div class="sum-div"></div><div class="coz-blk"><div class="coz-sh">תוספות שנבחרו</div>${svc.map(s=>`<div class="coz-svc"><span class="coz-ok">✓</span><span>${s}</span></div>`).join('')}</div>`:''}
-    ${opts.total?`<div class="coz-totbox"><div class="coz-tot"><span class="coz-tnum">${nis(buyTotal())}</span><span class="coz-tlbl">סה״כ לתשלום</span></div>${opts.detail?`<button class="coz-detail" data-act="to-order">פירוט</button>`:''}</div>`:''}
+    ${opts.total?`<div class="coz-totbox"><div class="coz-tot"><span class="coz-tnum">${nis(buyTotal())}</span><span class="coz-tlbl">${opts.paid?'סה״כ שולם':'סה״כ לתשלום'}</span></div>${opts.detail?`<button class="coz-detail" data-act="to-order">פירוט</button>`:''}</div>`:''}
   </div>`;
 }
 
@@ -2677,13 +2724,10 @@ function pageConfirm(){
   ${purHead('אישור הזמנה','home')}
   <div class="pur">
     <div class="conf-hero"><div class="conf-tick">✓</div><div class="conf-t">ההזמנה אושרה!</div><div class="conf-s">מספר הזמנה · ${state.orderNo}</div></div>
+    <div class="pur-card col"><div class="pc-t">מתי מקבלים את הכרטיסים?</div><div class="pc-s">כרטיס דיגיטלי · יישלח למייל עד 24 שעות לפני האירוע ✓</div></div>
     <div class="conf-callback">📞 בשעות הקרובות נציג מטעמנו ייצור איתך קשר לסגירת פרטי העסקה.</div>
-    ${orderSummaryCard({total:true})}
-    <div class="chk-sec">
-      <div class="pur-card col"><div class="pc-t">מתי מקבלים את הכרטיסים?</div><div class="pc-s">כרטיס דיגיטלי · יישלח למייל עד 24 שעות לפני האירוע ✓</div></div>
-      <div class="fld-row"><button class="btn2" data-act="wallet">הוסף לארנק</button><button class="btn2" data-act="share">שיתוף</button></div>
-      <div class="pur-card col"><div class="pc-t">מה עכשיו?</div><div class="pc-s">מעקב מסירה · אחריות מלאה על הכרטיס · תמיכה 24/7</div></div>
-    </div>
+    ${orderSummaryCard({total:true, paid:true})}
+    <button class="btn2 share-cta" data-act="share">${ICON.share} שתפו את הכרטיס</button>
     <button class="btn btn-pink pur-cta" data-act="mytickets">הכרטיסים שלי</button>
     <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>
   </div>`;
@@ -2729,7 +2773,7 @@ function pageSplitInvite(){
     <div class="pur-note">כל חבר מקבל קישור "שלמו את חלקכם" ומשלם באשראי / ארנק — ללא צורך בחשבון.</div>
     <div class="sum-label">שתפו את הקישור לתשלום</div>
     <div class="linkbox2"><span class="lb-url" dir="ltr">livetickets.co.il/split/xR4k…</span><button class="lb-cp" data-act="copy-link">${state.linkCopied?'הועתק ✓':'העתק'}</button></div>
-    <button class="btn2 wapp" data-act="share">שיתוף בוואטסאפ</button>
+    <button class="btn2 wapp" data-act="wa-split">שיתוף בוואטסאפ</button>
     <button class="btn btn-pink pur-cta" data-act="to-organizer">סיום — למעקב סטטוס</button>
     <button class="link-btn ctr" data-act="preview-friend">תצוגת מסך החבר ←</button>
   </div>`;
@@ -2807,8 +2851,8 @@ function pageEdge(){
 const DDETAIL={south:'seat',vip:'seat','south-c':'row',east:'row',west:'section',north:'section'};
 function deskDetail(l){ return DDETAIL[l.key]||'seat'; }
 function deskPasses(l){ const d=deskDetail(l);
-  if(state.dlvl==='row') return d==='seat'||d==='row';
-  if(state.dlvl==='seat') return d==='seat';
+  if(state.dlvl==='row') return d==='seat'||d==='row';   // listings with a known row
+  if(state.dlvl==='section') return d==='section';        // area-only (general admission)
   return true; }
 function deskSections(){
   const W=900,H=560,w=150,h=86;
@@ -2851,7 +2895,7 @@ function eventFilterBar(n){
       <button class="chip${ac?' on':''}" data-act="p3filter">מאפייני מקום${ac?` · ${ac}`:''}</button>
       <button class="chip">מסירה מיידית</button>
     </div>
-    <div class="dlvl" title="רמת פירוט">${[['all','הכול'],['row','עם שורה'],['seat','עם שורה מדויקת']].map(([k,t])=>`<button class="${state.dlvl===k?'on':''}" data-act="dlvl-desk" data-k="${k}">${t}</button>`).join('')}</div>
+    <div class="dlvl" title="רמת הידע על המושב">${[['all','הכל'],['row','שורה'],['section','איזור']].map(([k,t])=>`<button class="${state.dlvl===k?'on':''}" data-act="dlvl-desk" data-k="${k}">${t}</button>`).join('')}</div>
     <div class="dflt-count"><span>${n} מקומות · ${state.buyQty||2} יחד</span><div class="dflt-sort">${sortBtn('best','הכי משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
   </div>`;
 }
@@ -2952,23 +2996,38 @@ function deskMapOverview(){
       <span><i style="background:#bfead9"></i>מאחורי השער</span><span><i style="background:#cdeed7"></i>Infield</span><span><i style="background:#e7d7f3"></i>Baseline · צד</span><span><i style="background:#d7d4f1"></i>Club Level</span><span><i style="background:#d3e4f8"></i>יציע עליון</span><span><i style="background:#f8dce9"></i>Bleachers</span></div>`;
 }
 /* zoom toward the map centre by a factor */
+/* the interactive stadium svg currently on screen (desktop overview or mobile event page) */
+function activeStadium(){ return document.getElementById('dStadium') || document.getElementById('ssStadium'); }
 function mapZoomBy(factor){
-  const svg=document.getElementById('dStadium'); if(!svg) return;
+  const svg=activeStadium(); if(!svg) return;
   let [x,y,w,h]=(svg.getAttribute('viewBox')||'0 0 900 620').split(' ').map(Number);
   const cx=x+w/2, cy=y+h/2;
   let nw=Math.min(1000,Math.max(240,w*factor)), nh=nw*(620/900);
   svg.setAttribute('viewBox',[cx-nw/2, cy-nh/2, nw, nh].join(' '));
 }
-/* drag-to-pan + wheel-zoom on the overview map (bound once per rendered svg) */
+/* drag-to-pan + wheel-zoom (mouse) + one-finger pan / pinch-zoom (touch) — bound once per svg */
 function bindMap(){
-  const svg=document.getElementById('dStadium'); if(!svg||svg.__bound) return; svg.__bound=true;
+  const svg=activeStadium(); if(!svg||svg.__bound) return; svg.__bound=true;
   const vb=()=>(svg.getAttribute('viewBox')||'0 0 900 620').split(' ').map(Number);
+  const setVB=(x,y,w,h)=>svg.setAttribute('viewBox',[x,y,w,h].join(' '));
+  const zoomAt=(w,h,x,y,f)=>{ let nw=Math.min(1000,Math.max(240,w*f)), nh=nw*(620/900); return [x+w/2-nw/2, y+h/2-nh/2, nw, nh]; };
   svg.addEventListener('wheel',e=>{ e.preventDefault(); mapZoomBy(e.deltaY>0?1.12:0.9); },{passive:false});
   let drag=null;
   svg.addEventListener('mousedown',e=>{ if(e.target.closest('.mz'))return; drag={sx:e.clientX,sy:e.clientY,v:vb(),moved:false}; svg.style.cursor='grabbing'; });
-  window.addEventListener('mousemove',e=>{ if(!drag)return; const [x,y,w,h]=drag.v; const r=svg.getBoundingClientRect(); if(Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)>3)drag.moved=true; svg.setAttribute('viewBox',[x-(e.clientX-drag.sx)*(w/r.width), y-(e.clientY-drag.sy)*(h/r.height), w, h].join(' ')); });
+  window.addEventListener('mousemove',e=>{ if(!drag)return; const [x,y,w,h]=drag.v; const r=svg.getBoundingClientRect(); if(Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)>3)drag.moved=true; setVB(x-(e.clientX-drag.sx)*(w/r.width), y-(e.clientY-drag.sy)*(h/r.height), w, h); });
   window.addEventListener('mouseup',()=>{ if(drag){ if(drag.moved) svg.__suppressClick=Date.now(); drag=null; svg.style.cursor=''; } });
   svg.addEventListener('click',e=>{ if(svg.__suppressClick && Date.now()-svg.__suppressClick<250){ e.stopPropagation(); e.preventDefault(); svg.__suppressClick=0; } }, true);
+  // touch: one-finger pan, two-finger pinch-zoom
+  let tdrag=null, pinch=null;
+  svg.addEventListener('touchstart',e=>{
+    if(e.touches.length===2){ tdrag=null; const dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY; pinch={d0:Math.hypot(dx,dy),v:vb()}; }
+    else if(e.touches.length===1){ if(e.target.closest('.mz'))return; tdrag={sx:e.touches[0].clientX,sy:e.touches[0].clientY,v:vb(),moved:false}; }
+  },{passive:true});
+  svg.addEventListener('touchmove',e=>{
+    if(pinch && e.touches.length===2){ e.preventDefault(); const dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY; const [x,y,w,h]=pinch.v; setVB.apply(null, zoomAt(w,h,x,y, pinch.d0/Math.max(1,Math.hypot(dx,dy)))); }
+    else if(tdrag && e.touches.length===1){ const [x,y,w,h]=tdrag.v; const r=svg.getBoundingClientRect(); const mx=e.touches[0].clientX-tdrag.sx, my=e.touches[0].clientY-tdrag.sy; if(Math.abs(mx)+Math.abs(my)>4){ tdrag.moved=true; e.preventDefault(); } setVB(x-mx*(w/r.width), y-my*(h/r.height), w, h); }
+  },{passive:false});
+  svg.addEventListener('touchend',e=>{ if(e.touches.length===0){ if(tdrag&&tdrag.moved) svg.__suppressClick=Date.now(); tdrag=null; pinch=null; } },{passive:true});
 }
 function pageEventDesk(){
   const E=EVENTS[state.eventKey]||EVENTS.coldplay;
@@ -3154,7 +3213,7 @@ function bindSheet(){
 function wire(){
   // rails: drag + wheel
   document.querySelectorAll('.hscroll').forEach(enableDrag);
-  if(state.desktop && state.page===3) bindMap();   // pan/zoom on the interactive map
+  if(state.page===3) bindMap();   // pan/zoom on the interactive map (desktop overview + mobile event page)
   if(!state.desktop && state.page===3) bindSheet();   // draggable seat-list drawer on the mobile event page
   // inputs: price fields (no re-render) + live search (re-render + refocus)
   document.getElementById('app').oninput = (e)=>{
@@ -3399,7 +3458,17 @@ function wire(){
       }
       case act==='bio': set({bioExpanded:!state.bioExpanded}); break;
       case act==='tour': set({tourExpanded:!state.tourExpanded}); break;
-      case act==='share': case act==='watch': case act==='package': break;
+      case act==='share': set({sharePop:true}); break;
+      case act==='share-close': set({sharePop:false}); break;
+      case act==='share-do': {
+        const to=a.getAttribute('data-to');
+        if(to==='copy'){ try{navigator.clipboard&&navigator.clipboard.writeText('https://livetickets.co.il');}catch(_){} }
+        set({sharePop:false});
+        toast({stories:'מוכן לשיתוף בסטורי ✓',save:'התמונה נשמרה ✓',copy:'הקישור הועתק ✓',wa:'נפתח וואטסאפ לשיתוף'}[to]||'שותף ✓');
+        break;
+      }
+      case act==='wa-split': toast('נפתח וואטסאפ עם קישור התשלום'); break;
+      case act==='watch': case act==='package': break;
       case act.startsWith('dsec:'): { const k=act.slice(5); set({drawerSection: state.drawerSection===k?null:k, drawerMusicGroup:null, mSport:null, mComp:null}); break; }
       case act.startsWith('dmg:'): { const k=act.slice(4); set({drawerMusicGroup: state.drawerMusicGroup===k?null:k}); break; }
       case act.startsWith('dsp:'): { const k=act.slice(4); set({mSport: state.mSport===k?null:k, mComp:null}); break; }

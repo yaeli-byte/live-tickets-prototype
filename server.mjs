@@ -12,7 +12,7 @@ const types = {
 createServer(async (req, res) => {
   try {
     let p = decodeURIComponent(req.url.split('?')[0]);
-    if (p === '/') p = '/index.html';
+    if (p === '/') p = '/flow.html';   // local preview serves the prototype directly (Pages still uses index.html redirect)
     const file = join(root, normalize(p));
     const data = await readFile(file);
     res.writeHead(200, { 'Content-Type': types[extname(file)] || 'application/octet-stream' });
