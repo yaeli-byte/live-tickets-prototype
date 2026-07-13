@@ -189,12 +189,12 @@ const D = {
   priceMarks:['₪520','₪540','₪1,400','₪640','₪650','₪690','₪890'],
   seatChars:['כמות','ישיבה יחד','מעבר','שורה ראשונה','ללא הסתרת מבט','נגישות'],
   listings:[
-    {key:'south',   sec:'יציע דרום',  row:'טור 24', price:'₪520', score:10, val:'ערך מעולה', tog:'עד 4 יחד', left:6, img:'seat1.jpg', pin:{t:82,l:52}},
-    {key:'south-c', sec:'דרום תחתון', row:'טור 12', price:'₪540', score:8,  val:'ערך טוב',   tog:'עד 2 יחד', left:4, img:'seat6.jpg', pin:{t:70,l:33}},
-    {key:'west',    sec:'מערב',       row:'טור 8',  price:'₪640', score:6,  val:'ערך סביר',  tog:'עד 4 יחד', left:8, img:'seat7.jpg', pin:{t:50,l:13}},
-    {key:'east',    sec:'מזרח',       row:'טור 15', price:'₪650', score:7,  val:'ערך טוב',   tog:'עד 6 יחד', left:5, img:'seat1.jpg', pin:{t:50,l:87}},
-    {key:'vip',     sec:'VIP',        row:'שורה 3', price:'₪890', score:9,  val:'ערך מעולה', tog:'עד 2 יחד', left:3, img:'seat6.jpg', pin:{t:40,l:52}},
-    {key:'north',   sec:'יציע צפון',  row:'טור 20', price:'₪690', score:7,  val:'ערך טוב',   tog:'עד 4 יחד', left:7, img:'seat7.jpg', pin:{t:15,l:50}},
+    {key:'south',   sec:'יציע דרום',  row:'טור 24', price:'₪520', score:10, val:'ערך מעולה', tog:'עד 4 יחד', left:6, img:'seat1.jpg', pin:{t:82,l:52}, sitTogetherGuaranteeAvailable:true},
+    {key:'south-c', sec:'דרום תחתון', row:'טור 12', price:'₪540', score:8,  val:'ערך טוב',   tog:'עד 2 יחד', left:4, img:'seat6.jpg', pin:{t:70,l:33}, sitTogetherGuaranteeAvailable:false},
+    {key:'west',    sec:'מערב',       row:'טור 8',  price:'₪640', score:6,  val:'ערך סביר',  tog:'עד 4 יחד', left:8, img:'seat7.jpg', pin:{t:50,l:13}, sitTogetherGuaranteeAvailable:true},
+    {key:'east',    sec:'מזרח',       row:'טור 15', price:'₪650', score:7,  val:'ערך טוב',   tog:'עד 6 יחד', left:5, img:'seat1.jpg', pin:{t:50,l:87}, sitTogetherGuaranteeAvailable:true},
+    {key:'vip',     sec:'VIP',        row:'שורה 3', price:'₪890', score:9,  val:'ערך מעולה', tog:'עד 2 יחד', left:3, img:'seat6.jpg', pin:{t:40,l:52}, sitTogetherGuaranteeAvailable:false},
+    {key:'north',   sec:'יציע צפון',  row:'טור 20', price:'₪690', score:7,  val:'ערך טוב',   tog:'עד 4 יחד', left:7, img:'seat7.jpg', pin:{t:15,l:50}, sitTogetherGuaranteeAvailable:true},
   ],
   related:[
     {name:'קולדפליי · פריז', price:'₪610', img:'tiktok3.jpg'},
@@ -388,11 +388,11 @@ const REAL = {
 /* ---------- event pages (concert / match) — pageEvent renders by state.eventKey ---------- */
 const EVENTS = {
   coldplay:{ img:'artist1.jpg', h1:'קולדפליי', venue:'📍 אצטדיון ומבלי, לונדון', date:'📅 4 ביולי 2026 · 20:00',
-    price:'₪520', stats:'🔥 נותרו 8 · 140 צופים עכשיו', slimT:'קולדפליי · ומבלי', slimD:'4 ביולי · 20:00', type:'concert', back:2,
+    price:'₪520', stats:'🔥 נותרו 8 · 140 צופים עכשיו', slimT:'קולדפליי · ומבלי', slimD:'4 ביולי · 20:00', type:'concert', back:2, sitTogetherGuaranteeAvailable:true,
     venueName:'אצטדיון ומבלי, לונדון', venueImg:'seat3.jpg', mapsQ:'Wembley Stadium London',
     venueDesc:'האצטדיון הגדול באנגליה — 90,000 מקומות, גישה נוחה בתחבורה ציבורית (תחנת Wembley Park), ומגוון רחב של דוכני מזון ושתייה.' },
   clasico:{ img:'team-realmadrid.jpg', h1:'אל קלאסיקו · ריאל נגד ברצלונה', venue:'📍 אצטדיון סנטיאגו ברנבאו, מדריד', date:'📅 14 ביולי 2026 · 22:00',
-    price:'₪690', stats:'🔥 נותרו 12 · 320 צופים עכשיו', slimT:'אל קלאסיקו · ברנבאו', slimD:'14 ביולי · 22:00', type:'match', back:7,
+    price:'₪690', stats:'🔥 נותרו 12 · 320 צופים עכשיו', slimT:'אל קלאסיקו · ברנבאו', slimD:'14 ביולי · 22:00', type:'match', back:7, sitTogetherGuaranteeAvailable:true,
     venueName:'אצטדיון סנטיאגו ברנבאו, מדריד', venueImg:'seat5.jpg', mapsQ:'Santiago Bernabeu Stadium Madrid',
     venueDesc:'הבית של ריאל מדריד — 81,000 מקומות, אחד המגרשים המפורסמים בעולם, במרכז מדריד (רחוב Concha Espina) עם גישה נוחה במטרו.' },
   // generic match — title/venue/date/price come from the clicked card (data-ev-*)
@@ -1831,7 +1831,7 @@ function overlays(){
 
 function p3ActiveCount(){
   const f=state.p3f;
-  return [state.selectedSection, (state.dlvl&&state.dlvl!=='all'), f.together, f.front, f.view, f.access, state.p3Min, state.p3Max].filter(Boolean).length;
+  return [state.selectedSection, f.together, f.front, f.view, f.access, state.p3Min, state.p3Max].filter(Boolean).length;
 }
 function p3FilterSheet(){
   const f=state.p3f;
@@ -1839,8 +1839,7 @@ function p3FilterSheet(){
   const resultCount = cnt===0 ? '3' : '1';
   const secBtn=s=>`<button class="ff-sec ${state.selectedSection===s.key?'on':''}" data-fsec="${s.key}" style="--dot:${s.dot}"><i style="background:${s.dot}"></i>${s.label}</button>`;
   const qtyBtn=n=>`<button class="ff-qty ${(state.buyQty||2)===n?'on':''}" data-act="qty-pick" data-q="${n}">${n}</button>`;
-  const dlvlBtn=(k,l)=>`<button class="ff-dlvl ${state.dlvl===k?'on':''}" data-act="dlvl-desk" data-k="${k}">${l}</button>`;
-  const chk=(k,l)=>`<button class="ff-check" data-fchar="${k}"><span class="box ${f[k]?'on':''}">${f[k]?'✓':''}</span>${l}</button>`;
+  const chk=(k,l,tip)=>`<button class="ff-check" data-fchar="${k}"${tip?` title="${tip}"`:''}><span class="box ${f[k]?'on':''}">${f[k]?'✓':''}</span>${l}</button>`;
   return `
   <div class="sheet-backdrop open" data-act="close-sheet"></div>
   <div class="sheet open filter-sheet">
@@ -1849,8 +1848,6 @@ function p3FilterSheet(){
     <div class="sh-body">
       <div class="ff-label">כמות כרטיסים</div>
       <div class="ff-qtys">${[1,2,3,4,5,6].map(qtyBtn).join('')}</div>
-      <div class="ff-label">רמת הידע על המושב</div>
-      <div class="ff-dlvls">${dlvlBtn('all','הכל')}${dlvlBtn('row','שורה')}${dlvlBtn('section','איזור')}</div>
       <div class="ff-label">קטע</div>
       <div class="ff-secs">${D.sections.map(secBtn).join('')}</div>
       <div class="ff-label">מחיר לכרטיס · כולל עמלות</div>
@@ -1860,7 +1857,8 @@ function p3FilterSheet(){
       </div>
       <div class="ff-note">הצג מחירים כולל עמלות</div>
       <div class="ff-label">אפשרויות</div>
-      <div class="ff-checks">${chk('together','ישיבה יחד')}${chk('view','ללא הסתרת מבט')}${chk('front','שורה ראשונה')}${chk('access','נגישות')}</div>
+      <div class="ff-checks">${chk('together','ישיבה יחד','מסנן לכרטיסים עם אחריות למקומות צמודים · התוספת מתומחרת בצ׳ק-אאוט')}${chk('view','ללא הסתרת מבט')}${chk('front','שורה ראשונה')}${chk('access','נגישות')}</div>
+      <div class="ff-sub">״ישיבה יחד״ מסנן לכרטיסים שמציעים אחריות למקומות צמודים (בתוספת תשלום בצ׳ק-אאוט) — לא בהכרח מקומות שכבר צמודים.</div>
     </div>
     <div class="sh-cta"><button class="btn btn-pink" style="width:100%" data-act="close-sheet">הציגו ${resultCount} כרטיסים</button></div>
   </div>`;
@@ -2373,14 +2371,17 @@ function qtyModal(){
   const date=(E.dynamic?(state.evDate||''):E.date||'').replace('📅 ','');
   const img=E.dynamic&&state.evImg?state.evImg:E.img;
   const cur=state.buyQty||2;
-  const opt=(q,lbl)=>`<button class="qm-opt${cur===q?' on':''}" data-act="qty-pick" data-q="${q}">${lbl||q}</button>`;
+  const guar=(E.sitTogetherGuaranteeAvailable!==false);   // per-event sit-together guarantee flag (default: available)
+  const opt=(q,lbl)=>`<button class="qm-opt${cur===q?' on':''}" data-act="qty-set" data-q="${q}">${lbl||q}</button>`;
+  const note = cur>=3 ? `<div class="qm-note">${guar?'מושבים צמודים בתוספת תשלום בסוף ההזמנה':'בבחירה של מעל 2 כרטיסים ייתכן שלא תשבו יחד'}</div>` : '';
   return `<div class="modal-scrim qm-scrim" data-act="qty-modal-close">
     <div class="qm" data-act="noop">
       <div class="qm-head"><img class="qm-img" src="${IMG}${img}" alt=""><div class="qm-ev"><div class="qm-t">${title}</div><div class="qm-d">${date}</div></div></div>
       <div class="qm-body">
         <div class="qm-q">כמה כרטיסים?</div>
-        <div class="qm-sub">כל המקומות יהיו צמודים · יושבים יחד</div>
         <div class="qm-grid">${opt(1)}${opt(2)}${opt(3)}${opt(4)}${opt(5)}${opt(6,'6+')}</div>
+        ${note}
+        <button class="btn btn-pink qm-go" data-act="qty-confirm">המשך</button>
       </div>
     </div>
   </div>`;
@@ -2408,7 +2409,7 @@ function selCard(l){
       <div class="rs">${rl.s}</div>
       <div class="lc-b"><span class="badge ${tier}">${l.val}</span><span class="lc-left">🔥 נותרו ${l.left}</span></div>
     </div>
-    <span class="vt" style="background-image:url(${IMG}${l.img})"></span>
+    <span class="vt vt-zone" style="background:${areaColorFor(l.key)}" aria-label="צבע האזור"></span>
   </div>`;
 }
 /* mobile map pins — clicking a price focuses its card in the drawer (doesn't navigate) */
@@ -2465,6 +2466,8 @@ function pageEventSel(){
         <button class="fchip qty" data-act="qty-desk">${q} כרטיסים ⌄</button>
         <button class="ff-open${ac?' on':''}" data-act="p3filter"><svg class="ff-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>סינון${ac?` · ${ac}`:''}</button>
       </div>
+      ${deskTrust()}
+      ${seatLegal18()}
     </div>
     <div class="ss-map">
       <div class="map-zoom"><button class="mz" data-act="map-zoom" data-dir="in" aria-label="הגדל">+</button><button class="mz" data-act="map-zoom" data-dir="out" aria-label="הקטן">−</button></div>
@@ -2483,6 +2486,7 @@ function pageEventSel(){
     <div class="ss-drawer${state.sheetExpanded?' up':''}" id="ssDrawer">
       <div class="ss-handle" id="ssHandle"><span></span></div>
       <div class="ss-meta"><span>${list.length} מקומות · ${q} יחד · כולל עמלות</span><div class="ss-sort">${sortBtn('best','משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
+      ${seatTrustBadges()}
       <div class="ss-list">${list.map(selCard).join('')}</div>
     </div>
     ${stadiumInfoPop()}
@@ -2842,10 +2846,6 @@ function pageEdge(){
    ============================================================ */
 const DDETAIL={south:'seat',vip:'seat','south-c':'row',east:'row',west:'section',north:'section'};
 function deskDetail(l){ return DDETAIL[l.key]||'seat'; }
-function deskPasses(l){ const d=deskDetail(l);
-  if(state.dlvl==='row') return d==='seat'||d==='row';   // listings with a known row
-  if(state.dlvl==='section') return d==='section';        // area-only (general admission)
-  return true; }
 function deskSections(){
   const W=900,H=560,w=150,h=86;
   return D.listings.map(l=>{ const cx=l.pin.l/100*W, cy=l.pin.t/100*H;
@@ -2859,7 +2859,12 @@ function deskTop(title, backAct, sub){
     <button class="circle-btn" data-act="${backAct||'home'}" aria-label="חזרה">→</button>
   </div>`;
 }
-function deskTrust(){ return `<div class="dtrust">🛡 אחריות 100% · <b>אחריות מלאה על הכרטיס</b> · כל המחירים כולל עמלות · תשלום מאובטח</div>`; }
+/* seat-selection trust strip (top) — same wording on desktop + mobile · no "ביטול כולל מילואים" (cancellation is a paid add-on) */
+function deskTrust(){ return `<div class="dtrust">🛡 אחריות 100% · מחירים כולל עמלות · תשלום מאובטח</div>`; }
+/* small muted 18+ legal note in the sticky hero/header (desktop + mobile) */
+function seatLegal18(){ return `<div class="seat-legal18">[[18+ LEGAL — נוסח סופי]]</div>`; }
+/* trust badges shown near the seat listings (desktop + mobile) */
+function seatTrustBadges(){ return `<div class="seat-badges"><span class="stb">🛡 אחריות 100%</span><span class="stb">✓ כרטיס מאומת</span><span class="stb">🔒 תשלום מאובטח</span></div>`; }
 function deskListingCard(l){
   const tier=l.score>=9?'best':l.score>=7?'good':'fair', d=deskDetail(l);
   const hot=state.hotSec===l.key?' hot':'';
@@ -2872,7 +2877,7 @@ function deskListingCard(l){
       <div class="lc-badge ${tier}"><span class="lbl">${l.val}</span><span class="box">${l.score}</span></div>
       <div class="lc-info">${l.tog} · 🔥 נותרו ${l.left}</div>
     </div>
-    <img class="lc-thumb" src="${IMG}${l.img}" alt="מבט מהמקום">
+    <span class="lc-thumb vt-zone" style="background:${areaColorFor(l.key)}" aria-label="צבע האזור"></span>
   </div>`;
 }
 /* filter bar — matches mobile: quantity chip + a single "סינון" button opening the drawer */
@@ -2891,9 +2896,12 @@ function eventFilterBar(n){
 /* shared listing set — detail-level (רמת פירוט) filter + section filter + sort */
 function eventListings(){
   const pnum=s=>parseInt((s||'').replace(/\D/g,''))||0;
-  let list=D.listings.filter(deskPasses);
+  let list=D.listings.slice();
   const q=state.buyQty||1;                                   // seat-count filter: only listings that seat this many together
   const fq=list.filter(l=>pnum(l.tog)>=q); if(fq.length) list=fq;
+  if(state.p3f&&state.p3f.together){                          // "ישיבה יחד": only listings offering the paid adjacency guarantee
+    const tg=list.filter(l=>l.sitTogetherGuaranteeAvailable); if(tg.length) list=tg;
+  }
   if(state.selectedSection){ const f=list.filter(l=>l.key===state.selectedSection || (state.selectedSection==='south'&&l.key==='south-c')); if(f.length) list=f; }
   list = state.sortBy==='price' ? list.slice().sort((a,b)=>pnum(a.price)-pnum(b.price))
        : state.sortBy==='qty'   ? list.slice().sort((a,b)=>pnum(b.tog)-pnum(a.tog))
@@ -3023,10 +3031,10 @@ function pageEventDesk(){
   const evTitle=E.dynamic?(state.evTitle||'משחק'):E.h1;
   const parts=[(E.dynamic?(state.evDate||''):E.date||'').replace('📅 ',''),(E.dynamic?(state.evVenue||''):E.venue||'').replace('📍 ','')].filter(Boolean);
   const list=eventListings();
-  return `${deskTop(evTitle, 'back-lobby', parts.join(' · '))}${deskTrust()}
+  return `${deskTop(evTitle, 'back-lobby', parts.join(' · '))}${deskTrust()}${seatLegal18()}
     <div class="dsplit">
       <div class="dmap" id="dmap">${deskMapOverview()}</div>
-      <div class="dside">${eventFilterBar(list.length)}<div class="dlist">${list.map(deskListingCard).join('')}</div></div>
+      <div class="dside">${eventFilterBar(list.length)}${seatTrustBadges()}<div class="dlist">${list.map(deskListingCard).join('')}</div></div>
     </div>`;
 }
 /* --- seat page (desktop): left = zoomed real section · ROW selection (seats are assigned, not chosen) --- */
@@ -3338,7 +3346,6 @@ function wire(){
       case act==='seat360': set({seat360:(state.seat360+1)%3}); break;
       case act==='map-zoom': mapZoomBy(a.getAttribute('data-dir')==='in'?0.78:1.28); break;
       case act==='pick-row-geo': set({selRow:parseInt(a.getAttribute('data-r'))||null}); break;
-      case act==='dlvl-desk': set({dlvl:a.getAttribute('data-k')}); break;
       case act==='dgtab': set({dGTab:a.getAttribute('data-g')}); break;
       case act==='back-to-event': go(3); break;
       case act==='qty-inc': set({buyQty:Math.min(8,state.buyQty+1)}); break;
@@ -3406,6 +3413,8 @@ function wire(){
         state.qtyChosen=false; state.qtyModal=true;   // "כמה כרטיסים?" popup between the lobby and the event page
         go(3); break; }
       case act==='qty-pick': set({buyQty:parseInt(a.getAttribute('data-q'))||1, qtyModal:false, qtyChosen:true}); break;
+      case act==='qty-set': set({buyQty:parseInt(a.getAttribute('data-q'))||1}); break;   // popup: pick qty, keep open so the sit-together note updates live
+      case act==='qty-confirm': set({qtyModal:false, qtyChosen:true}); break;              // popup: apply chosen qty
       case act==='qty-modal-close': set({qtyModal:false, qtyChosen:true}); break;
       case act==='occasion': go(4); break;
       case act==='football': state.leagueTitle=''; go(5); break;
@@ -3431,7 +3440,7 @@ function wire(){
       case act==='back-lobby': go((EVENTS[state.eventKey]||EVENTS.coldplay).back); break;
       case act==='setlist3': set({setlistP3Open:!state.setlistP3Open}); break;
       case act==='p3filter': set({openSheet:'p3-filter'}); break;
-      case act==='p3clear': set({selectedSection:null, p3Qty:null, p3Min:'', p3Max:'', dlvl:'all', p3f:{together:false,front:false,view:false,access:false}}); break;
+      case act==='p3clear': set({selectedSection:null, p3Qty:null, p3Min:'', p3Max:'', p3f:{together:false,front:false,view:false,access:false}}); break;
       case act==='fav-feature': state.hearts.feature=!state.hearts.feature; render(); break;
       case act==='follow': { const on=!state.following; state.favCount=Math.max(0,state.favCount+(on?1:-1)); set({following:on}); break; }
       case act==='together': set({p2Together:!state.p2Together}); break;
