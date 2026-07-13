@@ -309,7 +309,7 @@ const FOOTBALL = {
     {q:'האם אפשר 4 מקומות צמודים?',a:'כן. בבחירת הכמות סמנו "ישיבה יחד" ונשריין לכם מקומות באותה שורה, בכפוף לזמינות.'},
     {q:'מה קורה אם נקראתי למילואים?',a:'הכיסוי שלנו כולל ביטול כולל מילואים — בהצגת צו קריאה תקבלו החזר מלא, גם ברגע האחרון.'},
   ],
-  seo:{h:'כרטיסים לכדורגל בחו״ל',p:'משחקי לה ליגה, פרמייר ליג וליגת האלופות: ריאל מדריד, ברצלונה, מנצ׳סטר סיטי ועוד. כל המחירים כוללים עמלות, עם אחריות 100% ואישור מיידי.'},
+  seo:{h:'כרטיסים לכדורגל בחו״ל',p:'משחקי לה ליגה, פרמייר ליג וליגת האלופות: ריאל מדריד, ברצלונה, מנצ׳סטר סיטי ועוד. כל המחירים כוללים עמלות, עם אחריות 100%.'},
 };
 
 const NBA = {
@@ -350,9 +350,9 @@ const NBA = {
   ],
   faq:[
     {q:'איך בוחרים מקומות במגרש?',a:'בוחרים אזור במפת האולם — קורטסייד, טבעת ראשונה או עליונה — ואנחנו משריינים את המקומות הטובים ביותר הזמינים באותו אזור.'},
-    {q:'מתי מקבל את הכרטיסים?',a:'הכרטיסים הדיגיטליים מגיעים לאימייל תוך דקות מרגע האישור, עם אישור מיידי. כל המחירים כוללים עמלות.'},
+    {q:'מתי מקבל את הכרטיסים?',a:'הכרטיסים הדיגיטליים מגיעים לאימייל תוך דקות מרגע האישור. כל המחירים כוללים עמלות.'},
   ],
-  seo:{h:'אודות כרטיסים ל-NBA',p:'משחקי ה-NBA הגדולים — 82 משחקי עונה לכל קבוצה, פלייאוף וגמר האליפות. כל המחירים כוללים עמלות, עם אחריות 100% ואישור מיידי.'},
+  seo:{h:'אודות כרטיסים ל-NBA',p:'משחקי ה-NBA הגדולים — 82 משחקי עונה לכל קבוצה, פלייאוף וגמר האליפות. כל המחירים כוללים עמלות, עם אחריות 100%.'},
 };
 
 const REAL = {
@@ -373,7 +373,7 @@ const REAL = {
   faq:[
     {q:'איך אשיג 4 מקומות צמודים?',a:'בבחירת הכמות סמנו "ישיבה יחד" ונשריין לכם מקומות באותה שורה ביציע, בכפוף לזמינות.'},
     {q:'מה קורה אם נקראתי למילואים?',a:'הכיסוי כולל ביטול כולל מילואים — בהצגת צו קריאה תקבלו החזר מלא, גם ברגע האחרון.'},
-    {q:'מתי אקבל את הכרטיסים?',a:'הכרטיסים הדיגיטליים מגיעים לאימייל תוך דקות מרגע האישור, עם אישור מיידי. כל המחירים כוללים עמלות.'},
+    {q:'מתי אקבל את הכרטיסים?',a:'הכרטיסים הדיגיטליים מגיעים לאימייל תוך דקות מרגע האישור. כל המחירים כוללים עמלות.'},
   ],
   reviews:[
     {stars:5,name:'אורי מ.',meta:'מדריד · מרץ 2025',t:'אווירה מטורפת בברנבאו. הכרטיסים הגיעו מיד, ישבנו צמודים כמו שהובטח.',av:'א'},
@@ -477,7 +477,8 @@ function header(){
   const cls = 'header' + (floating ? ' header--float' + (state.headerSolid?' solid':'') : '');
   return `
   <header class="${cls}">
-    <div class="promo-strip"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
+    <div class="promo-strip"><span class="star">★</span> אחריות 100% · תשלום מאובטח</div>
+    <div class="hdr-legal">[[LEGAL HEADER — נוסח סופי יתקבל]]</div>
     <nav class="nav">
       <div class="nav-group">
         <button class="circle-btn" data-act="favs">${ICON.heart}<span class="nav-badge">${state.favCount}</span></button>
@@ -885,9 +886,10 @@ function pageHome(){
     <div class="hscroll cat-row">${D.homeTravel.map(tile).join('')}</div>
   </section>
 
-  <section class="faq">
+  <section class="faq" id="faq">
     <h2>שאלות נפוצות</h2>
     ${D.homeFaq.map((f,i)=>`<div class="faq-item ${state.faqHome===i?'open':''}"><button class="faq-q" data-faqh="${i}"><span class="qt">${f.q}</span><span class="qi"></span></button><div class="faq-a"><p>${f.a}</p></div></div>`).join('')}
+    <a class="faq-howto" data-act="howto">איך זה עובד? ›</a>
   </section>
 
   ${footer()}`;
@@ -975,7 +977,7 @@ function pageOccasion(){
   </section>
   ${mondialBracket()}
   <div class="trust">
-    <div class="r1"><span class="star">★</span> אחריות 100% · אישור מיידי · ביטול כולל מילואים</div>
+    <div class="r1"><span class="star">★</span> אחריות 100% · ביטול כולל מילואים</div>
     <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · מאז 2006 · 300,000+ לקוחות</div>
     <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
   </div>
@@ -1093,7 +1095,7 @@ function pageCategory(){
 
   <!-- Trust banner -->
   <div class="trust">
-    <div class="r1"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
+    <div class="r1"><span class="star">★</span> אחריות 100% · תשלום מאובטח</div>
     <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · מאז 2006 · 300,000+ לקוחות</div>
     <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
   </div>
@@ -1107,11 +1109,6 @@ function pageCategory(){
         <div class="faq-a"><p>${f.a}</p></div>
       </div>`).join('')}
   </section>
-
-  <div class="seo">
-    <h3>כרטיסים להופעות פופ</h3>
-    <p>מצאו כרטיסים להופעות הפופ הגדולות באירופה: הארי סטיילס, דואה ליפה, קולדפליי. כל המחירים כוללים עמלות, עם אחריות 100%.</p>
-  </div>
 
   ${footer()}`;
 }
@@ -1144,7 +1141,7 @@ function featuredCard(f,dest){
 function sportsTrust(){
   return `
   <div class="trust">
-    <div class="r1"><span class="star">★</span> אחריות 100% · אישור מיידי · ביטול כולל מילואים</div>
+    <div class="r1"><span class="star">★</span> אחריות 100% · ביטול כולל מילואים</div>
     <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · כל המחירים כוללים עמלות</div>
     <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
   </div>`;
@@ -1243,7 +1240,6 @@ function gameCard(g){
     <div class="gc-info">
       <div class="gc-name">${g.name}</div>
       <div class="gc-venue">${g.venue}</div>
-      <span class="gc-ok">אישור מיידי</span>
     </div>
     <img class="gc-thumb" src="${IMG}${g.img||matchImg(g.name+' '+g.venue)}" alt="">
     <div class="gc-date"><span class="d">${g.d}</span><span class="mo">${g.mo}</span></div>
@@ -1380,7 +1376,6 @@ function pageNBA(){
 
   ${sportsTrust()}
   ${sportsFaq(N.title,N.faq)}
-  <div class="seo"><h3>${N.seo.h}</h3><p>${N.seo.p}</p></div>
   ${footer()}`;
 }
 
@@ -1429,7 +1424,7 @@ function pageTeam(){
     ${T.fixtures.map(e=>`
       <button class="drow-ev" data-act="event" data-event="${e.ev||'match'}" data-ev-title="${T.name} ${e.opp}" data-ev-venue="${e.info}" data-ev-price="${e.price}" data-ev-date="${e.d} ${e.dow}" data-ev-img="team-realmadrid.jpg">
         <span class="chev">‹</span>
-        <div class="d-price"><span class="from">מ-</span><span class="amt">${e.price}</span><span class="im">אישור מיידי</span></div>
+        <div class="d-price"><span class="from">מ-</span><span class="amt">${e.price}</span></div>
         <div class="d-info"><div class="d-city">${e.opp}</div><div class="d-venue">${e.info}</div></div>
         <div class="d-date"><div class="dd">${e.d}</div><div class="dm">${e.dow}</div></div>
       </button>`).join('')}
@@ -1470,8 +1465,8 @@ function pageTeam(){
       ${T.h2h.cells.map(c=>`<div class="h2h-cell"><div class="hv">${c.v}</div><div class="hl">${c.l}</div></div>`).join('')}
     </div>
 
-    <!-- סטוריז מהיציע -->
-    <div class="sub-h">סטוריז מהיציע</div>
+    <!-- רילז מהיציע · טיקטוק -->
+    <div class="sub-h">רילז מהיציע · טיקטוק</div>
     <div class="videothumbs"><span></span><span></span><span></span></div>
   </section>
 
@@ -1498,19 +1493,6 @@ function pageTeam(){
 
   ${sportsFaq('כרטיסים ל'+T.name,T.faq)}
 
-  <!-- קבוצות יריבות -->
-  <section class="section">
-    <div class="sec-head"><span></span><h2 class="sec-title">קבוצות יריבות</h2></div>
-    <div class="teamgrid">
-      ${T.rivals.map((t,i)=>`
-        <div class="teamcard" data-act="team" data-team="${t.key}">
-          <button class="lheart ${state.followed['rv'+i]?'on':''}" data-follow-team="rv${i}">${ICON.hs}</button>
-          <div class="tc-info"><div class="tc-name">${t.n}</div></div>
-          <div class="tc-thumb"></div>
-        </div>`).join('')}
-    </div>
-  </section>
-
   ${footer()}`;
 }
 
@@ -1532,6 +1514,7 @@ function footer(){
         ${SOCIALS.map(s=>`<a class="foc-btn" data-act="soon" data-title="Live Tickets · ${s.k}" aria-label="${s.k}"><svg viewBox="0 0 24 24" fill="currentColor">${s.svg}</svg></a>`).join('')}
       </div>
       <div class="footer-copy">© Live Tickets · כל הזכויות שמורות</div>
+      <div class="footer-copy footer-made">made by moveo</div>
     </div>
   </footer>`;
 }
@@ -1578,7 +1561,7 @@ function pageLobby(){
     ${D.p2Dates.map(e=>`
       <button class="drow-ev" data-act="event">
         <span class="chev">‹</span>
-        <div class="d-price"><span class="from">מ-</span><span class="amt">${e.price}</span><span class="im">אישור מיידי</span></div>
+        <div class="d-price"><span class="from">מ-</span><span class="amt">${e.price}</span></div>
         <div class="d-info"><div class="d-city">${e.city}</div><div class="d-venue">${e.venue}</div></div>
         <div class="d-date"><div class="dd">${e.d}</div><div class="dm">${e.dow}</div></div>
       </button>`).join('')}
@@ -1622,7 +1605,7 @@ function pageLobby(){
 
   <!-- Trust banner -->
   <div class="trust">
-    <div class="r1"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
+    <div class="r1"><span class="star">★</span> אחריות 100% · תשלום מאובטח</div>
     <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · מאז 2006 · 300,000+ לקוחות</div>
     <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
   </div>
@@ -1640,7 +1623,7 @@ function pageLobby(){
   <!-- Testimonials — moved above "מעריצים אוהבים גם", renamed -->
   <section class="section">
     <div class="sec-head"><a class="sec-link" data-act="soon" data-title="ביקורות">כל 847 הביקורות ›</a><h2 class="sec-title">איך היה בהופעה?</h2></div>
-    ${reviewRecap('4.8','847','רוב המבקרים מציינים אווירה מטורפת, סאונד מדהים ומקומות צמודים כפי שהובטח — עם שבחים חמים על השירות בעברית ואישור מיידי.')}
+    ${reviewRecap('4.8','847','רוב המבקרים מציינים אווירה מטורפת, סאונד מדהים ומקומות צמודים כפי שהובטח — עם שבחים חמים על השירות בעברית.')}
     <div class="reviews">
       ${D.reviews.map(r=>`
         <div class="rev">
@@ -1734,7 +1717,7 @@ function pageEvent(){
     <button class="es-back" data-act="back-lobby">→</button>
   </div>
 
-  <div class="ev-trust"><span class="star">★</span> אחריות 100% · אישור מיידי · <b>כל המחירים כולל עמלות</b> · <span class="star">★</span> 4.8 Google</div>
+  <div class="ev-trust"><span class="star">★</span> אחריות 100% · <b>כל המחירים כולל עמלות</b> · <span class="star">★</span> 4.8 Google</div>
 
   <!-- STICKY SEAT MAP -->
   <div class="seatmap">
@@ -1784,7 +1767,7 @@ function pageEvent(){
   </section>
 
   <div class="trust">
-    <div class="r1"><span class="star">★</span> אחריות 100% · אישור מיידי · תשלום מאובטח</div>
+    <div class="r1"><span class="star">★</span> אחריות 100% · תשלום מאובטח</div>
     <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · מאז 2006 · 300,000+ לקוחות</div>
     <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
   </div>
@@ -1792,9 +1775,9 @@ function pageEvent(){
   <!-- ביקורות -->
   <section class="section">
     <div class="sec-head"><a class="sec-link" data-act="soon" data-title="ביקורות">כל ${E.type==='match'?'512':'847'} הביקורות ›</a><h2 class="sec-title">${E.type==='match'?'איך היה במשחק?':'איך היה בהופעה?'}</h2></div>
-    ${reviewRecap('4.8', E.type==='match'?'512':'847', E.type==='match'?'הצופים מדגישים אווירה חשמלית ביציע, מקומות צמודים כמו שהובטח וקבלת כרטיסים מיידית — עם אחריות מלאה על הכרטיס.':'רוב המבקרים מציינים אווירה מטורפת, סאונד מדהים ומקומות צמודים כפי שהובטח — עם שבחים על השירות בעברית ואישור מיידי.')}
+    ${reviewRecap('4.8', E.type==='match'?'512':'847', E.type==='match'?'הצופים מדגישים אווירה חשמלית ביציע, מקומות צמודים כמו שהובטח וקבלת כרטיסים מיידית — עם אחריות מלאה על הכרטיס.':'רוב המבקרים מציינים אווירה מטורפת, סאונד מדהים ומקומות צמודים כפי שהובטח — עם שבחים על השירות בעברית.')}
     <div class="reviews">
-      ${(E.type==='match'?[{av:'⚽',name:'אורי מ.',meta:'מדריד · 2025',stars:5,t:'אווירה חשמלית ביציע, ישבנו צמודים כמו שהובטח. הכרטיסים הגיעו מיד — חוויה מושלמת.'},{av:'🙌',name:'דנה ק.',meta:'ברצלונה · 2025',stars:5,t:'משחק ענק! השירות בעברית עזר מאוד, ואישור מיידי. ממליצה בחום.'},{av:'🎽',name:'טל ב.',meta:'לונדון · 2025',stars:4,t:'מקומות מצוינים, קבלה מהירה של הכרטיסים לנייד. נחזור בהחלט.'}]:D.reviews).map(r=>`
+      ${(E.type==='match'?[{av:'⚽',name:'אורי מ.',meta:'מדריד · 2025',stars:5,t:'אווירה חשמלית ביציע, ישבנו צמודים כמו שהובטח. הכרטיסים הגיעו מיד — חוויה מושלמת.'},{av:'🙌',name:'דנה ק.',meta:'ברצלונה · 2025',stars:5,t:'משחק ענק! השירות בעברית עזר מאוד. ממליצה בחום.'},{av:'🎽',name:'טל ב.',meta:'לונדון · 2025',stars:4,t:'מקומות מצוינים, קבלה מהירה של הכרטיסים לנייד. נחזור בהחלט.'}]:D.reviews).map(r=>`
         <div class="rev">
           <div class="rev-head">
             <div class="rev-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
@@ -2006,7 +1989,7 @@ function categoriesDrawer(){
         sub += `<div style="padding:4px 16px 10px;color:#888;font-size:11px;text-align:right">ערים</div>`;
         sub += D.drawer.dest.map(c=>`<button class="drow" data-act="lobby" style="font-size:13px;padding-right:28px;color:#555">${c}</button>`).join('');
       } else if(k==='support'){
-        sub += D.drawer.support.map(t=>`<button class="drow" data-act="soon" data-title="${t}" style="font-size:13px;padding-right:28px;color:#555">${t}</button>`).join('');
+        sub += D.drawer.support.map(t=>{ const act = t==='איך זה עובד'?'howto' : t==='שאלות נפוצות'?'faqjump' : 'soon'; return `<button class="drow" data-act="${act}" data-title="${t}" style="font-size:13px;padding-right:28px;color:#555">${t}</button>`; }).join('');
       }
       secHtml += `<div class="sub">${sub}</div>`;
     }
@@ -2163,7 +2146,7 @@ function searchOverlay(){
         <div class="ev-body">
           <div class="ev-name">${e.name}</div>
           <div class="ev-sub">${e.date} · ${e.venue}</div>
-          <div class="ev-pricerow"><span class="amt">מ-${e.price}</span><span class="fees"> · כולל עמלות</span><span class="ok"> · אישור מיידי</span></div>
+          <div class="ev-pricerow"><span class="amt">מ-${e.price}</span><span class="fees"> · כולל עמלות</span></div>
         </div>
         <img class="ev-thumb" src="${IMG}${SR_EVENT_IMG[e.perfKey]||'artist3.jpg'}" alt="">
       </div>`).join('')+`</div>`; }
@@ -2719,7 +2702,7 @@ function orderSummaryCard(opts){
     <div class="sum-div"></div>
     <div class="coz-blk"><div class="coz-k"><span class="sec-dot" style="background:${areaColorFor(b.key)}"></span>${b.sec||'איזור'}</div><div class="coz-v">${seatLine}</div></div>
     ${svc.length?`<div class="sum-div"></div><div class="coz-blk"><div class="coz-sh">תוספות שנבחרו</div>${svc.map(s=>`<div class="coz-svc"><span class="coz-ok">✓</span><span>${s}</span></div>`).join('')}</div>`:''}
-    ${opts.total?`<div class="coz-totbox"><div class="coz-tot"><span class="coz-tnum">${nis(buyTotal())}</span><span class="coz-tlbl">${opts.paid?'סה״כ שולם':'סה״כ לתשלום'}</span></div>${opts.detail?`<button class="coz-detail" data-act="to-order">פירוט</button>`:''}${opts.splitPaid?`<div class="coz-split"><div class="coz-split-h">חלוקת תשלום · כל ${SPLIT_FRIENDS.length} המשתתפים שילמו</div>${SPLIT_FRIENDS.map(f=>`<div class="coz-split-row"><span>${f.n}</span><span class="coz-split-ok">שולם ✓</span></div>`).join('')}</div>`:''}</div>`:''}
+    ${opts.total?`<div class="coz-totbox"><div class="coz-tot"><span class="coz-tnum">${nis(buyTotal())}</span><span class="coz-tlbl">${opts.paid?'סה״כ שולם':'סה״כ לתשלום'}</span></div>${opts.detail?`<button class="coz-detail" data-act="to-order">פירוט</button>`:''}${opts.splitPaid?`<div class="coz-split"><div class="coz-split-h">חלוקת תשלום · כל ${SPLIT_FRIENDS.length} המשתתפים שילמו</div>${SPLIT_FRIENDS.map((f,i)=>`<div class="coz-split-row"><span>משתתף ${i+1} · ${sInitials(f.n)}</span><span class="coz-split-ok">שולם ✓</span></div>`).join('')}</div>`:''}</div>`:''}
   </div>`;
 }
 
@@ -2805,10 +2788,12 @@ function pageFriendPay(){
 
 /* ---- 16 · Organizer status ---- */
 const SPLIT_FRIENDS=[{n:'יעל (את/ה)'},{n:'דניאל'},{n:'מאיה'},{n:'יואב'}];
+/* privacy: show participant initials only, never full names, in split-status rows */
+const sInitials=n=>{ const base=(n||'').replace(/\(.*?\)/g,'').trim(); const w=base.split(/\s+/).filter(Boolean); return w.map(x=>x[0]).join('').slice(0,2)||'•'; };
 /* the "מי שילם" participants list — shown while waiting (organizer) and, all-paid, on the confirmation */
 function splitPaidList(all){
   const paid=state.splitAllPaid;
-  const rows=SPLIT_FRIENDS.map((f,i)=>{ const p = all || paid || i<3; return `<div class="fr-row"><span class="fr-av"></span><span class="fr-n">${f.n}</span><span class="fr-pd ${p?'y':'n'}">${p?'שולם ✓':'ממתין'}</span></div>`; });
+  const rows=SPLIT_FRIENDS.map((f,i)=>{ const p = all || paid || i<3; return `<div class="fr-row"><span class="fr-av">${sInitials(f.n)}</span><span class="fr-n">משתתף ${i+1}</span><span class="fr-pd ${p?'y':'n'}">${p?'שולם ✓':'ממתין'}</span></div>`; });
   const paidN=all?SPLIT_FRIENDS.length:(paid?SPLIT_FRIENDS.length:3);
   return `<div class="chk-sec">
     <div class="chk-h">מי שילם</div>
@@ -2885,7 +2870,7 @@ function deskListingCard(l){
       <div class="lc-sec"><span class="sec-dot" style="background:${areaColorFor(l.key)}"></span>${l.sec}</div>
       <div class="lc-row${d!=='seat'?' soft':''}">${rowLine}</div>
       <div class="lc-badge ${tier}"><span class="lbl">${l.val}</span><span class="box">${l.score}</span></div>
-      <div class="lc-info">${l.tog} · אישור מיידי · 🔥 נותרו ${l.left}</div>
+      <div class="lc-info">${l.tog} · 🔥 נותרו ${l.left}</div>
     </div>
     <img class="lc-thumb" src="${IMG}${l.img}" alt="מבט מהמקום">
   </div>`;
@@ -3303,6 +3288,9 @@ function wire(){
     const a = e.target.closest('[data-act]'); if(!a) return;
     const act = a.getAttribute('data-act');
     switch(true){
+      // FAQ ↔ "how it works" — each reachable from the other (both live on the home FAQ)
+      case act==='faqjump': { state.faqHome=-1; go(0); setTimeout(()=>document.getElementById('faq')?.scrollIntoView({behavior:'smooth',block:'start'}),50); break; }
+      case act==='howto': { state.faqHome=0; go(0); setTimeout(()=>document.getElementById('faq')?.scrollIntoView({behavior:'smooth',block:'start'}),50); break; }
       case act==='drawer': set({drawerOpen:true, acctOpen:false}); break;
       case act==='account': set({acctOpen:true, drawerOpen:false}); break;
       case act==='favs': { state.phTitle='המועדפים שלי'; state.phNote='העמוד הזה עדיין בעיצוב — בקרוב'; go(8); break; }

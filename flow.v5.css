@@ -61,6 +61,9 @@ img{display:block;}
 .promo-strip{height:33px;display:flex;align-items:center;justify-content:center;gap:8px;
   background:#2a2a30;color:rgba(255,255,255,.92);font-size:12px;}
 .promo-strip .star{color:var(--orange);}
+/* small muted legal line under the promo strip (desktop + mobile) */
+.hdr-legal{font-size:10px;line-height:1.35;text-align:center;padding:3px 16px 0;color:var(--muted);}
+.header--float .hdr-legal{color:rgba(255,255,255,.72);}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;}
 .nav-group{display:flex;align-items:center;gap:11px;}
 .circle-btn{width:34.4px;height:34.4px;border-radius:50%;background:#fff;border:1px solid var(--line);
@@ -1696,6 +1699,9 @@ svg.stadium{width:100%;height:100%;}
 .footer .foc-btn:hover{transform:translateY(-2px);background:var(--pink);color:#fff;}
 .footer .foc-btn svg{width:19px;height:19px;}
 .footer .footer-copy{font-size:11px;color:#8a8496;text-align:center;}
+.footer .footer-made{opacity:.85;letter-spacing:.03em;}
+/* FAQ → "how it works" cross-link */
+.faq .faq-howto{display:inline-block;margin-top:12px;font-size:13px;color:var(--link);text-decoration:none;cursor:pointer;}
 
 /* checkout discount / voucher code field */
 .chk-coupon .coupon-row{display:flex;gap:8px;margin-top:6px;}
