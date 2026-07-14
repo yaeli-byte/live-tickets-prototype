@@ -1848,16 +1848,16 @@ function p3FilterSheet(){
     <div class="sh-body">
       <div class="ff-label">כמות כרטיסים</div>
       <div class="ff-qtys">${[1,2,3,4,5,6].map(qtyBtn).join('')}</div>
-      <div class="ff-label">קטע</div>
-      <div class="ff-secs">${D.sections.map(secBtn).join('')}</div>
       <div class="ff-label">מחיר לכרטיס · כולל עמלות</div>
       <div class="ff-price">
         <label>מקסימום <span>₪</span><input type="number" inputmode="numeric" data-fprice="max" value="${state.p3Max}"></label>
         <label>מינימום <span>₪</span><input type="number" inputmode="numeric" data-fprice="min" value="${state.p3Min}"></label>
       </div>
       <div class="ff-note">הצג מחירים כולל עמלות</div>
-      <div class="ff-label">אפשרויות</div>
-      <div class="ff-checks">${chk('together','ישיבה יחד','מסנן לכרטיסים עם אחריות למקומות צמודים · התוספת מתומחרת בצ׳ק-אאוט')}${chk('view','ללא הסתרת מבט')}${chk('front','שורה ראשונה')}${chk('access','נגישות')}</div>
+      <div class="ff-label">אזור/יציע</div>
+      <div class="ff-secs">${D.sections.map(secBtn).join('')}</div>
+      <div class="ff-label">ישיבה יחד</div>
+      <div class="ff-checks">${chk('together','ישיבה יחד','מסנן לכרטיסים עם אחריות למקומות צמודים · התוספת מתומחרת בצ׳ק-אאוט')}</div>
       <div class="ff-sub">״ישיבה יחד״ מסנן לכרטיסים שמציעים אחריות למקומות צמודים (בתוספת תשלום בצ׳ק-אאוט) — לא בהכרח מקומות שכבר צמודים.</div>
     </div>
     <div class="sh-cta"><button class="btn btn-pink" style="width:100%" data-act="close-sheet">הציגו ${resultCount} כרטיסים</button></div>
