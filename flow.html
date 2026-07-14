@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=42" />
+<link rel="stylesheet" href="flow.v5.css?v=43" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2700,7 +2700,7 @@ function orderSummaryCard(opts){
   opts = opts||{};
   const b=state.buy||{};
   const evLines=[b.date, b.venue].filter(Boolean);
-  const seatLine=[b.row, `${state.buyQty} כרטיסים · אפשרות ישיבה יחד`].filter(Boolean).join(' · ');
+  const seatLine=[b.row, `${state.buyQty} כרטיסים`].filter(Boolean).join(' · ');
   const svc=[];
   if(state.buyAdjacent) svc.push("ישיבה יחד · אותה שורה");
   if(state.buyCoverage) svc.push(`כיסוי למקרה ביטול · ${state.buyQty} מבוטחים`);
