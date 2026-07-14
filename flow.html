@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=40" />
+<link rel="stylesheet" href="flow.v5.css?v=41" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -46,6 +46,7 @@ const state = {
   wantTogether:false, buyDelivery:false, sheetExpanded:false, seat360:0, stadiumInfo:false, sharePop:false,
   desktop:false, hotSec:null, dGTab:'360', dlvl:'all', qtyModal:false, qtyChosen:false, selRow:null,
   moreDates:false, moreArtists:false,   // "הצג עוד" progressive-reveal toggles (lobby dates · category artists)
+  aobDismissed:false,   // user closed the floating active-order snackbar
   coName:'', coFirst:'', coLast:'', coPhone:'', coEmail:'', coInstall:'12', coSplitOpen:false,
   splitN:4, splitMode:'equal', orderNo:'LT-38210', splitAllPaid:false, splitConfirmed:false,
   buyEdge:null, // 'expired' | 'soldout' | 'tentative' | null
@@ -448,7 +449,7 @@ function render(){
   const isEventSel = !state.desktop && state.page===3;   // mobile event page = map + drawer seat-selection
   const isPurchase = state.page>=10 && state.page<=18;
   const isBrowse = state.page>=0 && state.page<=7;
-  const showBar = state.holdActive && isBrowse;   // sitewide active-order bar
+  const showBar = state.holdActive && isBrowse && !state.aobDismissed;   // sitewide active-order bar (dismissable)
   // desktop: seat-selection screens (event listings + seat page) go wide two-pane.
   // checkout & the rest of the purchase flow get their desktop layout next.
   const pfWide = state.desktop && (state.page===3 || state.page===10 || state.page===11);
@@ -2231,7 +2232,7 @@ function toast(msg){
 /* ---- hold timer (persists across pages; updates in place; graceful expiry) ---- */
 let holdTimer=null;
 function startHold(step){
-  state.holdActive=true; state.holdExpired=false; state.holdWarn=false;
+  state.holdActive=true; state.holdExpired=false; state.holdWarn=false; state.aobDismissed=false;
   state.holdSec=600; state.holdStep=step||10;
   clearInterval(holdTimer); holdTimer=setInterval(tickHold,1000);
 }
@@ -2258,6 +2259,7 @@ function activeOrderBar(){
   return `<div class="aob ${cls}" data-act="${act}">
     <span class="aob-go"><span class="aob-arr">→</span><span>${cta}</span></span>
     <div class="aob-main"><span class="aob-txt">${txt}</span><span class="aob-clk">${fmtClock(state.holdSec)}</span></div>
+    <button class="aob-x" data-act="aob-close" aria-label="סגירה">✕</button>
   </div>`;
 }
 /* in-page timer bar shown on Order + Checkout */
@@ -2404,8 +2406,8 @@ function selRowLine(l){
   const d=selDetail(l);
   const rn=(l.row||'').replace(/\D/g,'')||l.row;
   if(d==='section') return {t:l.sec, s:'אזור פתוח · מספר שורה יימסר עם הכרטיס'};
-  if(d==='row')     return {t:l.sec, s:`שורה ${rn} (משוער) · יושבים יחד`};
-  return {t:l.sec, s:`שורה ${rn} · יושבים יחד`};
+  if(d==='row')     return {t:l.sec, s:`שורה ${rn} (משוער) · אפשרות ישיבה יחד`};
+  return {t:l.sec, s:`שורה ${rn} · אפשרות ישיבה יחד`};
 }
 function selCard(l){
   const rl=selRowLine(l);
@@ -2470,7 +2472,7 @@ function pageEventSel(){
   return `<div class="ss">
     <div class="ss-stk">
       <div class="mhdr"><span class="mh-sp"></span><img class="mh-logo nav-logo" src="assets/logo.png" alt="Live Tickets"><button class="circle-btn" data-act="back-lobby" aria-label="חזרה">→</button></div>
-      <div class="nhero"><button class="nh-info" data-act="stadium-open">ⓘ אצטדיון</button><div class="nh-g"><div class="nh-t">${evTitle}</div><div class="nh-m">${[evDate,evVenue].filter(Boolean).join(' · ')}</div></div><span class="nh-th" style="background-image:url(${IMG}${evImg})"></span></div>
+      <div class="nhero"><div class="nh-g"><div class="nh-t">${evTitle}</div><div class="nh-m">${[evDate,evVenue].filter(Boolean).join(' · ')}</div></div><span class="nh-th" style="background-image:url(${IMG}${evImg})"></span></div>
       <div class="ss-filters">
         <button class="fchip qty" data-act="qty-desk">${q} כרטיסים ⌄</button>
         <button class="ff-open${ac?' on':''}" data-act="p3filter"><svg class="ff-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>סינון${ac?` · ${ac}`:''}</button>
@@ -2525,7 +2527,7 @@ function seatRichBody(b){
   const det=DDETAIL_SEL[b.key]||'seat';
   const q=state.buyQty||2;
   const seatTitle = det==='section' ? `${b.sec||'איזור'}` : `${b.sec} · ${b.row}`;
-  const seatSub   = det==='section' ? 'אזור פתוח · מספר שורה יימסר עם הכרטיס' : det==='row' ? 'שורה משוערת · יושבים יחד' : `${q} כרטיסים · יושבים יחד`;
+  const seatSub   = det==='section' ? 'אזור פתוח · מספר שורה יימסר עם הכרטיס' : det==='row' ? 'שורה משוערת · אפשרות ישיבה יחד' : `${q} כרטיסים · אפשרות ישיבה יחד`;
   const L=D.listings.find(x=>x.key===b.key)||{};
   const sc=Number(b.score)||8;
   const valNum = sc>=10?'9.6':sc>=9?'9.4':sc>=8?'8.9':sc>=7?'8.3':'7.6';
@@ -2699,7 +2701,7 @@ function orderSummaryCard(opts){
   opts = opts||{};
   const b=state.buy||{};
   const evLines=[b.date, b.venue].filter(Boolean);
-  const seatLine=[b.row, `${state.buyQty} כרטיסים · יושבים יחד`].filter(Boolean).join(' · ');
+  const seatLine=[b.row, `${state.buyQty} כרטיסים · אפשרות ישיבה יחד`].filter(Boolean).join(' · ');
   const svc=[];
   if(state.buyAdjacent) svc.push("ישיבה יחד · אותה שורה");
   if(state.buyCoverage) svc.push(`כיסוי למקרה ביטול · ${state.buyQty} מבוטחים`);
@@ -3393,6 +3395,7 @@ function wire(){
       case act==='remind': toast('תזכורת נשלחה ✓'); break;
       case act==='notify': toast('נרשמתם להתראה — נעדכן כשמתפנה במחיר שלכם'); break;
       case act==='hold-back': go(state.holdStep||10); break;
+      case act==='aob-close': set({aobDismissed:true}); break;   // dismiss the floating active-order snackbar
       case act==='edge-expired': state.buyEdge='expired'; go(17); break;
       case act==='edge-soldout': set({buyEdge:'soldout'}); break;
       case act==='rehold': startHold(10); state.buyEdge=null; go(10); break;
