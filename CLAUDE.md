@@ -57,8 +57,8 @@ pages **3 / 10 / 11**. Below 640px the app fills the screen; otherwise it's a 37
 - "Change missing on the live site" is almost always browser cache → verify with `curl`, check in incognito.
 
 ## Current status (2026-07)
-- **Deployed:** `pass A` (copy sweep), `pass B` (event/seat page), `pass B-mod` (filters set) are pushed
-  and live at **`?v=38`**.
+- **Deployed:** pass A/B/B-mod + the "הצג עוד"/FAQ-merge/legal-strip updates are pushed and live at **`?v=39`**.
+  `desktop.html` (standalone desktop nav) is also deployed (separate link).
 - Next deploy: bump `?v=` in `flow.html` + `index.html` to the same new N, then push (see cache-bust rule above).
 - Placeholder copy awaiting finals: `[[LEGAL HEADER — נוסח סופי יתקבל]]` (site header) and
   `[[18+ LEGAL — נוסח סופי]]` (event page). Replace when final legal copy arrives.
