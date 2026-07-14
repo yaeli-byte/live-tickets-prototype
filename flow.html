@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=43" />
+<link rel="stylesheet" href="flow.v5.css?v=44" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2471,14 +2471,13 @@ function pageEventSel(){
   const sortBtn=(k,l)=>`<button class="sort-btn ${state.sortBy===k?'on':''}" data-sort="${k}">${l}</button>`;
   return `<div class="ss">
     <div class="ss-stk">
+      ${deskTrust(true)}
       <div class="mhdr"><span class="mh-sp"></span><img class="mh-logo nav-logo" src="assets/logo.png" alt="Live Tickets"><button class="circle-btn" data-act="back-lobby" aria-label="חזרה">→</button></div>
       <div class="nhero"><div class="nh-g"><div class="nh-t">${evTitle}</div><div class="nh-m">${[evDate,evVenue].filter(Boolean).join(' · ')}</div></div><span class="nh-th" style="background-image:url(${IMG}${evImg})"></span></div>
       <div class="ss-filters">
         <button class="fchip qty" data-act="qty-desk">${q} כרטיסים ⌄</button>
         <button class="ff-open${ac?' on':''}" data-act="p3filter"><svg class="ff-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>סינון${ac?` · ${ac}`:''}</button>
       </div>
-      ${deskTrust()}
-      ${seatLegal18()}
     </div>
     <div class="ss-map">
       <div class="map-zoom"><button class="mz" data-act="map-zoom" data-dir="in" aria-label="הגדל">+</button><button class="mz" data-act="map-zoom" data-dir="out" aria-label="הקטן">−</button></div>
@@ -2496,7 +2495,7 @@ function pageEventSel(){
     </div>
     <div class="ss-drawer${state.sheetExpanded?' up':''}" id="ssDrawer">
       <div class="ss-handle" id="ssHandle"><span></span></div>
-      <div class="ss-meta"><span>${list.length} מקומות · ${q} יחד · כולל עמלות</span><div class="ss-sort">${sortBtn('best','משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
+      <div class="ss-meta"><span>${list.length} מקומות · אפשרות ישיבה יחד · כולל עמלות</span><div class="ss-sort">${sortBtn('best','משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
       <div class="ss-list">${list.map(selCard).join('')}</div>
     </div>
     ${stadiumInfoPop()}
@@ -2545,8 +2544,7 @@ function seatRichBody(b){
     <div class="seat-info">
       <div class="si-r"><span class="si-ic">👁</span><div><b>שדה ראייה נקי</b> · ללא הסתרת מבט</div></div>
       <div class="si-r"><span class="si-ic">🔥</span><div><b>פופולרי</b> · 340 צפו באירוע</div></div>
-      <div class="si-r"><span class="si-ic">📱</span><div><b>כרטיס דיגיטלי</b> · יימסר עד 24ש׳ לפני — בזמן לטיסה</div></div>
-      <div class="si-r nob"><span class="si-ic">🛡</span><div><b>אחריות מלאה</b> · כרטיס מאומת · אפשר למכור מחדש</div></div>
+      <div class="si-r nob"><span class="si-ic">📱</span><div><b>כרטיס דיגיטלי</b> · יימסר עד 24ש׳ לפני — בזמן לטיסה</div></div>
     </div>
     <button class="seat-change" data-act="back-event">‹ שינוי מקום</button>
     <div class="seat-priceblk">
@@ -2869,9 +2867,8 @@ function deskTop(title, backAct, sub){
   </div>`;
 }
 /* seat-selection trust strip (top) — same wording on desktop + mobile · no "ביטול כולל מילואים" (cancellation is a paid add-on) */
-function deskTrust(){ return `<div class="dtrust">🛡 אחריות 100% · מחירים כולל עמלות · תשלום מאובטח</div>`; }
+function deskTrust(legal){ return `<div class="dtrust">🛡 אחריות 100% · מחירים כולל עמלות · תשלום מאובטח${legal?' · [[18+ LEGAL — נוסח סופי]]':''}</div>`; }
 /* small muted 18+ legal note in the sticky hero/header (desktop + mobile) */
-function seatLegal18(){ return `<div class="seat-legal18">[[18+ LEGAL — נוסח סופי]]</div>`; }
 function deskListingCard(l){
   const tier=l.score>=9?'best':l.score>=7?'good':'fair', d=deskDetail(l);
   const hot=state.hotSec===l.key?' hot':'';
@@ -2897,7 +2894,7 @@ function eventFilterBar(n){
       <button class="chip dark" data-act="qty-desk">${state.buyQty||2} כרטיסים ⌄</button>
       <button class="chip ff-open${ac?' on':''}" data-act="p3filter">${FILTER_ICON}סינון${ac?` · ${ac}`:''}</button>
     </div>
-    <div class="dflt-count"><span>${n} מקומות · ${state.buyQty||2} יחד · כולל עמלות</span><div class="dflt-sort">${sortBtn('best','משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
+    <div class="dflt-count"><span>${n} מקומות · אפשרות ישיבה יחד · כולל עמלות</span><div class="dflt-sort">${sortBtn('best','משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
   </div>`;
 }
 /* shared listing set — detail-level (רמת פירוט) filter + section filter + sort */
@@ -3038,7 +3035,7 @@ function pageEventDesk(){
   const evTitle=E.dynamic?(state.evTitle||'משחק'):E.h1;
   const parts=[(E.dynamic?(state.evDate||''):E.date||'').replace('📅 ',''),(E.dynamic?(state.evVenue||''):E.venue||'').replace('📍 ','')].filter(Boolean);
   const list=eventListings();
-  return `${deskTop(evTitle, 'back-lobby', parts.join(' · '))}${deskTrust()}${seatLegal18()}
+  return `${deskTrust(true)}${deskTop(evTitle, 'back-lobby', parts.join(' · '))}
     <div class="dsplit">
       <div class="dmap" id="dmap">${deskMapOverview()}</div>
       <div class="dside">${eventFilterBar(list.length)}<div class="dlist">${list.map(deskListingCard).join('')}</div></div>

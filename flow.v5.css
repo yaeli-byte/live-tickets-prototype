@@ -1366,7 +1366,6 @@ img{display:block;}
 .dtrust{background:var(--slate);color:#fff;font-size:12.5px;text-align:center;padding:7px 14px;flex-shrink:0;}
 .dtrust b{color:#ffd9e6;font-weight:600;}
 /* Pass B — event/seat selection: 18+ note, trust badges, qty note, filter subtext */
-.seat-legal18{font-size:10px;color:var(--muted);text-align:center;padding:4px 12px;background:#fff;border-bottom:1px solid var(--line);flex-shrink:0;}
 .qm-note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.4;unicode-bidi:plaintext;}
 .qm-go{width:100%;margin-top:12px;}
 .ff-sub{font-size:10.5px;color:var(--muted);margin:6px 2px 2px;line-height:1.4;}
