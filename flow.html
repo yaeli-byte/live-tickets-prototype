@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=39" />
+<link rel="stylesheet" href="flow.v5.css?v=40" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2495,7 +2495,6 @@ function pageEventSel(){
     <div class="ss-drawer${state.sheetExpanded?' up':''}" id="ssDrawer">
       <div class="ss-handle" id="ssHandle"><span></span></div>
       <div class="ss-meta"><span>${list.length} מקומות · ${q} יחד · כולל עמלות</span><div class="ss-sort">${sortBtn('best','משתלם')}${sortBtn('price','מחיר')}${sortBtn('qty','כמות')}</div></div>
-      ${seatTrustBadges()}
       <div class="ss-list">${list.map(selCard).join('')}</div>
     </div>
     ${stadiumInfoPop()}
@@ -2872,8 +2871,6 @@ function deskTop(title, backAct, sub){
 function deskTrust(){ return `<div class="dtrust">🛡 אחריות 100% · מחירים כולל עמלות · תשלום מאובטח</div>`; }
 /* small muted 18+ legal note in the sticky hero/header (desktop + mobile) */
 function seatLegal18(){ return `<div class="seat-legal18">[[18+ LEGAL — נוסח סופי]]</div>`; }
-/* trust badges shown near the seat listings (desktop + mobile) */
-function seatTrustBadges(){ return `<div class="seat-badges"><span class="stb">🛡 אחריות 100%</span><span class="stb">✓ כרטיס מאומת</span><span class="stb">🔒 תשלום מאובטח</span></div>`; }
 function deskListingCard(l){
   const tier=l.score>=9?'best':l.score>=7?'good':'fair', d=deskDetail(l);
   const hot=state.hotSec===l.key?' hot':'';
@@ -3043,7 +3040,7 @@ function pageEventDesk(){
   return `${deskTop(evTitle, 'back-lobby', parts.join(' · '))}${deskTrust()}${seatLegal18()}
     <div class="dsplit">
       <div class="dmap" id="dmap">${deskMapOverview()}</div>
-      <div class="dside">${eventFilterBar(list.length)}${seatTrustBadges()}<div class="dlist">${list.map(deskListingCard).join('')}</div></div>
+      <div class="dside">${eventFilterBar(list.length)}<div class="dlist">${list.map(deskListingCard).join('')}</div></div>
     </div>`;
 }
 /* --- seat page (desktop): left = zoomed real section · ROW selection (seats are assigned, not chosen) --- */
