@@ -1161,7 +1161,7 @@ img{display:block;}
 .lb-cp{background:var(--link);color:#fff;border:none;border-radius:8px;padding:6px 12px;font:700 11px 'Rubik',sans-serif;cursor:pointer;flex-shrink:0;}
 .fr-list{margin-top:12px;}
 .fr-row{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--line);}
-.fr-av{width:30px;height:30px;border-radius:50%;background:#e6e1d7;flex-shrink:0;}
+.fr-av{width:30px;height:30px;border-radius:50%;background:#e6e1d7;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#7a6f5c;line-height:1;}
 .fr-n{font-size:13px;color:var(--ink);}
 .fr-pd{margin-inline-start:auto;font-size:12px;font-weight:600;}
 .fr-pd.y{color:var(--pgreen);}.fr-pd.n{color:var(--muted);}
@@ -1748,7 +1748,7 @@ svg.stadium{width:100%;height:100%;}
 .share-dests .sd-ic.wapp{background:#25D366;border:none;}
 .share-dests .sd-l{font-size:12px;color:var(--ink);font-weight:500;}
 .share-cta{display:flex;align-items:center;justify-content:center;gap:8px;}
-.share-cta svg{width:32px;height:32px;flex-shrink:0;}
+.share-cta svg{width:40px;height:40px;flex-shrink:0;}
 
 /* frame consistency: below 640px the .app fills the screen — the fixed/sticky bars must too
    (placed at end so it overrides the individual max-width:375px base rules) */
