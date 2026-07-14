@@ -45,6 +45,7 @@ const state = {
   showHoldModal:false, payMethod:'', seatSlim:false,
   wantTogether:false, buyDelivery:false, sheetExpanded:false, seat360:0, stadiumInfo:false, sharePop:false,
   desktop:false, hotSec:null, dGTab:'360', dlvl:'all', qtyModal:false, qtyChosen:false, selRow:null,
+  moreDates:false, moreArtists:false,   // "הצג עוד" progressive-reveal toggles (lobby dates · category artists)
   coName:'', coFirst:'', coLast:'', coPhone:'', coEmail:'', coInstall:'12', coSplitOpen:false,
   splitN:4, splitMode:'equal', orderNo:'LT-38210', splitAllPaid:false, splitConfirmed:false,
   buyEdge:null, // 'expired' | 'soldout' | 'tentative' | null
@@ -83,6 +84,10 @@ const D = {
     {id:'dua',  name:'דואה ליפה', sub:'פופ · 4 הופעות', price:'₪460', img:'artist4.jpg'},
     {id:'bruno',name:'ברונו מארס', sub:'פופ · R&B · 2 הופעות', price:'₪480', img:'artist2.jpg'},
     {id:'sabr', name:'סאברינה קרפנטר', sub:'פופ · 5 הופעות', price:'₪520', img:'artist7.jpg'},
+    {id:'weeknd',name:'The Weeknd', sub:'פופ · R&B · 4 הופעות', price:'₪610', img:'artist8.jpg'},
+    {id:'billie',name:'בילי אייליש', sub:'פופ · אלטרנטיבי · 3 הופעות', price:'₪540', img:'artist3.jpg'},
+    {id:'olivia',name:'אוליביה רודריגו', sub:'פופ · 3 הופעות', price:'₪500', img:'artist4.jpg'},
+    {id:'taylor',name:'טיילור סוויפט', sub:'פופ · 6 הופעות', price:'₪720', img:'artist6.jpg'},
   ],
   playlist:[
     {n:1, t:'As It Was — Harry Styles'},
@@ -153,6 +158,10 @@ const D = {
     {d:'7', dow:'ביולי · ג׳', venue:'אצטדיון ומבלי', city:'לונדון', price:'₪540'},
     {d:'12', dow:'ביולי · א׳', venue:'סטאד דה פראנס', city:'פריז', price:'₪610'},
     {d:'18', dow:'ביולי · ש׳', venue:'אולימפיאשטדיון', city:'מינכן', price:'₪480'},
+    {d:'21', dow:'ביולי · ג׳', venue:'אצטדיון אולימפי', city:'ברלין', price:'₪560'},
+    {d:'25', dow:'ביולי · ו׳', venue:'יוהאן קרויף ארֶנה', city:'אמסטרדם', price:'₪590'},
+    {d:'29', dow:'ביולי · ג׳', venue:'סן סירו', city:'מילאנו', price:'₪620'},
+    {d:'2',  dow:'אוגוסט · ש׳', venue:'וומבלי', city:'לונדון', price:'₪640'},
   ],
   setlist:['Yellow','Higher Power','The Scientist','Viva la Vida','Fix You','Clocks','A Sky Full of Stars','My Universe (feat. BTS)'],
   gallery:['artist1.jpg','tiktok1.jpg','tiktok2.jpg','tiktok3.jpg'],
@@ -270,7 +279,7 @@ const D = {
       {n:'אמנים',items:['BTS','אריאנה גרנדה','קולדפליי','דה וויקנד','ברונו מארס','שאקירה']},
     ],
     dest:['לונדון','ברצלונה','מדריד','פריז','מילאנו','מינכן','אמסטרדם','רומא'],
-    support:['איך זה עובד','אחריות ומדיניות ביטול','שאלות נפוצות','צור קשר / שירות לקוחות'],
+    support:['אחריות ומדיניות ביטול','שאלות נפוצות','צור קשר / שירות לקוחות'],
   },
 };
 
@@ -477,8 +486,7 @@ function header(){
   const cls = 'header' + (floating ? ' header--float' + (state.headerSolid?' solid':'') : '');
   return `
   <header class="${cls}">
-    <div class="promo-strip"><span class="star">★</span> אחריות 100% · תשלום מאובטח</div>
-    <div class="hdr-legal">[[LEGAL HEADER — נוסח סופי יתקבל]]</div>
+    <div class="promo-strip">[[LEGAL HEADER — נוסח סופי יתקבל]] · <span class="star">★</span> אחריות 100% · תשלום מאובטח</div>
     <nav class="nav">
       <div class="nav-group">
         <button class="circle-btn" data-act="favs">${ICON.heart}<span class="nav-badge">${state.favCount}</span></button>
@@ -889,7 +897,6 @@ function pageHome(){
   <section class="faq" id="faq">
     <h2>שאלות נפוצות</h2>
     ${D.homeFaq.map((f,i)=>`<div class="faq-item ${state.faqHome===i?'open':''}"><button class="faq-q" data-faqh="${i}"><span class="qt">${f.q}</span><span class="qi"></span></button><div class="faq-a"><p>${f.a}</p></div></div>`).join('')}
-    <a class="faq-howto" data-act="howto">איך זה עובד? ›</a>
   </section>
 
   ${footer()}`;
@@ -1042,7 +1049,7 @@ function pageCategory(){
   <section class="section">
     <div class="sec-head"><span></span><h2 class="sec-title">אמני פופ</h2></div>
     <div class="listcards">
-      ${D.popArtists.map(a=>`
+      ${(state.moreArtists?D.popArtists:D.popArtists.slice(0,5)).map(a=>`
         <div class="listcard" data-act="lobby">
           <button class="lheart ${state.hearts[a.id]?'on':''}" data-heart="${a.id}">${ICON.hs}</button>
           <div class="lbody">
@@ -1057,6 +1064,7 @@ function pageCategory(){
           <img class="lthumb" src="${IMG}${a.img}" alt="${a.name}">
         </div>`).join('')}
     </div>
+    ${!state.moreArtists && D.popArtists.length>5 ? `<button class="showmore" data-act="more-artists">הצג עוד (${D.popArtists.length-5})</button>` : ''}
   </section>
 
   <!-- הפלייליסט של פופ -->
@@ -1558,7 +1566,7 @@ function pageLobby(){
 
   <!-- Date list -->
   <div class="datelist">
-    ${D.p2Dates.map(e=>`
+    ${(state.moreDates?D.p2Dates:D.p2Dates.slice(0,4)).map(e=>`
       <button class="drow-ev" data-act="event">
         <span class="chev">‹</span>
         <div class="d-price"><span class="from">מ-</span><span class="amt">${e.price}</span></div>
@@ -1566,6 +1574,7 @@ function pageLobby(){
         <div class="d-date"><div class="dd">${e.d}</div><div class="dm">${e.dow}</div></div>
       </button>`).join('')}
   </div>
+  ${!state.moreDates && D.p2Dates.length>4 ? `<button class="showmore" data-act="more-dates">הצג עוד (${D.p2Dates.length-4})</button>` : ''}
 
   <!-- אודות האמן -->
   <section class="section">
@@ -1987,7 +1996,7 @@ function categoriesDrawer(){
         sub += `<div style="padding:4px 16px 10px;color:#888;font-size:11px;text-align:right">ערים</div>`;
         sub += D.drawer.dest.map(c=>`<button class="drow" data-act="lobby" style="font-size:13px;padding-right:28px;color:#555">${c}</button>`).join('');
       } else if(k==='support'){
-        sub += D.drawer.support.map(t=>{ const act = t==='איך זה עובד'?'howto' : t==='שאלות נפוצות'?'faqjump' : 'soon'; return `<button class="drow" data-act="${act}" data-title="${t}" style="font-size:13px;padding-right:28px;color:#555">${t}</button>`; }).join('');
+        sub += D.drawer.support.map(t=>{ const act = t==='שאלות נפוצות'?'faqjump' : 'soon'; return `<button class="drow" data-act="${act}" data-title="${t}" style="font-size:13px;padding-right:28px;color:#555">${t}</button>`; }).join('');
       }
       secHtml += `<div class="sub">${sub}</div>`;
     }
@@ -3298,7 +3307,8 @@ function wire(){
     switch(true){
       // FAQ ↔ "how it works" — each reachable from the other (both live on the home FAQ)
       case act==='faqjump': { state.faqHome=-1; go(0); setTimeout(()=>document.getElementById('faq')?.scrollIntoView({behavior:'smooth',block:'start'}),50); break; }
-      case act==='howto': { state.faqHome=0; go(0); setTimeout(()=>document.getElementById('faq')?.scrollIntoView({behavior:'smooth',block:'start'}),50); break; }
+      case act==='more-dates': set({moreDates:true}); break;      // lobby: reveal the rest of the tour dates
+      case act==='more-artists': set({moreArtists:true}); break;  // category: reveal more artists
       case act==='drawer': set({drawerOpen:true, acctOpen:false}); break;
       case act==='account': set({acctOpen:true, drawerOpen:false}); break;
       case act==='favs': { state.phTitle='המועדפים שלי'; state.phNote='העמוד הזה עדיין בעיצוב — בקרוב'; go(8); break; }
