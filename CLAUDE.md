@@ -13,7 +13,11 @@ events **abroad** (concerts, sports). Single-file vanilla-JS SPA. Design languag
   Never run bare `node`/`npm`; start the preview via the launch config, not `node server.mjs` by hand.
 
 ## Architecture — read this before editing
-- **`flow.html`** (~3500 lines) *is the whole app.* One global `state` object + `render()`
+- **`desktop.html`** — standalone **desktop navigation** demo (separate link from the mobile prototype;
+  open `/desktop.html`). Self-contained vanilla HTML/CSS/JS port of the Claude Design "Live Tickets Nav"
+  (RTL mega-menus: sports cascade ענף→ליגה→קבוצות, music, destinations, holidays, support, search, account).
+  Not wired into `flow.html`. Data mirrors `flow.html`'s `D.drawer`.
+- **`flow.html`** (~3500 lines) *is the whole app (mobile prototype).* One global `state` object + `render()`
   (rebuilds `#app.innerHTML`) + one delegated `wire()` that dispatches on `data-act`
   (`const a = e.target.closest('[data-act]'); act = a.getAttribute('data-act')`).
   `set(patch)` merges state and re-renders; `go(page)` navigates (resets scroll, closes overlays).

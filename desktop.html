@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Tickets — Desktop Nav</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,400;0,500;0,600;0,700;0,800;1,800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:Rubik,sans-serif;font-size:16px;line-height:1.6;background:#F4F4F4;color:#1A1A1A;min-height:100vh;}
+  a{color:inherit;}
+  ::placeholder{color:#A4A4A4;}
+  input,select,button{font-family:inherit;}
+  @keyframes lt-fade{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes lt-pop{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:scale(1);}}
+  .lt-navscroll{scrollbar-width:none;} .lt-navscroll::-webkit-scrollbar{display:none;}
+  /* nav triggers */
+  .navbtn{display:flex;align-items:center;gap:6px;height:100%;padding:0 16px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:500;color:#313131;white-space:nowrap;border-bottom:3px solid transparent;transition:background .12s;}
+  .navbtn:hover{background:#FAFAFB;}
+  .navbtn.active{color:#ED1860;border-bottom-color:#ED1860;background:#fff;}
+  .support-btn{gap:8px;padding:0 14px;font-size:14px;color:#5B5B5B;flex-shrink:0;}
+  .season-btn{gap:10px;padding:6px 14px;border-radius:10px;border:1px solid #F6D9E4;background:linear-gradient(180deg,#fff,#FFF4F8);height:auto;align-self:center;border-bottom:1px solid #F6D9E4;transition:box-shadow .14s;}
+  .season-btn:hover{box-shadow:0 2px 10px rgba(237,24,96,.18);}
+  .acctbtn{display:flex;align-items:center;gap:7px;height:40px;padding:0 16px;border-radius:999px;border:none;cursor:pointer;background:#1A1A1A;color:#fff;font-family:inherit;font-size:14px;font-weight:600;white-space:nowrap;}
+  /* mega panels */
+  .mega{display:none;position:absolute;top:100%;right:0;left:0;background:#fff;border-top:1px solid #EBEBEB;box-shadow:0 8px 32px rgba(0,0,0,.06);animation:lt-fade .16s ease;z-index:40;}
+  .mega.open{display:block;}
+  .cas-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 24px;text-decoration:none;color:#313131;font-size:15px;cursor:pointer;border:none;background:none;width:100%;text-align:right;font-family:inherit;}
+  .cas-item:hover,.cas-item.on{background:#FAFAFB;color:#ED1860;}
+  .cas-item svg{opacity:.5;}
+  .team-item{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;text-decoration:none;color:#313131;font-size:15px;cursor:pointer;}
+  .team-item:hover{background:#FAFAFB;color:#ED1860;}
+  .mtype{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:none;border:1px solid #EBEBEB;border-radius:8px;cursor:pointer;font-size:14.5px;color:#313131;text-align:right;font-family:inherit;}
+  .mtype:hover{border-color:#ED1860;}
+  .genre{padding:9px 15px;background:#F6F6F7;border:1px solid #EDEDED;border-radius:999px;cursor:pointer;font-size:14px;color:#313131;font-family:inherit;}
+  .genre:hover{background:#fff;border-color:#ED1860;color:#ED1860;}
+  .imgcard{position:relative;height:110px;border-radius:12px;overflow:hidden;border:none;cursor:pointer;display:block;}
+  .imgcard .ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.65) 0%,rgba(0,0,0,0) 65%);}
+  .imgcard .nm{position:absolute;right:14px;bottom:12px;color:#fff;font-weight:500;font-size:16px;text-shadow:0 1px 3px rgba(0,0,0,.5);}
+  .supcard{display:flex;align-items:center;gap:11px;padding:18px 20px;background:#fff;border:1px solid #EBEBEB;border-radius:12px;cursor:pointer;text-align:right;font-family:inherit;}
+  .supcard:hover{border-color:#ED1860;}
+  .occ-card{display:flex;align-items:center;gap:12px;padding:16px 18px;background:#fff;border:1px solid #EBEBEB;border-radius:12px;cursor:pointer;text-align:right;font-family:inherit;}
+  .occ-card:hover{border-color:#ED1860;}
+  .schip{padding:9px 15px;background:#F6F6F7;border:1px solid #EDEDED;border-radius:999px;cursor:pointer;font-size:13.5px;color:#444;font-family:inherit;}
+  .schip:hover{border-color:#ED1860;color:#ED1860;}
+  .acct-item{width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;padding:10px 16px;cursor:pointer;text-align:right;font-family:inherit;font-size:15.5px;color:#1A1A1A;border-radius:8px;}
+  .acct-item:hover{background:#FAFAFB;color:#ED1860;}
+  /* page body */
+  .pagewrap{max-width:1280px;margin:0 auto;padding:40px;}
+  .demo-note{background:#FFF4F8;border:1px solid #F6D9E4;border-radius:12px;padding:16px 20px;color:#8A3D5A;font-size:14px;margin-bottom:28px;}
+  .demo-note b{color:#ED1860;}
+  .hero{border-radius:16px;background:linear-gradient(150deg,#1A1A1A,#3a2030);color:#fff;padding:56px 48px;min-height:340px;display:flex;flex-direction:column;justify-content:center;gap:14px;}
+  .hero h1{font-size:44px;font-weight:800;margin:0;line-height:1.05;max-width:640px;}
+  .hero p{font-size:18px;color:#cfcfd6;margin:0;max-width:560px;}
+</style>
+</head>
+<body>
+
+<header style="position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(0,0,0,.08);">
+  <!-- Utility bar -->
+  <div style="background:#1A1A1A;color:#A0A3AB;font-size:12px;letter-spacing:.01em;">
+    <div style="max-width:1280px;margin:0 auto;padding:9px 40px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:24px;">
+        <a href="tel:035223050" style="display:flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font-weight:500;"><span style="font-size:14px;">📞</span> שירות 03-5223050</a>
+        <span style="color:#5a5d68;">·</span>
+        <span>₪ ILS</span>
+        <span style="color:#5a5d68;">·</span>
+        <button style="background:none;border:none;color:#B9BCC4;cursor:pointer;display:flex;align-items:center;gap:4px;font-size:13px;">עברית <span style="font-size:9px;">▼</span></button>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px;color:#9a9da6;">
+        <span style="display:flex;align-items:center;gap:5px;"><span style="color:#F57E20;">★</span> אחריות 100%</span>
+        <span style="color:#5a5d68;">·</span>
+        <span>תשלום מאובטח</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main bar + nav region -->
+  <div id="navRegion" style="background:#fff;position:relative;">
+    <div style="max-width:1280px;margin:0 auto;padding:0 40px;display:flex;align-items:center;gap:24px;height:72px;">
+      <!-- Logo -->
+      <a href="#" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0;">
+        <img src="assets/logo.png" alt="Live Tickets" style="height:30px;width:auto;display:block;">
+      </a>
+      <!-- Primary nav -->
+      <nav class="lt-navscroll" style="display:flex;align-items:stretch;height:100%;min-width:0;flex-shrink:1;overflow-x:auto;">
+        <button class="navbtn" data-menu="sports">ספורט <span style="font-size:9px;opacity:.6;">▼</span></button>
+        <button class="navbtn" data-menu="music">מוזיקה והופעות <span style="font-size:9px;opacity:.6;">▼</span></button>
+        <button class="navbtn" data-menu="dest">יעדים <span style="font-size:9px;opacity:.6;">▼</span></button>
+        <button class="navbtn season-btn" data-menu="holidays">
+          <span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#ED1860,#F57E20);flex-shrink:0;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l1.6 4.9a3 3 0 0 0 1.9 1.9L20.4 10.4 15.5 12a3 3 0 0 0-1.9 1.9L12 18.8l-1.6-4.9A3 3 0 0 0 8.5 12L3.6 10.4 8.5 8.8a3 3 0 0 0 1.9-1.9z"></path></svg>
+          </span>
+          <span style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;line-height:1.05;">
+            <span style="font-size:9px;font-weight:700;letter-spacing:.4px;color:#F57E20;">מומלץ · מתחלף</span>
+            <span style="font-size:15px;font-weight:700;color:#ED1860;">מונדיאל 2026</span>
+          </span>
+          <span style="font-size:9px;opacity:.55;color:#ED1860;">▼</span>
+        </button>
+      </nav>
+      <!-- Search field -->
+      <button id="searchTrigger" style="flex:1 1 0;min-width:56px;height:44px;display:flex;align-items:center;gap:10px;padding:0 16px;background:#F5F5F5;border:1px solid #E8E8E8;border-radius:999px;cursor:text;color:#8A8A8A;font-size:14px;text-align:right;overflow:hidden;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">חפשו אמן, קבוצה, מופע או עיר…</span>
+      </button>
+      <!-- Help -->
+      <button class="navbtn support-btn" data-menu="support">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 0 1 4.5 1.5c0 1.7-2 2-2 3.5"></path><path d="M12 17h.01"></path></svg>
+        עזרה ותמיכה <span style="font-size:9px;opacity:.55;">▼</span>
+      </button>
+      <!-- Personal area -->
+      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;position:relative;">
+        <button title="מועדפים" aria-label="מועדפים" style="position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;background:none;border:none;cursor:pointer;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ED1860" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.6a5 5 0 0 0-8.8-3.2A5 5 0 0 0 3.2 8.6c0 4.4 8.8 10.4 8.8 10.4s8.8-6 8.8-10.4z"></path></svg>
+          <span style="position:absolute;top:-6px;left:-6px;min-width:18px;height:18px;padding:0 4px;background:#F57E20;color:#fff;border-radius:9px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">3</span>
+        </button>
+        <button id="acctBtn" class="acctbtn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+          האזור האישי <span style="font-size:9px;opacity:.75;">▼</span>
+        </button>
+        <!-- Account dropdown -->
+        <div id="acctDD" style="display:none;position:absolute;top:calc(100% + 10px);left:0;width:320px;background:#fff;border:1px solid #EBEBEB;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.16);z-index:55;overflow:hidden;animation:lt-pop .14s ease;">
+          <div style="display:flex;align-items:center;gap:11px;padding:16px;background:#F8F8F9;border-bottom:1px solid #EBEBEB;">
+            <span style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ED1860,#F57E20);display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg></span>
+            <div style="display:flex;flex-direction:column;gap:1px;"><span style="font-size:15px;font-weight:700;color:#313131;">האזור האישי</span><span style="font-size:12px;color:#8A8A8A;">התחברו כדי לראות הזמנות והעדפות</span></div>
+          </div>
+          <div id="acctList" style="padding:8px;"></div>
+          <div style="padding:12px 16px;border-top:1px solid #EBEBEB;display:flex;gap:8px;">
+            <button style="flex:1;height:42px;background:#ED1860;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">התחברות</button>
+            <button style="flex:1;height:42px;background:#fff;border:1px solid #E6E6E6;border-radius:8px;color:#313131;font-size:14px;font-weight:600;cursor:pointer;">הרשמה</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MEGA-MENUS ===== -->
+    <!-- Sports cascade -->
+    <div class="mega" id="mega-sports">
+      <div style="max-width:1280px;margin:0 auto;padding:24px 40px 32px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid #EBEBEB;border-radius:12px;overflow:hidden;min-height:260px;">
+          <div style="border-left:1px solid #EBEBEB;padding:12px 0;">
+            <div style="padding:12px 24px 14px;font-size:11px;font-weight:500;letter-spacing:2px;color:#999;">ענף</div>
+            <div id="sportCol"></div>
+          </div>
+          <div style="border-left:1px solid #EBEBEB;padding:12px 0;" id="compCol">
+            <div style="height:100%;display:flex;align-items:center;justify-content:center;padding:24px;color:#CFCFCF;font-size:14px;text-align:center;">רחפו על ענף כדי לראות מפעלים וליגות</div>
+          </div>
+          <div style="padding:12px 0;" id="teamCol">
+            <div style="height:100%;display:flex;align-items:center;justify-content:center;padding:24px;color:#CFCFCF;font-size:14px;text-align:center;">רחפו על מפעל / ליגה כדי לראות קבוצות</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Music -->
+    <div class="mega" id="mega-music">
+      <div style="max-width:1280px;margin:0 auto;padding:28px 40px 36px;display:grid;grid-template-columns:1fr 1fr 2fr;gap:36px;">
+        <div>
+          <div style="font-size:11px;font-weight:500;letter-spacing:2px;color:#999;margin-bottom:20px;">לפי סוג</div>
+          <div id="musicTypes" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:500;letter-spacing:2px;color:#999;margin-bottom:20px;">ז'אנר</div>
+          <div id="musicGenres" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+        </div>
+        <div style="border-right:1px solid #EBEBEB;padding-right:36px;">
+          <div style="font-size:11px;font-weight:500;letter-spacing:2px;color:#999;margin-bottom:18px;">אמנים חמים</div>
+          <div id="musicArtists" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Destinations -->
+    <div class="mega" id="mega-dest">
+      <div style="max-width:1280px;margin:0 auto;padding:28px 40px 36px;display:grid;grid-template-columns:320px 1fr;gap:32px;">
+        <div style="background:linear-gradient(150deg,#313131,#454853);border-radius:12px;padding:22px;color:#fff;">
+          <div style="font-size:20px;font-weight:700;margin-bottom:4px;">לאן אתם טסים?</div>
+          <div style="font-size:13px;color:#B9BCC4;margin-bottom:18px;">בחרו עיר ותאריכים ונראה מה קורה שם</div>
+          <label style="display:block;font-size:12px;color:#B9BCC4;margin-bottom:5px;">עיר יעד</label>
+          <select id="destCity" style="width:100%;height:40px;padding:0 12px;border-radius:8px;border:none;font-size:14px;margin-bottom:14px;color:#313131;"></select>
+          <div style="display:flex;gap:8px;margin-bottom:18px;">
+            <div style="flex:1;"><label style="display:block;font-size:12px;color:#B9BCC4;margin-bottom:5px;">מתאריך</label><input type="date" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:none;font-size:13px;color:#313131;"></div>
+            <div style="flex:1;"><label style="display:block;font-size:12px;color:#B9BCC4;margin-bottom:5px;">עד תאריך</label><input type="date" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:none;font-size:13px;color:#313131;"></div>
+          </div>
+          <button style="width:100%;height:46px;background:#F57E20;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;">ראו מה קורה שם</button>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:500;letter-spacing:2px;color:#999;margin-bottom:18px;">יעדים פופולריים</div>
+          <div id="cityGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Support -->
+    <div class="mega" id="mega-support">
+      <div style="max-width:1280px;margin:0 auto;padding:28px 40px 36px;display:grid;grid-template-columns:1fr 320px;gap:32px;">
+        <div>
+          <div style="font-size:11px;font-weight:500;letter-spacing:2px;color:#999;margin-bottom:18px;">איך אפשר לעזור?</div>
+          <div id="supportGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;"></div>
+        </div>
+        <div style="background:linear-gradient(150deg,#313131,#454853);border-radius:12px;padding:22px;color:#fff;display:flex;flex-direction:column;">
+          <div style="font-size:18px;font-weight:700;margin-bottom:4px;">צור קשר / שירות לקוחות</div>
+          <div style="font-size:13px;color:#B9BCC4;margin-bottom:16px;">א׳–ה׳ 9:00–20:00 · ו׳ 9:00–13:00</div>
+          <a href="#" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#25D366;border-radius:10px;text-decoration:none;color:#fff;font-weight:600;font-size:14px;margin-bottom:10px;"><span style="font-size:17px;">💬</span> WhatsApp · מענה מיידי</a>
+          <a href="tel:035223050" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:10px;text-decoration:none;color:#fff;font-weight:600;font-size:14px;"><span style="font-size:17px;">📞</span> טלפון · 03-5223050</a>
+          <div style="margin-top:auto;padding-top:16px;font-size:12px;color:#B9BCC4;"><span style="color:#F57E20;">★</span> אחריות רכישה 100% על כל הזמנה</div>
+        </div>
+      </div>
+    </div>
+    <!-- Holidays / occasion -->
+    <div class="mega" id="mega-holidays">
+      <div style="max-width:1280px;margin:0 auto;padding:28px 40px 36px;display:grid;grid-template-columns:340px 1fr;gap:32px;">
+        <div style="border-radius:12px;position:relative;background:linear-gradient(150deg,#ED1860,#F57E20);color:#fff;padding:22px;display:flex;flex-direction:column;justify-content:space-between;min-height:220px;">
+          <div>
+            <span style="display:inline-block;background:rgba(255,255,255,.22);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:12px;">המומלץ עכשיו</span>
+            <div style="font-size:30px;font-weight:800;line-height:1.1;margin-bottom:6px;">מונדיאל 2026</div>
+            <div style="font-size:14px;opacity:.92;max-width:260px;">11 יוני – 19 יולי 2026 · ארה״ב · קנדה · מקסיקו. כל המשחקים, all-in, עם אחריות מלאה.</div>
+          </div>
+          <button style="align-self:flex-start;margin-top:16px;background:#fff;color:#ED1860;border:none;border-radius:8px;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer;">כל מונדיאל 2026 ←</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="font-size:11px;font-weight:500;letter-spacing:2px;color:#999;">האוסף למונדיאל 2026</div>
+          <div id="occGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Search panel -->
+    <div class="mega" id="mega-search">
+      <div style="max-width:1280px;margin:0 auto;padding:24px 40px 28px;">
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 1.2fr 1fr auto;gap:16px;align-items:end;">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:#5B5B5B;margin-bottom:6px;">מי / מה</label>
+            <input placeholder="אמן, קבוצה, מופע…" style="width:100%;height:46px;padding:0 14px;border:1px solid #E6E6E6;border-radius:8px;font-size:14px;">
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:#5B5B5B;margin-bottom:6px;">איפה</label>
+            <input placeholder="עיר או אולם" style="width:100%;height:46px;padding:0 14px;border:1px solid #E6E6E6;border-radius:8px;font-size:14px;">
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:#5B5B5B;margin-bottom:6px;">מתי</label>
+            <div style="display:flex;gap:6px;"><input type="date" style="width:100%;height:46px;padding:0 10px;border:1px solid #E6E6E6;border-radius:8px;font-size:13px;"><input type="date" style="width:100%;height:46px;padding:0 10px;border:1px solid #E6E6E6;border-radius:8px;font-size:13px;"></div>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:#5B5B5B;margin-bottom:6px;">תקציב (עד ₪)</label>
+            <input type="number" placeholder="1500" style="width:100%;height:46px;padding:0 14px;border:1px solid #E6E6E6;border-radius:8px;font-size:14px;">
+          </div>
+          <button style="height:46px;padding:0 24px;background:#F57E20;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;">מצא כרטיסים</button>
+        </div>
+        <div id="searchChips" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Light desktop page body (context for the nav) -->
+<div class="pagewrap">
+  <div class="demo-note">🖥️ <b>Desktop navigation</b> — standalone demo, separate from the mobile prototype (<a href="flow.html">flow.html</a>). Hover the category tabs for the mega-menus; the sports menu cascades ענף → ליגה → קבוצות.</div>
+  <div class="hero">
+    <h1>החוויות הכי גדולות בעולם — במרחק טיסה אחת</h1>
+    <p>כל המשחקים, התחרויות וההופעות בחו״ל, במקום אחד. מחירים all-in כולל עמלות · אחריות 100%.</p>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  sports:[
+    {n:'כדורגל',comps:[{n:'ליגת האלופות',teams:['ריאל מדריד','מנצ׳סטר סיטי','באיירן מינכן','אינטר']},{n:'ליגה אנגלית',teams:['ארסנל','ליברפול','מנצ׳סטר יונייטד','צ׳לסי']},{n:'ליגה ספרדית',teams:['ריאל מדריד','ברצלונה','אתלטיקו מדריד','סביליה']},{n:'מונדיאל 2026',teams:['משחק הפתיחה','שלב הבתים','שמינית גמר','הגמר']}]},
+    {n:'כדורסל',comps:[{n:'יורוליג',teams:['מכבי ת״א','פאניתנייקוס','ריאל מדריד','פנרבחצ׳ה']},{n:'NBA',teams:['בוסטון סלטיקס','לייקרס','גולדן סטייט','ניקס']}]},
+    {n:'טניס',comps:[{n:'ווימבלדון',teams:['גמר גברים','גמר נשים','חצי גמר','כרטיס יומי']},{n:'US Open',teams:['גמר גברים','גמר נשים','חצי גמר','כרטיס יומי']}]},
+    {n:'פורמולה 1',comps:[{n:'גרנד פרי בריטניה',teams:['מירוץ ראשי','ספרינט','גרנדסטנד','פאדוק קלאב']},{n:'מונזה',teams:['מירוץ ראשי','דירוג','גרנדסטנד','פאדוק קלאב']}]},
+    {n:'אגרוף / MMA',comps:[{n:'UFC',teams:['Main Event','Co-Main','Prelims','כרטיס ערב']}]},
+  ],
+  musicTypes:['קונצרטים / הופעות','פסטיבלים','קלאסי ואופרה'],
+  musicGenres:[{i:'🎤',n:'פופ'},{i:'🎸',n:'רוק'},{i:'🎧',n:'היפ-הופ'},{i:'💃',n:'לטין'},{i:'🎻',n:'קלאסי'},{i:'✨',n:'כל ההופעות'}],
+  musicArtists:['BTS','אריאנה גרנדה','קולדפליי','דה וויקנד','ברונו מארס','שאקירה'],
+  cities:['לונדון','ברצלונה','מדריד','פריז','מילאנו','מינכן','אמסטרדם','רומא'],
+  support:[{e:'🛡️',n:'אחריות ומדיניות ביטול',m:'ביטול, החזרים ותנאים'},{e:'❓',n:'שאלות נפוצות',m:'הזמנה, משלוח, כרטיסים'},{e:'💳',n:'תשלום ואבטחה',m:'אמצעי תשלום, חשבוניות'},{e:'📱',n:'הכרטיס הדיגיטלי',m:'קבלה, שליחה, אישור כניסה'}],
+  occ:[{e:'⚽',n:'משחק הפתיחה',tag:'מקסיקו סיטי · 11 יוני',c:'#ED1860'},{e:'🏟️',n:'שלב הבתים',tag:'ניו יורק · 18 יוני',c:'#216CA5'},{e:'🥇',n:'חצי גמר',tag:'אטלנטה · 14 יולי',c:'#F57E20'},{e:'🏆',n:'הגמר הגדול',tag:'ניו יורק · 19 יולי',c:'#ED1860'}],
+  account:[{e:'🎟️',n:'הכרטיסים שלי'},{e:'🔔',n:'התראות והעדפות'},{e:'⚙️',n:'הגדרות'},{e:'❤️',n:'מועדפים / Wishlist'},{e:'⭐',n:'VIP / קבוצות'}],
+  searchChips:['מונדיאל 2026','טיילור סוויפט','קולדפליי','ריאל מדריד','אל קלאסיקו'],
+  cardGrad:['linear-gradient(135deg,#ED1860,#7a1030)','linear-gradient(135deg,#216CA5,#0d2f4a)','linear-gradient(135deg,#F57E20,#8a3d05)','linear-gradient(135deg,#3a2f5a,#1a1030)','linear-gradient(135deg,#1c7a46,#0c3320)','linear-gradient(135deg,#8a2b6a,#3a0f2c)','linear-gradient(135deg,#245a8a,#0f2c45)','linear-gradient(135deg,#a04010,#4a1c05)'],
+};
+const $ = s => document.querySelector(s);
+const chev = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>';
+
+// ---- build data-driven lists ----
+function card(name, i){ return `<button class="imgcard" style="background:${DATA.cardGrad[i%DATA.cardGrad.length]};"><span class="ov"></span><span class="nm">${name}</span></button>`; }
+
+// sports col1
+$('#sportCol').innerHTML = DATA.sports.map((s,i)=>`<button class="cas-item" data-sport="${i}"><span>${s.n}</span>${chev}</button>`).join('');
+// music
+$('#musicTypes').innerHTML = DATA.musicTypes.map(t=>`<button class="mtype">${t}<span style="font-size:11px;color:#A4A4A4;">▸</span></button>`).join('');
+$('#musicGenres').innerHTML = DATA.musicGenres.map(g=>`<button class="genre">${g.i} ${g.n}</button>`).join('');
+$('#musicArtists').innerHTML = DATA.musicArtists.map((a,i)=>card(a,i)).join('');
+// dest
+$('#destCity').innerHTML = DATA.cities.map(c=>`<option>${c}</option>`).join('');
+$('#cityGrid').innerHTML = DATA.cities.map((c,i)=>card(c,i)).join('');
+// support
+$('#supportGrid').innerHTML = DATA.support.map(h=>`<button class="supcard"><span style="font-size:19px;flex-shrink:0;">${h.e}</span><span style="display:flex;flex-direction:column;gap:4px;"><span style="font-weight:400;font-size:16px;color:#1A1A1A;">${h.n}</span><span style="font-size:13px;color:#888;">${h.m}</span></span></button>`).join('');
+// occasion
+$('#occGrid').innerHTML = DATA.occ.map(o=>`<button class="occ-card"><span style="font-size:22px;">${o.e}</span><span style="display:flex;flex-direction:column;gap:4px;"><span style="font-weight:400;font-size:16px;color:#1A1A1A;">${o.n}</span><span style="font-size:12px;color:${o.c};">${o.tag}</span></span></button>`).join('');
+// account
+$('#acctList').innerHTML = DATA.account.map(g=>`<button class="acct-item"><span style="font-size:16px;">${g.e}</span><span>${g.n}</span></button>`).join('');
+// search chips
+$('#searchChips').innerHTML = DATA.searchChips.map(c=>`<button class="schip">${c}</button>`).join('');
+
+// ---- sports cascade ----
+function revealComps(si){
+  const s = DATA.sports[si];
+  document.querySelectorAll('#sportCol .cas-item').forEach((el,i)=>el.classList.toggle('on', i===si));
+  $('#compCol').innerHTML = `<div style="padding:12px 24px 14px;font-size:11px;font-weight:500;letter-spacing:2px;color:#999;">${s.n} · מפעלים</div>` +
+    s.comps.map((c,i)=>`<button class="cas-item" data-sport="${si}" data-comp="${i}"><span>${c.n}</span>${chev}</button>`).join('');
+  $('#teamCol').innerHTML = `<div style="height:100%;display:flex;align-items:center;justify-content:center;padding:24px;color:#CFCFCF;font-size:14px;text-align:center;">רחפו על מפעל / ליגה כדי לראות קבוצות</div>`;
+}
+function revealTeams(si,ci){
+  const c = DATA.sports[si].comps[ci];
+  $('#compCol').querySelectorAll('.cas-item').forEach((el,i)=>el.classList.toggle('on', i===ci));
+  $('#teamCol').innerHTML = `<div style="padding:12px 24px 14px;font-size:11px;font-weight:500;letter-spacing:2px;color:#999;">${c.n} · קבוצות</div>` +
+    c.teams.map(t=>`<a class="team-item"><span>${t}</span><span style="font-size:11px;color:#A4A4A4;">כרטיסים ›</span></a>`).join('');
+}
+
+// ---- menu open/close ----
+let openName = null;
+function openMenu(name){
+  openName = name;
+  document.querySelectorAll('.mega').forEach(m=>m.classList.toggle('open', m.id==='mega-'+name));
+  document.querySelectorAll('.navbtn[data-menu]').forEach(b=>b.classList.toggle('active', b.getAttribute('data-menu')===name));
+  if(name==='sports'){ revealComps(0); revealTeams(0,0); document.querySelector('#sportCol .cas-item').classList.add('on'); }
+}
+function closeMenu(){ openName=null; document.querySelectorAll('.mega').forEach(m=>m.classList.remove('open')); document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active')); }
+
+document.querySelectorAll('.navbtn[data-menu]').forEach(btn=>{
+  const n = btn.getAttribute('data-menu');
+  btn.addEventListener('mouseenter', ()=>openMenu(n));
+  btn.addEventListener('click', ()=> openName===n ? closeMenu() : openMenu(n));
+});
+$('#searchTrigger').addEventListener('click', ()=> openName==='search' ? closeMenu() : openMenu('search'));
+$('#navRegion').addEventListener('mouseleave', closeMenu);
+
+// cascade hover (delegated)
+$('#mega-sports').addEventListener('mouseover', e=>{
+  const el = e.target.closest('[data-sport]'); if(!el) return;
+  const si = +el.getAttribute('data-sport');
+  if(el.hasAttribute('data-comp')) revealTeams(si, +el.getAttribute('data-comp'));
+  else revealComps(si);
+});
+
+// account dropdown
+const acctBtn=$('#acctBtn'), acctDD=$('#acctDD');
+acctBtn.addEventListener('click', e=>{ e.stopPropagation(); acctDD.style.display = acctDD.style.display==='block'?'none':'block'; });
+document.addEventListener('click', e=>{ if(!acctDD.contains(e.target) && e.target!==acctBtn) acctDD.style.display='none'; });
+</script>
+</body>
+</html>
