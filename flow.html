@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=50" />
+<link rel="stylesheet" href="flow.v5.css?v=51" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -50,6 +50,7 @@ const state = {
   coName:'', coFirst:'', coLast:'', coPhone:'', coEmail:'', coInstall:'12', coSplitOpen:false,
   splitN:4, splitMode:'equal', splitAmounts:{}, orderNo:'LT-38210', splitAllPaid:false, splitConfirmed:false,
   cashPending:false,   // offline (מזומן/העברה) — seats held 24h pending payment, auto-cancel on expiry
+  h24Active:false, h24Sec:86400,   // 24h payment window — from deposit paid until order paid in full
   buyEdge:null, // 'expired' | 'soldout' | 'tentative' | null
   srRecent:['קולדפליי','ריאל מדריד','טיילור סוויפט'],
   p1LastMinute:false, p1GenreSelected:null, p1CitySelected:null, p1DateLabel:null,
@@ -450,7 +451,7 @@ function render(){
   const isEventSel = !state.desktop && state.page===3;   // mobile event page = map + drawer seat-selection
   const isPurchase = state.page>=10 && state.page<=18;
   const isBrowse = state.page>=0 && state.page<=7;
-  const showBar = (state.holdActive || state.cashPending) && isBrowse && !state.aobDismissed;   // sitewide active-order bar (dismissable)
+  const showBar = (state.holdActive || state.h24Active) && isBrowse && !state.aobDismissed;   // sitewide active-order bar (dismissable)
   // desktop: seat-selection screens (event listings + seat page) go wide two-pane.
   // checkout & the rest of the purchase flow get their desktop layout next.
   const pfWide = state.desktop && (state.page===3 || state.page===10 || state.page===11);
@@ -2258,12 +2259,20 @@ function tickHold(){
 }
 function stopHold(){ state.holdActive=false; state.holdWarn=false; state.holdExpired=false; clearInterval(holdTimer); }
 
+/* ---- 24h payment-window timer — starts when the deposit is paid, runs until the order is paid in full ---- */
+let hold24Timer=null;
+function fmt24(s){ s=Math.max(0,s|0); const p=n=>String(n).padStart(2,'0'); return `${p(Math.floor(s/3600))}:${p(Math.floor((s%3600)/60))}:${p(s%60)}`; }
+function startHold24(){ state.h24Active=true; state.h24Sec=86400; state.aobDismissed=false; clearInterval(hold24Timer); hold24Timer=setInterval(tickHold24,1000); }
+function tickHold24(){ if(!state.h24Active) return; state.h24Sec=Math.max(0,state.h24Sec-1); document.querySelectorAll('.h24-clk').forEach(el=>el.textContent=fmt24(state.h24Sec)); if(state.h24Sec<=0) clearInterval(hold24Timer); }
+function stopHold24(){ state.h24Active=false; clearInterval(hold24Timer); }
+function hold24Bar(){ return `<div class="otimer hold h24"><div class="ot-txt"><div class="ot-row"><span class="ot-clk h24-clk">${fmt24(state.h24Sec)}</span><span class="ot-main">המקומות שמורים · חלון תשלום</span></div><div class="ot-sub">השלימו את התשלום מכל המשתתפים בזמן — אחרת החזר אוטומטי למי ששילם.</div></div>${LOCK_SVG}</div>`; }
+
 /* ---- sitewide active-order bar (browse pages only; hidden on the purchase screens) ---- */
 function activeOrderBar(){
-  if(state.cashPending && !state.holdActive){   // offline payment — 24h hold pending
-    return `<div class="aob warn" data-act="to-confirm">
+  if(state.h24Active && !state.holdActive){   // 24h payment window — deposit paid (split) or offline pending
+    return `<div class="aob warn" data-act="${state.cashPending?'to-confirm':'to-split-status'}">
       <span class="aob-go"><span class="aob-arr">→</span><span>לפרטים</span></span>
-      <div class="aob-main"><span class="aob-txt">המקומות שמורים · השלימו תשלום</span><span class="aob-clk">24 שעות</span></div>
+      <div class="aob-main"><span class="aob-txt">המקומות שמורים · חלון תשלום</span><span class="aob-clk h24-clk">${fmt24(state.h24Sec)}</span></div>
       <button class="aob-x" data-act="aob-close" aria-label="סגירה">✕</button>
     </div>`;
   }
@@ -2753,6 +2762,7 @@ function pageConfirm(){
     ${purHead('סטטוס הזמנה','home')}
     <div class="pur">
       <div class="conf-hero"><div class="conf-tick pend">⏳</div><div class="conf-t">ההזמנה התקבלה — ממתינה לתשלום</div><div class="conf-s">מספר הזמנה · ${state.orderNo}</div></div>
+      ${hold24Bar()}
       <div class="pur-card col hold24"><div class="pc-t">המקומות שמורים ל-24 שעות</div><div class="pc-s">השלימו את התשלום (מזומן / העברה בנקאית) בתוך 24 שעות. אם התשלום לא יתקבל בזמן — ההזמנה תבוטל אוטומטית והמקומות ישוחררו. אין אבטחה סופית לפני קבלת הכסף.</div></div>
       <div class="conf-callback">📞 בשעות הקרובות נציג מטעמנו ייצור איתך קשר להשלמת התשלום ומסירת פרטי ההעברה.</div>
       ${orderSummaryCard({total:true, paid:false})}
@@ -2818,6 +2828,7 @@ function pageSplitInvite(){
   ${purHead('הזמנת חברים','back-checkout')}
   <div class="pur">
     <div class="conf-hero"><div class="conf-tick">✓</div><div class="conf-t">המקומות אובטחו!</div><div class="conf-s">לחברים 24 שעות לשלם את חלקם</div></div>
+    ${hold24Bar()}
     <div class="pur-note">כל חבר מקבל קישור "שלמו את חלקכם" ומשלם באשראי / ארנק — ללא צורך בחשבון.</div>
     <div class="sum-label">שתפו את הקישור לתשלום</div>
     <div class="linkbox2"><span class="lb-url" dir="ltr">livetickets.co.il/split/xR4k…</span><button class="lb-cp" data-act="copy-link">${state.linkCopied?'הועתק ✓':'העתק'}</button></div>
@@ -2836,6 +2847,7 @@ function pageFriendPay(){
   <div class="pur pur-pad">
     <h1 class="fp-invite">יעל הזמינה אתכם ל${b.title||'האירוע'}</h1>
     ${sub?`<div class="fp-invite-sub">${sub}</div>`:''}
+    ${hold24Bar()}
     ${orderSummaryCard({})}
     <div class="pur-card"><span class="badge-ok">מאומת</span><div class="pc-g"><div class="pc-t">כרטיס מאומת · אחריות מלאה</div><div class="pc-s">מגובה באחריות רכישה 100%</div></div></div>
     <div class="sumbox2"><div class="sr tot"><span>${nis(splitPer())}</span><span>החלק שלך</span></div></div>
@@ -2857,7 +2869,7 @@ function splitPaidList(all){
   const paidN=all?SPLIT_FRIENDS.length:(paid?SPLIT_FRIENDS.length:3);
   return `<div class="chk-sec">
     <div class="chk-h">מי שילם</div>
-    <div class="pur-sub">${paidN} מתוך ${SPLIT_FRIENDS.length} שילמו · ${all?'חלוקת התשלום הושלמה':'נותרו 22 שעות'}</div>
+    <div class="pur-sub">${paidN} מתוך ${SPLIT_FRIENDS.length} שילמו · ${all?'חלוקת התשלום הושלמה':'חלון התשלום פעיל'}</div>
     <div class="fr-list">${rows.join('')}</div>
   </div>`;
 }
@@ -2865,6 +2877,7 @@ function pageOrganizer(){
   return `
   ${purHead('מעקב תשלומים','home')}
   <div class="pur">
+    ${hold24Bar()}
     <div class="pur-note">ההזמנה תאושר כשכל המשתתפים ישלמו את חלקם · אחרת <b>החזר אוטומטי</b> למי ששילם.</div>
     ${splitPaidList(false)}
     <button class="btn2 rem" data-act="remind">שלחו תזכורת לממתינים</button>
@@ -3383,7 +3396,7 @@ function wire(){
         const date  = (E.dynamic ? (state.evDate||'') : E.date||'').replace('📅 ','');
         const price = parseInt((a.getAttribute('data-b-price')||'0').replace(/[^\d]/g,''))||0;
         state.buy={title, venue, date, sec:a.getAttribute('data-b-sec')||'', row:a.getAttribute('data-b-row')||'', unit:price, score:a.getAttribute('data-b-score')||'8', img:(E.dynamic&&state.evImg?state.evImg:E.img), key:a.getAttribute('data-lkey')||null, abroad:true, tentative:(E.type==='match')};
-        state.buyEdge=null; state.buyCoverage=false; state.buyAdjacent=false; state.buyDelivery=false; state.payMethod=''; state.showHoldModal=false; state.selRow=null; state.seat360=0; state.splitConfirmed=false; state.splitAllPaid=false; state.cashPending=false; state.splitAmounts={};
+        state.buyEdge=null; state.buyCoverage=false; state.buyAdjacent=false; state.buyDelivery=false; state.payMethod=''; state.showHoldModal=false; state.selRow=null; state.seat360=0; state.splitConfirmed=false; state.splitAllPaid=false; state.cashPending=false; state.splitAmounts={}; stopHold24();
         state.wantTogether = !!(state.p3f && state.p3f.together);   // carry the "ישיבה יחד" filter to checkout
         if(state.desktop && state.page===3){ deskZoom(state.buy.key, ()=>set({showHoldModal:true})); }   // zoom → 10-min price-lock popup (like mobile)
         else { set({showHoldModal:true}); }   // mobile: 10-min price-lock popup before the seat screen
@@ -3426,17 +3439,18 @@ function wire(){
       case act==='split-inc': { state.splitN=Math.min(10,state.splitN+1); if(state.splitMode==='custom') splitInitAmounts(); set({}); break; }
       case act==='split-dec': { state.splitN=Math.max(2,state.splitN-1); if(state.splitMode==='custom') splitInitAmounts(); set({}); break; }
       case act==='split-mode': { const m=a.getAttribute('data-m'); if(m==='custom' && (Object.keys(state.splitAmounts).length===0 || splitSum()===0)) splitInitAmounts(); set({splitMode:m}); break; }
-      case act==='split-pay': if(state.splitMode==='custom' && !splitBalanced()) break; set({splitAllPaid:false, linkCopied:false}); go(14); break;
+      case act==='split-pay': if(state.splitMode==='custom' && !splitBalanced()) break; startHold24(); set({splitAllPaid:false, linkCopied:false}); go(14); break;   // deposit paid → 24h window opens
+      case act==='to-split-status': go(16); break;
       case act==='copy-link': { try{navigator.clipboard&&navigator.clipboard.writeText('https://livetickets.co.il/split/xR4k');}catch(_){}; state.linkCopied=true; toast('הלינק הועתק ✓'); render(); break; }
       case act==='to-organizer': go(16); break;
       case act==='preview-friend': go(15); break;
       case act==='friend-paid': toast('התשלום שלך התקבל · תודה!'); go(16); break;
-      case act==='mark-allpaid': state.splitAllPaid=true; state.splitConfirmed=true; stopHold(); go(12); break;  // everyone paid → straight to success (with the "מי שילם" list)
+      case act==='mark-allpaid': state.splitAllPaid=true; state.splitConfirmed=true; stopHold(); stopHold24(); go(12); break;  // paid in full → timer stops, straight to success
       case act==='split-confirm': stopHold(); go(12); break;
       case act==='confirm-pay': stopHold(); go(12); break;
-      case act==='pay': { const cash=state.payMethod==='cash'; stopHold(); set({cashPending:cash, aobDismissed:false}); go(12); break; }   // offline → 24h pending hold; else confirmed
+      case act==='pay': { const cash=state.payMethod==='cash'; stopHold(); set({cashPending:cash, aobDismissed:false}); if(cash) startHold24(); go(12); break; }   // offline → 24h pending window; else confirmed
       case act==='to-confirm': go(12); break;
-      case act==='cash-expire': { state.cashPending=false; state.buyEdge='expired'; go(17); break; }   // 24h passed, payment not received → auto-cancel, start over
+      case act==='cash-expire': { state.cashPending=false; stopHold24(); state.buyEdge='expired'; go(17); break; }   // 24h passed, payment not received → auto-cancel, start over
       case act==='install': set({coInstall:a.getAttribute('data-n')}); break;
       case act==='mytickets': { state.phTitle='הכרטיסים שלי'; state.phNote='האזור האישי — הכרטיסים שלכם יופיעו כאן · בקרוב'; go(8); break; }
       case act==='wallet': toast('נוסף לארנק ✓'); break;
