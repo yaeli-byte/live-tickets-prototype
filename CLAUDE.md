@@ -15,8 +15,15 @@ events **abroad** (concerts, sports). Single-file vanilla-JS SPA. Design languag
 ## Architecture — read this before editing
 - **`desktop.html`** — standalone **desktop navigation** demo (separate link from the mobile prototype;
   open `/desktop.html`). Self-contained vanilla HTML/CSS/JS port of the Claude Design "Live Tickets Nav"
-  (RTL mega-menus: sports cascade ענף→ליגה→קבוצות, music, destinations, holidays, support, search, account).
-  Not wired into `flow.html`. Data mirrors `flow.html`'s `D.drawer`.
+  (RTL mega-menus: music, destinations, holidays, support, search, account). Not wired into `flow.html`.
+  **Nav order (RTL):** `כדורגל · ספורט · מוזיקה והופעות · יעדים · ראש השנה 2026`. `כדורגל` is its own
+  top-level tab (rail `לפי ליגה`); `ספורט`'s `לפי ענף` starts at `כדורסל` (no football).
+  Both use one shared cascade shell (`NAV` model + `buildShell`/`casCat`/`casMid`/`casReset`):
+  **default = rail (right) + hot topics (left), middle empty — no category pre-selected**; hover a rail
+  item → middle fills + left clears; hover a middle item → left fills (right→middle→left); mouse-out →
+  back to default. Mirrored on mobile by `flow.html`'s `categoriesDrawer()` (`D.drawer.football`/
+  `footballHot`/`sportsHot`), where every level carries a **`לכל ה…` CTA** (the touch stand-in for
+  clicking a level's header on desktop).
 - **`flow.html`** (~3500 lines) *is the whole app (mobile prototype).* One global `state` object + `render()`
   (rebuilds `#app.innerHTML`) + one delegated `wire()` that dispatches on `data-act`
   (`const a = e.target.closest('[data-act]'); act = a.getAttribute('data-act')`).
