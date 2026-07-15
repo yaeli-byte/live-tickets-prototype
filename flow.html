@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=53" />
+<link rel="stylesheet" href="flow.v5.css?v=54" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -642,9 +642,11 @@ function aiRespond(query){
     if(/מתי|הבא|התאריך|when|next/i.test(q)){ const c=fx[0]; return {summary:'המשחק הבא: '+c.title+' · '+c.date+' · '+c.venue+'. מ-'+c.price+' כולל עמלות.', cards:[fxToAiCard(c)]}; }
   }
   const sport=/כדורגל|ריאל|ברצלונ|קלאסיקו|nba|כדורסל|לייקרס|דרבי|משחק|ספורט|מונדיאל|אתלטיקו/i.test(q);
+  const qt=(q||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));   // echo the query safely
+  const ref=qt?`לגבי ״${qt}״ — `:'';
   return sport
-    ? {summary:'מצאתי משחקים זמינים בטווח שלך. ההצעות המשתלמות ביותר, כולל כל העמלות:', cards:AI_CARDS_SPORT}
-    : {summary:'מצאתי 3 מופעים בוומבלי בטווח שלך. שתי האפשרויות המשתלמות ביותר, כולל כל העמלות:', cards:AI_CARDS_CONCERT};
+    ? {summary:ref+'מצאתי משחקים זמינים בטווח שלך. ההצעות המשתלמות ביותר, כולל כל העמלות:', cards:AI_CARDS_SPORT}
+    : {summary:ref+'מצאתי מופעים זמינים בטווח שלך. האפשרויות המשתלמות ביותר, כולל כל העמלות:', cards:AI_CARDS_CONCERT};
 }
 function openAI(query){
   if(state.page!==9) state.aiReturn = state.page;
