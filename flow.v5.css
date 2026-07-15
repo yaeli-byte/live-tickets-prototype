@@ -1116,6 +1116,12 @@ img{display:block;}
 .pur-cta{width:100%;margin-top:14px;padding:13px;font-size:14px;border-radius:12px;}
 .pur-trust{text-align:center;font-size:11px;color:var(--muted);margin-top:12px;}
 .pur-trust .star{color:var(--orange);}
+/* payment/security badges (Figma 332:3357) */
+.pay-badges{display:flex;gap:40px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:16px;}
+.pay-badges img{display:block;object-fit:contain;max-width:100%;}
+.pay-badges .pb-visa{width:63px;height:27px;}
+.pay-badges .pb-pci{width:80px;height:31px;}
+.pay-badges .pb-mc{width:77px;height:44px;}
 /* fields */
 .fld{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font:400 13px 'Rubik',sans-serif;color:var(--ink);text-align:right;background:#fff;margin-top:8px;outline:none;}
 .fld::placeholder{color:var(--muted);}

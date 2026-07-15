@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=44" />
+<link rel="stylesheet" href="flow.v5.css?v=45" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2673,6 +2673,8 @@ function chkAddons(){
     <div class="ao-note">${want?'סימנתם ״ישיבה יחד״ באירוע · ':''}הוספה בנגיעה — לא מחויב אוטומטית</div>
   </div>`;
 }
+/* payment/security badges (Figma 332:3357) — checkout footer */
+function payBadges(){ return `<div class="pay-badges"><img class="pb-visa" src="assets/pay-visa-verified.png" alt="Verified by Visa"><img class="pb-pci" src="assets/pay-pci-dss.png" alt="PCI DSS Compliant"><img class="pb-mc" src="assets/pay-mc-securecode.png" alt="MasterCard SecureCode"></div>`; }
 function pageCheckout(){
   return `
   <div class="chk-stick">${collapsingHead(state.buy||{}, 'back-order')}</div>
@@ -2687,7 +2689,7 @@ function pageCheckout(){
     ${chkPayment()}
     ${chkTerms()}
     <button class="btn btn-pink pur-cta" data-act="pay">אישור ותשלום · ${nis(buyTotal())}</button>
-    <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>
+    ${payBadges()}
   </div>`;
 }
 
@@ -3118,7 +3120,7 @@ function pageCheckoutDesk(){
           ${orderSummaryCard({})}
           <div class="chk-h">סיכום הזמנה</div>
           <div class="sumbox2"><div class="sb-title">פירוט מחיר</div>${buySummaryRows()}</div>
-          <div class="pur-trust"><span class="star">★</span> אחריות 100% · אחריות מלאה על הכרטיס · תשלום מאובטח</div>
+          ${payBadges()}
         </div>
       </div>
       <div class="dchk-form"><div class="dchk-form-in">
