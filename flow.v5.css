@@ -1114,6 +1114,16 @@ img{display:block;}
 .sumbox2 .sr .incl{color:var(--pgreen);font-weight:600;}
 .sumbox2 .sr.tot{font-weight:700;color:var(--ink);font-size:14px;border-top:1px dashed var(--line);margin-top:6px;padding-top:7px;}
 .pur-cta{width:100%;margin-top:14px;padding:13px;font-size:14px;border-radius:12px;}
+.pur-cta.disabled{opacity:.45;pointer-events:none;}
+/* unequal split editor + offline-pending states */
+.split-custom .split-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
+.split-custom .split-amt{width:96px;flex-shrink:0;text-align:center;}
+.split-custom .split-lbl{font-size:13px;color:var(--ink);unicode-bidi:plaintext;}
+.split-bal{margin-top:11px;font-size:13.5px;font-weight:700;text-align:center;}
+.split-bal.warn{color:var(--amber);}
+.split-bal.ok{color:var(--pgreen);}
+.conf-tick.pend{background:#fff4e3;color:var(--amber);}
+.pur-card.hold24{border-color:var(--amber);background:#fffaf2;}
 .pur-trust{text-align:center;font-size:11px;color:var(--muted);margin-top:12px;}
 .pur-trust .star{color:var(--orange);}
 /* payment/security badges (Figma 332:3357) */

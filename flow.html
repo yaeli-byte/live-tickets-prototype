@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=48" />
+<link rel="stylesheet" href="flow.v5.css?v=49" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -48,7 +48,8 @@ const state = {
   moreDates:false, moreArtists:false,   // "הצג עוד" progressive-reveal toggles (lobby dates · category artists)
   aobDismissed:false,   // user closed the floating active-order snackbar
   coName:'', coFirst:'', coLast:'', coPhone:'', coEmail:'', coInstall:'12', coSplitOpen:false,
-  splitN:4, splitMode:'equal', orderNo:'LT-38210', splitAllPaid:false, splitConfirmed:false,
+  splitN:4, splitMode:'equal', splitAmounts:{}, orderNo:'LT-38210', splitAllPaid:false, splitConfirmed:false,
+  cashPending:false,   // offline (מזומן/העברה) — seats held 24h pending payment, auto-cancel on expiry
   buyEdge:null, // 'expired' | 'soldout' | 'tentative' | null
   srRecent:['קולדפליי','ריאל מדריד','טיילור סוויפט'],
   p1LastMinute:false, p1GenreSelected:null, p1CitySelected:null, p1DateLabel:null,
@@ -108,7 +109,7 @@ const D = {
   ],
   faqP1:[
     {q:'איך זה עובד?', a:'רכשו כרטיסים ישירות בלחיצה אחת. כל הכרטיסים מאומתים ומגיעים לאימייל תוך דקות.'},
-    {q:'האם המחיר כולל עמלות?', a:'כן! כל המחירים המוצגים הם מחיר all-in כולל עמלות. אין הפתעות בקופה.'},
+    {q:'האם המחיר כולל עמלות?', a:'כן — המחיר המוצג כולל את עמלת הפלטפורמה. דמי משלוח ותוספות שתבחרו מתווספים בנפרד, עם פירוט מלא לפני התשלום.'},
   ],
   musicGenres:['פופ','רוק','היפ-הופ','לטין','קלאסי','כל ההופעות'],
   cities:['לונדון','ברצלונה','מדריד','פריז','מילאנו','מינכן','אמסטרדם','רומא'],
@@ -174,7 +175,7 @@ const D = {
   ],
   faqP2:[
     {q:'איך אדע שהמקומות צמודים?', a:'בעמוד הבחירה ניתן לבחור כמות ואנו מבטיחים מקומות צמודים.'},
-    {q:'מה קורה אם נקראתי למילואים?', a:'החזר כספי מלא למי שנקרא למילואים עם הצו הרלוונטי.'},
+    {q:'אפשר לבטל את ההזמנה?', a:'ניתן להוסיף כיסוי ביטול בתשלום בשלב התשלום (אופציונלי · בכפוף לזמינות ולתנאי הכיסוי) ולקבל החזר בהתאם לתנאים.'},
     {q:'מתי אקבל את הכרטיסים?', a:'הכרטיסים ישלחו לאימייל מיד לאחר הרכישה — לרוב תוך דקות.'},
   ],
   alsoLike:[
@@ -185,7 +186,7 @@ const D = {
   ],
   reviews:[
     {av:'🙋', name:'מיכל כ.', meta:'לונדון · יולי 2025', stars:5, t:'חוויה שלא תישכח לעולם. הקסם של הצמידים המאירים בחשכה, הקול של קריס מרטין — זה פשוט מושלם. כרטיסים דרך Live Tickets הגיעו מיד ✅'},
-    {av:'👨', name:'יונתן ל.', meta:'פריז · יולי 2025', stars:5, t:'הופעת חיים! הפקה עצומה, סאונד מדהים. המחיר all-in ב-Live Tickets היה הוגן מאוד — ממליץ בחום.'},
+    {av:'👨', name:'יונתן ל.', meta:'פריז · יולי 2025', stars:5, t:'הופעת חיים! הפקה עצומה, סאונד מדהים. המחיר ב-Live Tickets היה הוגן ושקוף — ממליץ בחום.'},
     {av:'👩', name:'תמר ש.', meta:'מינכן · אוגוסט 2025', stars:4, t:'קולדפליי הם פנומן. ישבנו ביציע הצדדי, מבט מצוין. הכרטיסים הגיעו לנייד שעה לפני — שירות מעולה.'},
   ],
   // ---- P3 (Event — קולדפליי · ומבלי) ----
@@ -255,7 +256,7 @@ const D = {
   ],
   homeFaq:[
     {q:'איך מזמינים כרטיסים?',a:'בוחרים אירוע, לוחצים "הזמנת כרטיסים", ומשלמים בתשלום מאובטח. האישור נשלח מיד למייל.'},
-    {q:'האם המחירים כוללים עמלות?',a:'כן — כל המחירים המוצגים הם מחיר all-in כולל עמלות. אין הפתעות בקופה.'},
+    {q:'האם המחירים כוללים עמלות?',a:'המחיר המוצג כולל את עמלת הפלטפורמה. דמי משלוח ותוספות אופציונליות מתווספים בנפרד — עם פירוט מלא לפני התשלום.'},
   ],
   // curated collection for the promoted occasion (see OCCASION config below)
   occasionEvents:[
@@ -295,7 +296,7 @@ const OCCASION = { occasion:'worldcup', label:'מונדיאל 2026', dateRange:'
 const FOOTBALL = {
   crumb:'כדורגל',
   title:'כרטיסים לכדורגל',
-  lede:'משחקי הכדורגל הגדולים בעולם · מחירים all-in',
+  lede:'משחקי הכדורגל הגדולים בעולם · מחירים כולל עמלות',
   hue:'green',
   featured:{ name:'אל קלאסיקו · ריאל נגד ברצלונה', tag:'לה ליגה · אצטדיון ברנבאו · מדריד · 14 יולי', price:'₪690', event:'clasico' },
   leagues:[
@@ -317,7 +318,7 @@ const FOOTBALL = {
   ],
   faq:[
     {q:'האם אפשר 4 מקומות צמודים?',a:'כן. בבחירת הכמות סמנו "ישיבה יחד" ונשריין לכם מקומות באותה שורה, בכפוף לזמינות.'},
-    {q:'מה קורה אם נקראתי למילואים?',a:'הכיסוי שלנו כולל ביטול כולל מילואים — בהצגת צו קריאה תקבלו החזר מלא, גם ברגע האחרון.'},
+    {q:'אפשר לבטל את ההזמנה?',a:'ניתן להוסיף כיסוי ביטול בתשלום בשלב התשלום (אופציונלי · בכפוף לזמינות ולתנאי הכיסוי) — ולקבל החזר בהתאם לתנאים.'},
   ],
   seo:{h:'כרטיסים לכדורגל בחו״ל',p:'משחקי לה ליגה, פרמייר ליג וליגת האלופות: ריאל מדריד, ברצלונה, מנצ׳סטר סיטי ועוד. כל המחירים כוללים עמלות, עם אחריות 100%.'},
 };
@@ -325,7 +326,7 @@ const FOOTBALL = {
 const NBA = {
   crumb:'NBA',
   title:'כרטיסים ל-NBA',
-  lede:'משחקי ה-NBA הגדולים · מחירים all-in',
+  lede:'משחקי ה-NBA הגדולים · מחירים כולל עמלות',
   hue:'purple',
   featured:{ name:'לייקרס נגד סלטיקס', tag:'NBA · לוס אנג׳לס · 14 יולי · Crypto.com Arena', price:'₪320' },
   tabs:[['games','משחקים'],['teams','קבוצות'],['players','שחקנים'],['table','טבלה']],
@@ -382,7 +383,7 @@ const REAL = {
   squad:[{name:'פראן גונזלס',img:'squad-1.jpg'},{name:'חבייר נבארו',img:'squad-2.jpg'},{name:'סרחיו מסטרה',img:'squad-3.jpg'},{name:'אלוארו פוסו',img:'squad-4.jpg'}],
   faq:[
     {q:'איך אשיג 4 מקומות צמודים?',a:'בבחירת הכמות סמנו "ישיבה יחד" ונשריין לכם מקומות באותה שורה ביציע, בכפוף לזמינות.'},
-    {q:'מה קורה אם נקראתי למילואים?',a:'הכיסוי כולל ביטול כולל מילואים — בהצגת צו קריאה תקבלו החזר מלא, גם ברגע האחרון.'},
+    {q:'אפשר לבטל את ההזמנה?',a:'ניתן להוסיף כיסוי ביטול בתשלום בשלב התשלום (אופציונלי · בכפוף לזמינות ולתנאי הכיסוי) — ולקבל החזר בהתאם לתנאים.'},
     {q:'מתי אקבל את הכרטיסים?',a:'הכרטיסים הדיגיטליים מגיעים לאימייל תוך דקות מרגע האישור. כל המחירים כוללים עמלות.'},
   ],
   reviews:[
@@ -449,7 +450,7 @@ function render(){
   const isEventSel = !state.desktop && state.page===3;   // mobile event page = map + drawer seat-selection
   const isPurchase = state.page>=10 && state.page<=18;
   const isBrowse = state.page>=0 && state.page<=7;
-  const showBar = state.holdActive && isBrowse && !state.aobDismissed;   // sitewide active-order bar (dismissable)
+  const showBar = (state.holdActive || state.cashPending) && isBrowse && !state.aobDismissed;   // sitewide active-order bar (dismissable)
   // desktop: seat-selection screens (event listings + seat page) go wide two-pane.
   // checkout & the rest of the purchase flow get their desktop layout next.
   const pfWide = state.desktop && (state.page===3 || state.page===10 || state.page===11);
@@ -520,7 +521,7 @@ const AI_CARDS_SPORT = [
   {name:'אל קלאסיקו · ריאל נגד ברצלונה', venue:'סנטיאגו ברנבאו, מדריד', date:'שבת 14 יולי 2026', section:'טריבונה מערב, שורה 8', price:'₪690', img:'team-realmadrid.jpg', ev:'clasico'},
   {name:'ריאל מדריד נגד אתלטיקו', venue:'סנטיאגו ברנבאו, מדריד', date:'ראשון 21 יולי 2026', section:'יציע צפון, שורה 14', price:'₪620', img:'team-realmadrid.jpg', ev:'match', evTitle:'ריאל מדריד נגד אתלטיקו מדריד', evVenue:'סנטיאגו ברנבאו, מדריד', evPrice:'₪620'},
 ];
-const AI_STARTERS = ['אל קלאסיקו — ריאל נגד ברצלונה','משחק של ריאל מדריד בקיץ','אירועי ספורט בסוף השבוע','הופעה בחו״ל עם ביטול כולל מילואים'];
+const AI_STARTERS = ['אל קלאסיקו — ריאל נגד ברצלונה','משחק של ריאל מדריד בקיץ','אירועי ספורט בסוף השבוע','הופעה בחו״ל עם כיסוי ביטול'];
 
 /* ============================================================
    MATCHUP / RIVALRY RESOLUTION LAYER
@@ -603,7 +604,7 @@ function matchupBlock(q){
       <div class="mu-fx-body">
         <div class="mu-fx-nm">${f.title}</div>
         <div class="mu-fx-mt">${f.date} · ${f.comp} · ${f.venue}</div>
-        <span class="ai-badge">✓ ביטול כולל מילואים</span>
+        <span class="ai-badge">✓ כרטיס מאומת</span>
         <div class="mu-fx-price">מ-${f.price}<span class="fees"> · כולל עמלות</span></div>
       </div>
       <span class="mu-fx-cta">לכרטיסים ›</span>
@@ -669,7 +670,7 @@ function pageAiChat(){
       <div class="ai-evc-body">
         <div class="ai-evc-nm">${c.name}</div>
         <div class="ai-evc-mt">${c.venue} · ${c.date} · ${c.section}</div>
-        <span class="ai-badge">✓ ביטול כולל מילואים</span>
+        <span class="ai-badge">✓ כרטיס מאומת</span>
         <div class="ai-evc-price">${c.price} <small>כולל עמלות · ליחיד</small></div>
         <button class="ai-cta" data-act="event" ${evAttr}>▶ לכרטיסים</button>
       </div>
@@ -682,7 +683,7 @@ function pageAiChat(){
       <div class="ai-asig"><span class="dot">✦</span> Live Tickets AI</div>
       <div class="ai-asum">${t.r.summary}</div>
       ${t.r.cards.map(evCard).join('')}
-      <div class="ai-cite"><span class="g">●</span> מבוסס על מלאי אמיתי · מחירים כולל הכל · עודכן היום</div>
+      <div class="ai-cite"><span class="g">●</span> מבוסס על מלאי אמיתי · מחירים כולל עמלות · עודכן היום</div>
       <div class="ai-fups">${fups.map(f=>`<button class="ai-fup" data-act="ai-fup" data-q="${f}">${f}</button>`).join('')}</div>
       <div class="ai-handoff" data-act="package">💬 רוצה עזרה אישית? דברו עם נציג <span class="wa-link">WhatsApp ←</span></div>
     </div>`;
@@ -985,7 +986,7 @@ function pageOccasion(){
   </section>
   ${mondialBracket()}
   <div class="trust">
-    <div class="r1"><span class="star">★</span> אחריות 100% · ביטול כולל מילואים</div>
+    <div class="r1"><span class="star">★</span> אחריות 100% · תשלום מאובטח</div>
     <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · מאז 2006 · 300,000+ לקוחות</div>
     <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
   </div>
@@ -1005,7 +1006,7 @@ function pageCategory(){
 
   <section class="cat-hero">
     <h1>כרטיסים להופעות פופ</h1>
-    <p class="lede">הופעות הפופ הגדולות ברחבי העולם · מחירים all-in</p>
+    <p class="lede">הופעות הפופ הגדולות ברחבי העולם · מחירים כולל עמלות</p>
     <div class="hero-big" data-act="lobby">
       <img class="hb-img" src="${IMG}artist1.jpg" alt="קולדפליי">
       <div class="hb-scrim"></div>
@@ -1150,7 +1151,7 @@ function featuredCard(f,dest){
 function sportsTrust(){
   return `
   <div class="trust">
-    <div class="r1"><span class="star">★</span> אחריות 100% · ביטול כולל מילואים</div>
+    <div class="r1"><span class="star">★</span> אחריות 100% · תשלום מאובטח</div>
     <div class="r2"><span class="star">★</span> 4.8 · 12,400 ביקורות Google · כל המחירים כוללים עמלות</div>
     <div class="pays"><span class="pay">Visa</span><span class="pay">Mastercard</span><span class="pay">PCI</span><span class="pay">SSL</span></div>
   </div>`;
@@ -1175,7 +1176,7 @@ function pageFootball(){
   const lg = state.leagueTitle;   // when set, this hub renders as that league's lobby
   const crumb = lg || F.crumb;
   const title = lg || F.title;
-  const lede  = lg ? `כל האירועים של ${lg} · מחירים all-in` : F.lede;
+  const lede  = lg ? `כל האירועים של ${lg} · מחירים כולל עמלות` : F.lede;
   const featured = lg ? {name:lg, tag:`המשחקים הגדולים של ${lg} · העונה 2026`, price:'₪690', event:'clasico', hue:F.hue} : F.featured;
   return `
   ${sportsCrumb(crumb)}
@@ -1486,7 +1487,7 @@ function pageTeam(){
   <!-- איך היה במשחק? (מעל שאלות נפוצות) -->
   <section class="section">
     <div class="sec-head"><a class="sec-link" data-act="soon" data-title="ביקורות">כל 512 הביקורות ›</a><h2 class="sec-title">איך היה במשחק?</h2></div>
-    ${reviewRecap('4.8','512','הצופים מדגישים אווירה חשמלית ביציע, מקומות צמודים כמו שהובטח וקבלת כרטיסים מיידית — כולל אחריות מלאה וביטול כולל מילואים.')}
+    ${reviewRecap('4.8','512','הצופים מדגישים אווירה חשמלית ביציע, מקומות צמודים כמו שהובטח וקבלת כרטיסים מיידית — כולל אחריות מלאה על הכרטיס.')}
     <div class="reviews">
       ${T.reviews.map(r=>`
         <div class="rev">
@@ -2210,6 +2211,14 @@ function buyTogetherAmt(){ return state.buyAdjacent ? 90*state.buyQty : 0; }   /
 function buyCoverageAmt(){ return state.buyCoverage ? Math.round(buyTicketsTotal()*0.10) : 0; } // כיסוי ביטול
 function buyTotal(){ return buyTicketsTotal() + buyDeliveryFee() + buyTogetherAmt() + buyCoverageAmt(); }
 function splitPer(){ return Math.round(buyTotal()/Math.max(1,state.splitN)); }
+/* unequal split — per-participant amounts must total the full price before seats can be secured */
+function splitSum(){ let s=0; for(let i=0;i<state.splitN;i++) s+=(parseFloat(state.splitAmounts[i])||0); return s; }
+function splitRemaining(){ return buyTotal()-splitSum(); }
+function splitBalanced(){ return Math.abs(splitRemaining())<1; }
+function splitInitAmounts(){ const n=state.splitN, per=Math.round(buyTotal()/n), a={}; for(let i=0;i<n;i++) a[i]=per; a[0]=per+(buyTotal()-per*n); state.splitAmounts=a; }
+function updateSplitBal(){ const el=document.getElementById('splitBal'); if(!el) return; const rem=splitRemaining(), bal=splitBalanced();
+  el.textContent = bal?'חולק במלואו ✓':(rem>0?`נותר לחלק ${nis(rem)}`:`חריגה של ${nis(-rem)} — עדכנו`); el.className='split-bal '+(bal?'ok':'warn');
+  const cta=document.getElementById('splitCta'); if(cta){ if(bal){cta.classList.remove('disabled');cta.setAttribute('data-act','split-pay');} else {cta.classList.add('disabled');cta.removeAttribute('data-act');} } }
 function fmtClock(s){ s=Math.max(0,s); const m=Math.floor(s/60), ss=s%60; return m+':'+String(ss).padStart(2,'0'); }
 /* card number: auto-format (spaces), auto-detect brand, Luhn check */
 function ccBrand(n){ if(/^4/.test(n))return 'VISA'; if(/^(5[1-5]|2[2-7])/.test(n))return 'MC'; if(/^3[47]/.test(n))return 'AMEX'; if(/^(6011|65|64[4-9])/.test(n))return 'DISCOVER'; return ''; }
@@ -2251,6 +2260,13 @@ function stopHold(){ state.holdActive=false; state.holdWarn=false; state.holdExp
 
 /* ---- sitewide active-order bar (browse pages only; hidden on the purchase screens) ---- */
 function activeOrderBar(){
+  if(state.cashPending && !state.holdActive){   // offline payment — 24h hold pending
+    return `<div class="aob warn" data-act="to-confirm">
+      <span class="aob-go"><span class="aob-arr">→</span><span>לפרטים</span></span>
+      <div class="aob-main"><span class="aob-txt">המקומות שמורים · השלימו תשלום</span><span class="aob-clk">24 שעות</span></div>
+      <button class="aob-x" data-act="aob-close" aria-label="סגירה">✕</button>
+    </div>`;
+  }
   if(!state.holdActive) return '';
   const cls=state.holdExpired?'exp':(state.holdWarn?'warn':'hold');
   const txt=state.holdExpired?'ההחזקה פגה':(state.holdWarn?'נותר זמן קצר להשלמה':'הכרטיסים שמורים עבורך לעוד');
@@ -2721,6 +2737,19 @@ function orderSummaryCard(opts){
 
 /* ---- 12 · Confirmation (success) ---- */
 function pageConfirm(){
+  if(state.cashPending){
+    return `
+    ${purHead('סטטוס הזמנה','home')}
+    <div class="pur">
+      <div class="conf-hero"><div class="conf-tick pend">⏳</div><div class="conf-t">ההזמנה התקבלה — ממתינה לתשלום</div><div class="conf-s">מספר הזמנה · ${state.orderNo}</div></div>
+      <div class="pur-card col hold24"><div class="pc-t">המקומות שמורים ל-24 שעות</div><div class="pc-s">השלימו את התשלום (מזומן / העברה בנקאית) בתוך 24 שעות. אם התשלום לא יתקבל בזמן — ההזמנה תבוטל אוטומטית והמקומות ישוחררו. אין אבטחה סופית לפני קבלת הכסף.</div></div>
+      <div class="conf-callback">📞 בשעות הקרובות נציג מטעמנו ייצור איתך קשר להשלמת התשלום ומסירת פרטי ההעברה.</div>
+      ${orderSummaryCard({total:true, paid:false})}
+      <button class="btn btn-pink pur-cta" data-act="mytickets">למעקב ההזמנה</button>
+      <button class="link-btn ctr" data-act="cash-expire">(דמו) התשלום לא התקבל בזמן →</button>
+      ${payBadges()}
+    </div>`;
+  }
   return `
   ${purHead('אישור הזמנה','home')}
   <div class="pur">
@@ -2752,15 +2781,22 @@ function pageSplitSetup(){
         <button class="pm-opt${state.splitMode==='custom'?' on':''}" data-act="split-mode" data-m="custom">סכומים שונים</button>
       </div>
     </div>
-    <div class="sumbox2">
+    ${state.splitMode==='custom' ? `<div class="sumbox2 split-custom">
+      <div class="sb-title">חלוקה לפי סכומים · ${nis(buyTotal())} סה״כ</div>
+      ${Array.from({length:state.splitN},(_,i)=>`<div class="split-row"><input class="fld split-amt" type="number" inputmode="numeric" data-splitamt="${i}" value="${state.splitAmounts[i]!=null?state.splitAmounts[i]:''}" placeholder="₪"><span class="split-lbl">משתתף ${i+1}${i===0?' (את/ה)':''}</span></div>`).join('')}
+      <div class="split-bal ${splitBalanced()?'ok':'warn'}" id="splitBal">${splitBalanced()?'חולק במלואו ✓':(splitRemaining()>0?`נותר לחלק ${nis(splitRemaining())}`:`חריגה של ${nis(-splitRemaining())} — עדכנו`)}</div>
+      <div class="ff-sub">הסכומים חייבים להסתכם למחיר המלא כדי לאבטח את המקומות.</div>
+    </div>` : `<div class="sumbox2">
       <div class="sb-title">התשלום הראשוני שלכם</div>
       <div class="sr"><span>${nis(buyTotal())}</span><span>סה״כ ההזמנה</span></div>
       <div class="sr"><span>${state.splitN} משתתפים</span><span>חלוקה</span></div>
       <div class="sr tot"><span>${nis(splitPer())}</span><span>החלק שלך · לתשלום עכשיו</span></div>
-    </div>
+    </div>`}
     ${chkPayer()}
     ${chkPayment({noSplit:true, title:'פרטי תשלום · תשלום ראשוני'})}
-    <button class="btn btn-pink pur-cta" data-act="split-pay">שלמו ${nis(splitPer())} ואבטחו את המקומות</button>
+    ${state.splitMode==='custom'
+      ? `<button class="btn btn-pink pur-cta split-cta${splitBalanced()?'':' disabled'}" id="splitCta"${splitBalanced()?' data-act="split-pay"':''}>אבטחת המקומות + הזמנה</button>`
+      : `<button class="btn btn-pink pur-cta" data-act="split-pay">שלמו ${nis(splitPer())} ואבטחו את המקומות</button>`}
     ${payBadges()}
   </div>`;
 }
@@ -3218,6 +3254,8 @@ function wire(){
   document.getElementById('app').oninput = (e)=>{
     const fp = e.target.closest('[data-fprice]');
     if(fp){ if(fp.getAttribute('data-fprice')==='min') state.p3Min=fp.value; else state.p3Max=fp.value; return; }
+    const sa = e.target.closest('[data-splitamt]');
+    if(sa){ const i=+sa.getAttribute('data-splitamt'); state.splitAmounts[i]= sa.value===''?'':parseFloat(sa.value); updateSplitBal(); return; }   // split amounts — live balance, no re-render
     const fld = e.target.closest('[data-fld]');
     if(fld){ state[fld.getAttribute('data-fld')] = fld.value; return; }   // contact fields — store, no re-render
     if(e.target.closest('[data-ccnum]')){ formatCC(e.target); return; }
@@ -3335,7 +3373,7 @@ function wire(){
         const date  = (E.dynamic ? (state.evDate||'') : E.date||'').replace('📅 ','');
         const price = parseInt((a.getAttribute('data-b-price')||'0').replace(/[^\d]/g,''))||0;
         state.buy={title, venue, date, sec:a.getAttribute('data-b-sec')||'', row:a.getAttribute('data-b-row')||'', unit:price, score:a.getAttribute('data-b-score')||'8', img:(E.dynamic&&state.evImg?state.evImg:E.img), key:a.getAttribute('data-lkey')||null, abroad:true, tentative:(E.type==='match')};
-        state.buyEdge=null; state.buyCoverage=false; state.buyAdjacent=false; state.buyDelivery=false; state.payMethod=''; state.showHoldModal=false; state.selRow=null; state.seat360=0; state.splitConfirmed=false; state.splitAllPaid=false;
+        state.buyEdge=null; state.buyCoverage=false; state.buyAdjacent=false; state.buyDelivery=false; state.payMethod=''; state.showHoldModal=false; state.selRow=null; state.seat360=0; state.splitConfirmed=false; state.splitAllPaid=false; state.cashPending=false; state.splitAmounts={};
         state.wantTogether = !!(state.p3f && state.p3f.together);   // carry the "ישיבה יחד" filter to checkout
         if(state.desktop && state.page===3){ deskZoom(state.buy.key, ()=>set({showHoldModal:true})); }   // zoom → 10-min price-lock popup (like mobile)
         else { set({showHoldModal:true}); }   // mobile: 10-min price-lock popup before the seat screen
@@ -3375,10 +3413,10 @@ function wire(){
       case act==='back-checkout': go(11); break;
       case act==='back-invite': go(14); break;
       case act==='to-split': go(13); break;
-      case act==='split-inc': set({splitN:Math.min(10,state.splitN+1)}); break;
-      case act==='split-dec': set({splitN:Math.max(2,state.splitN-1)}); break;
-      case act==='split-mode': set({splitMode:a.getAttribute('data-m')}); break;
-      case act==='split-pay': set({splitAllPaid:false, linkCopied:false}); go(14); break;
+      case act==='split-inc': { state.splitN=Math.min(10,state.splitN+1); if(state.splitMode==='custom') splitInitAmounts(); set({}); break; }
+      case act==='split-dec': { state.splitN=Math.max(2,state.splitN-1); if(state.splitMode==='custom') splitInitAmounts(); set({}); break; }
+      case act==='split-mode': { const m=a.getAttribute('data-m'); if(m==='custom' && (Object.keys(state.splitAmounts).length===0 || splitSum()===0)) splitInitAmounts(); set({splitMode:m}); break; }
+      case act==='split-pay': if(state.splitMode==='custom' && !splitBalanced()) break; set({splitAllPaid:false, linkCopied:false}); go(14); break;
       case act==='copy-link': { try{navigator.clipboard&&navigator.clipboard.writeText('https://livetickets.co.il/split/xR4k');}catch(_){}; state.linkCopied=true; toast('הלינק הועתק ✓'); render(); break; }
       case act==='to-organizer': go(16); break;
       case act==='preview-friend': go(15); break;
@@ -3386,7 +3424,9 @@ function wire(){
       case act==='mark-allpaid': state.splitAllPaid=true; state.splitConfirmed=true; stopHold(); go(12); break;  // everyone paid → straight to success (with the "מי שילם" list)
       case act==='split-confirm': stopHold(); go(12); break;
       case act==='confirm-pay': stopHold(); go(12); break;
-      case act==='pay': stopHold(); go(12); break;
+      case act==='pay': { const cash=state.payMethod==='cash'; stopHold(); set({cashPending:cash, aobDismissed:false}); go(12); break; }   // offline → 24h pending hold; else confirmed
+      case act==='to-confirm': go(12); break;
+      case act==='cash-expire': { state.cashPending=false; state.buyEdge='expired'; go(17); break; }   // 24h passed, payment not received → auto-cancel, start over
       case act==='install': set({coInstall:a.getAttribute('data-n')}); break;
       case act==='mytickets': { state.phTitle='הכרטיסים שלי'; state.phNote='האזור האישי — הכרטיסים שלכם יופיעו כאן · בקרוב'; go(8); break; }
       case act==='wallet': toast('נוסף לארנק ✓'); break;
