@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=45" />
+<link rel="stylesheet" href="flow.v5.css?v=46" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2382,9 +2382,8 @@ function qtyModal(){
   const date=(E.dynamic?(state.evDate||''):E.date||'').replace('📅 ','');
   const img=E.dynamic&&state.evImg?state.evImg:E.img;
   const cur=state.buyQty||2;
-  const guar=(E.sitTogetherGuaranteeAvailable!==false);   // per-event sit-together guarantee flag (default: available)
   const opt=(q,lbl)=>`<button class="qm-opt${cur===q?' on':''}" data-act="qty-set" data-q="${q}">${lbl||q}</button>`;
-  const note = cur>=3 ? `<div class="qm-note">${guar?'מושבים צמודים בתוספת תשלום בסוף ההזמנה':'בבחירה של מעל 2 כרטיסים ייתכן שלא תשבו יחד'}</div>` : '';
+  const note = cur>=3 ? `<div class="qm-note">מעל 2 כרטיסים? ייתכן שלא תשבו יחד. ניתן להוסיף ישיבה משותפת בתשלום.</div>` : '';
   return `<div class="modal-scrim qm-scrim" data-act="qty-modal-close">
     <div class="qm" data-act="noop">
       <div class="qm-head"><img class="qm-img" src="${IMG}${img}" alt=""><div class="qm-ev"><div class="qm-t">${title}</div><div class="qm-d">${date}</div></div></div>
