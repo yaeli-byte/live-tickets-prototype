@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=52" />
+<link rel="stylesheet" href="flow.v5.css?v=53" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2061,6 +2061,38 @@ function srTypeahead(q){
   rows.push({kind:'all',label:'כל התוצאות עבור "'+q+'"',sub:'',icon:'🔍'});
   return rows.slice(0,8);
 }
+/* Contextual AI follow-up questions for the LIVE search dropdown (active state).
+   No live model in the prototype → a small rule set: canned per demo topic, else
+   query-filled templates with concert- vs sport-appropriate phrasing. */
+const SR_AIQ = [
+  {tags:['קולדפליי','coldplay'],                          qs:['כמה עולים כרטיסים לקולדפליי בוומבלי?','אילו תאריכים זמינים לקולדפליי באוגוסט?','מה ההבדל בין היציעים בוומבלי?']},
+  {tags:['טיילור','סוויפט','taylor','swift'],              qs:['מתי ההופעה הקרובה של טיילור סוויפט?','מה טווח המחירים לכרטיסים לטיילור סוויפט?','יש כרטיסים צמודים לשניים להופעה?']},
+  {tags:['bts','בי טי אס','בטס'],                          qs:['מתי המופע הקרוב של BTS?','כמה עולים כרטיסים ל-BTS?','אילו ערים זמינות בסיבוב של BTS?']},
+  {tags:['ריאל','real madrid','לוס בלנקוס'],               qs:['מתי המשחק הקרוב של ריאל מדריד?','מה טווח המחירים למשחק בברנבאו?','יש כרטיסים לאל קלאסיקו הקרוב?']},
+  {tags:['ברצלונ','ברסלונ','בארסה','ברסה','barca','barça'], qs:['מתי המשחק הקרוב של ברצלונה?','כמה עולים כרטיסים בקאמפ נואו?','יש כרטיסים לאל קלאסיקו הקרוב?']},
+  {tags:['nba','אן בי איי','לייקרס','סלטיקס','כדורסל'],     qs:['אילו משחקי NBA זמינים החודש?','מה טווח המחירים לכרטיסי NBA?','מהם המקומות הכי טובים ליד הפרקט?']},
+];
+function srIsSport(q){ return /כדורגל|ריאל|ברצלונ|בארסה|ברסה|קלאסיקו|nba|כדורסל|לייקרס|סלטיקס|דרבי|משחק|ספורט|מונדיאל|אתלטיקו|ליגה|גביע/i.test(q||'') || !!resolveMatchup(q) || !!mResolveTeam(q); }
+function srFollowups(q){
+  const s=(q||'').trim(); if(!s) return [];
+  const ql=s.toLowerCase();
+  const hit=SR_AIQ.find(o=>o.tags.some(t=>ql.includes(t.toLowerCase())));
+  if(hit) return hit.qs;
+  const sport=srIsSport(s);
+  return [
+    sport?`מתי המשחק הקרוב של ${s}?`:`מתי ההופעה הקרובה של ${s}?`,
+    `מה טווח המחירים לכרטיסים ל-${s}?`,
+    `אילו תאריכים וערים זמינים ל-${s}?`,
+    `מה החבילה הכי משתלמת ל-${s}?`,
+  ];
+}
+function srFollowBlock(q){
+  const fups=srFollowups(q); if(!fups.length) return '';
+  return `<div class="sr-aifup">
+    <div class="sr-aifup-h">המשיכו עם AI <span class="dot">✦</span></div>
+    ${fups.map(f=>`<button class="sr-aiq" data-act="ai-open" data-q="${f.replace(/"/g,'&quot;')}"><span class="sp">✦</span><span class="tx">${f}</span><span class="ar">←</span></button>`).join('')}
+  </div>`;
+}
 function srResults(q){
   if(!q.trim()) return {topMatch:null,events:[],performers:[],cities:[],categories:[]};
   const ql=q.toLowerCase(), intent=srDetectIntent(q);
@@ -2126,7 +2158,7 @@ function searchOverlay(){
         <div class="tx"><div class="n">${r.label}</div>${r.sub?`<div class="s">${r.sub}</div>`:''}</div>
         ${tagLabel[r.kind]?`<span class="ta-tag" style="color:${tagColor[r.kind]};background:${tagColor[r.kind]}1a">${tagLabel[r.kind]}</span>`:''}
       </div>`;
-    }).join('');
+    }).join('') + srFollowBlock(q);
   } else {
     const r=srResults(q);
     const sec=(t)=>`<h4 class="res-h">${t}</h4>`;
