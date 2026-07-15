@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=55" />
+<link rel="stylesheet" href="flow.v5.css?v=56" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -277,19 +277,20 @@ const D = {
       {n:'ליגה ספרדית',teams:['ריאל מדריד','ברצלונה','אתלטיקו מדריד','סביליה']},
     ],
     footballHot:[
-      {n:'ברצלונה',act:'team',team:'barca'},
-      {n:'ריאל מדריד',act:'team',team:'real'},
-      {n:'מנצ׳סטר יונייטד',act:'team',team:'united'},
-      {n:'מנצ׳סטר סיטי',act:'team',team:'city'},
-      {n:'סופר קלאסיקו',act:'event',ev:'clasico'},
+      {n:'ברצלונה',act:'team',team:'barca',img:'team-barcelona.jpg'},
+      {n:'ריאל מדריד',act:'team',team:'real',img:'team-realmadrid.jpg'},
+      {n:'סופר קלאסיקו',act:'event',ev:'clasico',img:'rm-highlights.jpg'},
+      {n:'מנצ׳סטר יונייטד',act:'team',team:'united',img:'sport1.jpg'},
+      {n:'מנצ׳סטר סיטי',act:'team',team:'city',img:'laliga.jpg'},
+      {n:'ליגת האלופות',act:'leaguelobby',img:'ucl.jpg'},
     ],
     sportsHot:[
-      {n:'ליגת האלופות',act:'leaguelobby'},
-      {n:'ליגה אנגלית',act:'leaguelobby'},
-      {n:'ליגה ספרדית',act:'leaguelobby'},
-      {n:'ליגה איטלקית',act:'leaguelobby'},
-      {n:'מונדיאל 2026',act:'occasion'},
-      {n:'NBA / יורוליג',act:'nba'},
+      {n:'ליגת האלופות',act:'leaguelobby',img:'ucl.jpg'},
+      {n:'ליגה אנגלית',act:'leaguelobby',img:'rm-highlights.jpg'},
+      {n:'ליגה ספרדית',act:'leaguelobby',img:'laliga.jpg'},
+      {n:'ליגה איטלקית',act:'leaguelobby',img:'dest-italy.jpg'},
+      {n:'מונדיאל 2026',act:'occasion',img:'sport1.jpg'},
+      {n:'NBA / יורוליג',act:'nba',img:'nba.jpg'},
     ],
     sports:[
       {n:'כדורסל',comps:[{n:'יורוליג',teams:['מכבי ת״א','פאניתנייקוס','ריאל מדריד','פנרבחצ׳ה']},{n:'NBA',teams:['בוסטון סלטיקס','לייקרס','גולדן סטייט','ניקס']}]},
@@ -1983,8 +1984,9 @@ function categoriesDrawer(){
   const sec = state.drawerSection;
   const row=(name,sign,act)=>`<button class="drow" data-act="${act}">${name}<span class="sign">${sign}</span></button>`;
   const hdr=t=>`<div style="padding:4px 16px 10px;color:#888;font-size:11px;text-align:right">${t}</div>`;
-  // hot-topic row (entry level of a category) — the merchandised shortcuts from the desktop nav
-  const hotRow=h=>`<button class="drow" data-act="${h.act}"${h.team?` data-team="${h.team}"`:''}${h.ev?` data-event="${h.ev}"`:''}${h.act==='leaguelobby'?` data-title="${h.n}"`:''} style="font-size:13px;padding-right:28px;color:#555">${h.n}<span class="sign">›</span></button>`;
+  // hot topics (entry level of a category) — image cards, mirroring the desktop nav's tiles
+  const hotCard=h=>`<button class="dcard" data-act="${h.act}"${h.team?` data-team="${h.team}"`:''}${h.ev?` data-event="${h.ev}"`:''}${h.act==='leaguelobby'?` data-title="${h.n}"`:''}><img src="${IMG}${h.img}" alt=""><span class="sc"></span><span class="nm">${h.n}</span></button>`;
+  const hotCards=items=>`<div class="dcards">${items.map(hotCard).join('')}</div>`;
   // "לכל ה…" CTA — every level gets its own entry point (mobile stand-in for clicking a level's header on desktop)
   const allCta=(label,act,title,pad)=>`<button class="drow" data-act="${act}"${title?` data-title="${title}"`:''} style="font-size:${pad>=48?12:13}px;padding-right:${pad}px;color:#ED1860;font-weight:600">לכל ה${label}<span class="sign">›</span></button>`;
   let secHtml='';
@@ -2004,7 +2006,7 @@ function categoriesDrawer(){
       } else if(k==='football'){
         // entry level: hot topics, then לפי ליגה → קבוצה
         sub += hdr('קבוצות ומשחקים חמים');
-        sub += D.drawer.footballHot.map(hotRow).join('');
+        sub += hotCards(D.drawer.footballHot);
         sub += hdr('לפי ליגה');
         D.drawer.football.forEach((lg,li)=>{
           const lo = state.mFbLeague===('l'+li);
@@ -2018,7 +2020,7 @@ function categoriesDrawer(){
       } else if(k==='sports'){
         // entry level: hot topics, then לפי ענף → מפעל/ליגה → קבוצה
         sub += hdr('אירועי ספורט פופולאריים');
-        sub += D.drawer.sportsHot.map(hotRow).join('');
+        sub += hotCards(D.drawer.sportsHot);
         sub += hdr('לפי ענף');
         D.drawer.sports.forEach((sp,si)=>{
           const so = state.mSport===('s'+si);

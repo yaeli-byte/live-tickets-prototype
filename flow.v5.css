@@ -613,6 +613,14 @@ img{display:block;}
   padding:13px 16px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:14px;color:var(--ink);text-align:right;}
 .drawer .drow:hover{background:#fafafa;}
 .drawer .drow .sign{color:var(--muted);font-size:13px;}
+/* hot-topic cards at a category's entry level — mirrors the desktop nav's tiles */
+.drawer .dcards{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 12px;}
+.drawer .dcard{position:relative;height:78px;border-radius:10px;overflow:hidden;border:none;padding:0;
+  cursor:pointer;display:block;background:#20242c;}
+.drawer .dcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.drawer .dcard .sc{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.74) 0%,rgba(0,0,0,0) 72%);}
+.drawer .dcard .nm{position:absolute;right:9px;left:9px;bottom:7px;color:#fff;font-weight:600;font-size:12px;
+  line-height:1.2;text-align:right;text-shadow:0 1px 3px rgba(0,0,0,.5);}
 /* promoted-occasion slot — accented, sits above the pillars */
 .drawer .drow-occasion{background:linear-gradient(90deg,#fff2f6,#fff6ee);border-bottom:1px solid var(--line);
   display:flex;align-items:center;justify-content:space-between;padding:14px 16px;}
