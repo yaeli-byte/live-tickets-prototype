@@ -881,9 +881,16 @@ img{display:block;}
 .lc-badge.good{background:#eef4ff;color:#216ca5;} .lc-badge.good .box{background:#216ca5;}
 .lc-badge.fair{background:#fff4e6;color:#b26a00;} .lc-badge.fair .box{background:#b26a00;}
 .lc-info{font-size:11px;color:var(--muted);margin-top:7px;}
-.lc-price{flex-shrink:0;text-align:left;}
-.lc-price .amt{font-size:20px;font-weight:700;color:var(--ink);display:block;}
-.lc-price .fees{font-size:11px;color:var(--muted);}
+.lc-price{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;}
+.lc-price .amt{font-size:20px;font-weight:700;color:var(--ink);display:block;line-height:1.1;}
+.lc-price .fees{font-size:11px;color:var(--pgreen);font-weight:600;}
+.lc-price .lc-val{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;border-radius:4px;padding:3px 9px;background:#f3f4f5;color:#1a1a1a;}
+.lc-price .lc-val.best{background:var(--pink);color:#fff;}
+.lc-price .lc-val .lc-star{font-size:10px;color:var(--orange);}
+.lc-price .lc-val.best .lc-star{color:#fff;}
+.lcard .lc-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;justify-content:flex-end;}
+.lcard .lc-chip{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:400;border-radius:4px;padding:3px 8px;background:#f3f4f5;color:#393939;white-space:nowrap;unicode-bidi:plaintext;}
+.lcard .lc-thumb.vt-bar{width:10px;height:auto;align-self:stretch;min-height:60px;border-radius:10px;background-color:transparent;}
 
 /* ================= HOME (P0) ================= */
 .home-hero{position:relative;color:#fff;text-align:center;background-color:var(--hero-to);
@@ -1681,22 +1688,26 @@ svg.stadium{width:100%;height:100%;}
 .ss-meta .sort-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 8px;font:600 10.5px 'Rubik',sans-serif;color:#41485c;cursor:pointer;}
 .ss-meta .sort-btn.on{background:var(--ink);color:#fff;border-color:var(--ink);}
 .ss-list{flex:1;overflow-y:auto;padding:8px 12px 16px;-webkit-overflow-scrolling:touch;}
-.ss-list .lc{display:flex;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px;cursor:pointer;background:#fff;}
+/* refined listing card (Figma 336:3362/3389/3416) — value badge under price · feature chips · zone side-bar */
+.ss-list .lc{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 6px 10px 10px;margin-top:8px;cursor:pointer;background:#fff;}
 .ss-list .lc.sel{border-color:var(--pink);box-shadow:0 0 0 2px rgba(237,24,96,.14);}
 .ss-list .lc.hov{border-color:var(--ink);}
-.ss-list .lc .vt{width:46px;height:46px;border-radius:9px;flex-shrink:0;background-size:cover;background-position:center;background-color:var(--card-dark);}
 .ss-list .lc .g{flex:1;min-width:0;text-align:right;}
-.ss-list .lc .nm{font-size:12.5px;font-weight:700;color:var(--ink);}
-.ss-list .lc .rs{font-size:10.5px;color:var(--muted);margin-top:2px;unicode-bidi:plaintext;}
-.ss-list .lc .lc-b{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin-top:5px;}
-/* value badges — brand pink (not area colours) · best=filled, good=tint, fair=neutral */
-.ss-list .lc .badge{font-size:9.5px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--pink);color:#fff;border:1px solid var(--pink);}
-.ss-list .lc .badge.good{background:#fef2f6;color:var(--pink);border-color:#f5c2d5;font-weight:600;}
-.ss-list .lc .badge.fair{background:#f4f2ee;color:#5a6274;border-color:var(--line);font-weight:600;}
-.ss-list .lc .lc-left{font-size:9.5px;color:var(--muted);unicode-bidi:plaintext;}
-.ss-list .lc .pr{text-align:start;white-space:nowrap;flex-shrink:0;}
-.ss-list .lc .pr .price{font-size:14px;font-weight:700;color:var(--ink);}
+.ss-list .lc .nm{font-size:14px;font-weight:600;color:var(--ink);}
+.ss-list .lc .rs{font-size:10.5px;color:var(--ink);margin-top:2px;unicode-bidi:plaintext;}
+.ss-list .lc .lc-chips{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:4px;margin-top:5px;}
+.ss-list .lc .lc-chip{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:400;border-radius:3px;padding:2px 6px;background:#f3f4f5;color:#393939;white-space:nowrap;unicode-bidi:plaintext;}
+.ss-list .lc .lc-chip .lc-ci{font-size:8px;}
+.ss-list .lc .pr{display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:start;white-space:nowrap;flex-shrink:0;}
+.ss-list .lc .pr .price{font-size:16px;font-weight:700;color:var(--ink);line-height:1.1;}
 .ss-list .lc .pr .allin{font-size:9px;color:var(--pgreen);font-weight:600;}
+/* value badge — best=brand pink, good/fair=neutral · with ★ */
+.ss-list .lc .lc-val{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:600;border-radius:3px;padding:2px 8px;background:#f3f4f5;color:#1a1a1a;}
+.ss-list .lc .lc-val.best{background:var(--pink);color:#fff;}
+.ss-list .lc .lc-val .lc-star{font-size:8.5px;color:var(--orange);}
+.ss-list .lc .lc-val.best .lc-star{color:#fff;}
+/* zone colour — thin full-height side bar */
+.ss-list .lc .vt-bar{width:9px;align-self:stretch;border-radius:9px;flex-shrink:0;min-height:44px;}
 .stad-info{background:#fff;border-radius:16px;width:100%;max-width:340px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:right;}
 .stad-info .si-head{display:flex;align-items:center;justify-content:space-between;}
 .stad-info .si-t{font-size:16px;font-weight:700;color:var(--ink);}

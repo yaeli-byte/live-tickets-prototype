@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=49" />
+<link rel="stylesheet" href="flow.v5.css?v=50" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -200,12 +200,12 @@ const D = {
   priceMarks:['₪520','₪540','₪1,400','₪640','₪650','₪690','₪890'],
   seatChars:['כמות','ישיבה יחד','מעבר','שורה ראשונה','ללא הסתרת מבט','נגישות'],
   listings:[
-    {key:'south',   sec:'יציע דרום',  row:'טור 24', price:'₪520', score:10, val:'ערך מעולה', tog:'עד 4 יחד', left:6, img:'seat1.jpg', pin:{t:82,l:52}, sitTogetherGuaranteeAvailable:true},
-    {key:'south-c', sec:'דרום תחתון', row:'טור 12', price:'₪540', score:8,  val:'ערך טוב',   tog:'עד 2 יחד', left:4, img:'seat6.jpg', pin:{t:70,l:33}, sitTogetherGuaranteeAvailable:false},
-    {key:'west',    sec:'מערב',       row:'טור 8',  price:'₪640', score:6,  val:'ערך סביר',  tog:'עד 4 יחד', left:8, img:'seat7.jpg', pin:{t:50,l:13}, sitTogetherGuaranteeAvailable:true},
-    {key:'east',    sec:'מזרח',       row:'טור 15', price:'₪650', score:7,  val:'ערך טוב',   tog:'עד 6 יחד', left:5, img:'seat1.jpg', pin:{t:50,l:87}, sitTogetherGuaranteeAvailable:true},
-    {key:'vip',     sec:'VIP',        row:'שורה 3', price:'₪890', score:9,  val:'ערך מעולה', tog:'עד 2 יחד', left:3, img:'seat6.jpg', pin:{t:40,l:52}, sitTogetherGuaranteeAvailable:false},
-    {key:'north',   sec:'יציע צפון',  row:'טור 20', price:'₪690', score:7,  val:'ערך טוב',   tog:'עד 4 יחד', left:7, img:'seat7.jpg', pin:{t:15,l:50}, sitTogetherGuaranteeAvailable:true},
+    {key:'south',   sec:'יציע דרום',  row:'טור 24', srow:7,  price:'₪520', score:10, val:'ערך מעולה', tog:'עד 4 יחד', left:6, img:'seat1.jpg', pin:{t:82,l:52}, sitTogetherGuaranteeAvailable:true,  cover:true},
+    {key:'south-c', sec:'דרום תחתון', row:'טור 12', srow:12, price:'₪540', score:8,  val:'ערך טוב',   tog:'עד 2 יחד', left:4, img:'seat6.jpg', pin:{t:70,l:33}, sitTogetherGuaranteeAvailable:false, cover:true},
+    {key:'west',    sec:'מערב',       row:'טור 8',  srow:4,  price:'₪640', score:6,  val:'ערך סביר',  tog:'עד 4 יחד', left:8, img:'seat7.jpg', pin:{t:50,l:13}, sitTogetherGuaranteeAvailable:true,  cover:true},
+    {key:'east',    sec:'מזרח',       row:'טור 15', srow:7,  price:'₪650', score:7,  val:'ערך טוב',   tog:'עד 6 יחד', left:5, img:'seat1.jpg', pin:{t:50,l:87}, sitTogetherGuaranteeAvailable:true,  cover:true},
+    {key:'vip',     sec:'VIP',        row:'שורה 3', srow:3,  price:'₪890', score:9,  val:'ערך מעולה', tog:'עד 2 יחד', left:3, img:'seat6.jpg', pin:{t:40,l:52}, sitTogetherGuaranteeAvailable:false, cover:false},
+    {key:'north',   sec:'יציע צפון',  row:'טור 20', srow:9,  price:'₪690', score:7,  val:'ערך טוב',   tog:'עד 4 יחד', left:7, img:'seat7.jpg', pin:{t:15,l:50}, sitTogetherGuaranteeAvailable:true,  cover:true},
   ],
   related:[
     {name:'קולדפליי · פריז', price:'₪610', img:'tiktok3.jpg'},
@@ -2420,22 +2420,33 @@ function selDetail(l){ return DDETAIL_SEL[l.key]||'seat'; }
 function selRowLine(l){
   const d=selDetail(l);
   const rn=(l.row||'').replace(/\D/g,'')||l.row;
-  if(d==='section') return {t:l.sec, s:'אזור פתוח · מספר שורה יימסר עם הכרטיס'};
-  if(d==='row')     return {t:l.sec, s:`שורה ${rn} (משוער) · אפשרות ישיבה יחד`};
-  return {t:l.sec, s:`שורה ${rn} · אפשרות ישיבה יחד`};
+  if(d==='section') return {t:l.sec, s:'אזור פתוח · מספר מושב יימסר עם הכרטיס'};
+  if(d==='row')     return {t:l.sec, s:`איזור ${rn} · שורה ${l.srow||'—'} · משוער`};
+  return {t:l.sec, s:`איזור ${rn} · שורה ${l.srow||'—'}`};
+}
+/* feature chips shared by mobile + desktop listing cards */
+function lcChips(l){
+  const c=[`<span class="lc-chip">🔥 נותרו ${l.left}</span>`];
+  if(l.cover) c.push(`<span class="lc-chip">כיסוי לביטול <span class="lc-ci">✓</span></span>`);
+  if(l.sitTogetherGuaranteeAvailable) c.push(`<span class="lc-chip">אפשרות ישיבה יחד <span class="lc-ci">👥</span></span>`);
+  return c.join('');
 }
 function selCard(l){
   const rl=selRowLine(l);
   const sel=state.buy&&state.buy.key===l.key, hot=state.hotSec===l.key;
   const tier=l.score>=9?'best':l.score>=7?'good':'fair';
   return `<div class="lc${sel?' sel':''}${hot?' hov':''}" data-lkey="${l.key}" data-act="buy-select" data-b-sec="${l.sec}" data-b-row="${l.row}" data-b-price="${l.price}" data-b-img="${l.img}" data-b-score="${l.score}">
-    <div class="pr"><div class="price">${l.price}</div><div class="allin">כולל עמלות</div></div>
-    <div class="g">
-      <div class="nm"><span class="sec-dot" style="background:${areaColorFor(l.key)}"></span>${rl.t}</div>
-      <div class="rs">${rl.s}</div>
-      <div class="lc-b"><span class="badge ${tier}">${l.val}</span><span class="lc-left">🔥 נותרו ${l.left}</span></div>
+    <div class="pr">
+      <div class="price">${l.price}</div>
+      <div class="allin">כולל עמלות</div>
+      <div class="lc-val ${tier}">${l.val} <span class="lc-star">★</span></div>
     </div>
-    <span class="vt vt-zone" style="background:${areaColorFor(l.key)}" aria-label="צבע האזור"></span>
+    <div class="g">
+      <div class="nm">${rl.t}</div>
+      <div class="rs">${rl.s}</div>
+      <div class="lc-chips">${lcChips(l)}</div>
+    </div>
+    <span class="vt-bar" style="background:${areaColorFor(l.key)}" aria-label="צבע האזור"></span>
   </div>`;
 }
 /* mobile map pins — clicking a price focuses its card in the drawer (doesn't navigate) */
@@ -2912,14 +2923,13 @@ function deskListingCard(l){
   const hot=state.hotSec===l.key?' hot':'';
   const rowLine = selRowLine(l).s;   // same row-number line as the mobile cards
   return `<div class="lcard${hot}${(state.buy&&state.buy.key===l.key)?' hl':''}" data-lkey="${l.key}" data-act="buy-select" data-b-sec="${l.sec}" data-b-row="${l.row}" data-b-price="${l.price}" data-b-img="${l.img}" data-b-score="${l.score}">
-    <div class="lc-price"><span class="amt">${l.price}</span><span class="fees">כולל עמלות</span></div>
+    <div class="lc-price"><span class="amt">${l.price}</span><span class="fees">כולל עמלות</span><span class="lc-val ${tier}">${l.val} <span class="lc-star">★</span></span></div>
     <div class="lc-mid">
-      <div class="lc-sec"><span class="sec-dot" style="background:${areaColorFor(l.key)}"></span>${l.sec}</div>
+      <div class="lc-sec">${l.sec}</div>
       <div class="lc-row${d!=='seat'?' soft':''}">${rowLine}</div>
-      <div class="lc-badge ${tier}"><span class="lbl">${l.val}</span><span class="box">${l.score}</span></div>
-      <div class="lc-info">${l.tog} · 🔥 נותרו ${l.left}</div>
+      <div class="lc-chips">${lcChips(l)}</div>
     </div>
-    <span class="lc-thumb vt-zone" style="background:${areaColorFor(l.key)}" aria-label="צבע האזור"></span>
+    <span class="lc-thumb vt-bar" style="background:${areaColorFor(l.key)}" aria-label="צבע האזור"></span>
   </div>`;
 }
 /* filter bar — matches mobile: quantity chip + a single "סינון" button opening the drawer */

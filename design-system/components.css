@@ -292,3 +292,19 @@
 .lt-scope-frame .lt-sheet,
 .lt-scope-frame .lt-sheet-backdrop,
 .lt-scope-frame .lt-whatsapp { position: absolute; }
+
+/* ---- Listing card (seat) — refined: value badge under price · feature chips · zone side-bar ---- */
+.lt-listing { display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--lt-line); border-radius:12px; padding:10px 6px 10px 10px; }
+.lt-listing__price { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; white-space:nowrap; }
+.lt-listing__amt { font-size:16px; font-weight:700; color:var(--lt-text); line-height:1.1; }
+.lt-listing__fees { font-size:9px; font-weight:600; color:#1c7a46; }
+.lt-listing__val { display:inline-flex; align-items:center; gap:3px; font-size:9.5px; font-weight:600; border-radius:3px; padding:2px 8px; background:#f3f4f5; color:var(--lt-text); }
+.lt-listing__val--best { background:var(--lt-primary); color:#fff; }
+.lt-listing__val .lt-star { font-size:8.5px; color:var(--lt-accent); }
+.lt-listing__val--best .lt-star { color:#fff; }
+.lt-listing__info { flex:1; min-width:0; text-align:right; }
+.lt-listing__sec { font-size:14px; font-weight:600; color:var(--lt-text); }
+.lt-listing__row { font-size:10.5px; color:var(--lt-text); margin-top:2px; unicode-bidi:plaintext; }
+.lt-listing__chips { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:4px; margin-top:5px; }
+.lt-listing__chip { display:inline-flex; align-items:center; gap:3px; font-size:9px; border-radius:3px; padding:2px 6px; background:#f3f4f5; color:#393939; white-space:nowrap; unicode-bidi:plaintext; }
+.lt-listing__bar { width:9px; align-self:stretch; min-height:44px; border-radius:9px; flex-shrink:0; }

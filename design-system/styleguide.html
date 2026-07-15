@@ -208,6 +208,25 @@
     </div>
   </div>
 
+  <h2 class="sg">Listing card (seat) — refined</h2>
+  <div class="demo" dir="rtl" style="max-width:380px;display:flex;flex-direction:column;gap:10px;">
+    <div class="lt-listing">
+      <div class="lt-listing__price"><span class="lt-listing__amt">₪520</span><span class="lt-listing__fees">כולל עמלות</span><span class="lt-listing__val lt-listing__val--best">ערך מעולה <span class="lt-star">★</span></span></div>
+      <div class="lt-listing__info"><div class="lt-listing__sec">יציע דרום</div><div class="lt-listing__row">איזור 24 · שורה 7</div><div class="lt-listing__chips"><span class="lt-listing__chip">🔥 נותרו 6</span><span class="lt-listing__chip">כיסוי לביטול ✓</span><span class="lt-listing__chip">אפשרות ישיבה יחד 👥</span></div></div>
+      <span class="lt-listing__bar" style="background:#d0f8d6;"></span>
+    </div>
+    <div class="lt-listing">
+      <div class="lt-listing__price"><span class="lt-listing__amt">₪650</span><span class="lt-listing__fees">כולל עמלות</span><span class="lt-listing__val">ערך טוב <span class="lt-star">★</span></span></div>
+      <div class="lt-listing__info"><div class="lt-listing__sec">מזרח</div><div class="lt-listing__row">איזור 15 · שורה 7 · משוער</div><div class="lt-listing__chips"><span class="lt-listing__chip">🔥 נותרו 5</span><span class="lt-listing__chip">כיסוי לביטול ✓</span></div></div>
+      <span class="lt-listing__bar" style="background:#d3e4f8;"></span>
+    </div>
+    <div class="lt-listing">
+      <div class="lt-listing__price"><span class="lt-listing__amt">₪640</span><span class="lt-listing__fees">כולל עמלות</span><span class="lt-listing__val">ערך סביר <span class="lt-star">★</span></span></div>
+      <div class="lt-listing__info"><div class="lt-listing__sec">מערב</div><div class="lt-listing__row">אזור פתוח · מספר מושב יימסר עם הכרטיס</div><div class="lt-listing__chips"><span class="lt-listing__chip">🔥 נותרו 8</span></div></div>
+      <span class="lt-listing__bar" style="background:#e7d7f3;"></span>
+    </div>
+  </div>
+
   <h2 class="sg">Category tiles</h2>
   <div class="demo row">
     <div class="lt-category"><img src="../assets/cards/dest-spain.jpg" alt=""><span class="lt-category__label">ספרד</span></div>
@@ -327,7 +346,7 @@
     {n:'קטגוריה · טורניר', t:'Category', d:'עמוד מונדיאל — hero, אירועים נבחרים, טבלת משחקים עם לשוניות שלב.', h:'../flow.html?tpl=category-tournament'},
     {n:'אירוע · הופעה', t:'Event', d:'עמוד כרטיסים להופעה — מפת מקומות, ליסטינגים, אצטדיון, ביקורות, FAQ.', h:'../flow.html?tpl=event-concert'},
     {n:'אירוע · משחק', t:'Event', d:'עמוד כרטיסים למשחק — מפת אצטדיון, ליסטינגים, "מגרש".', h:'../flow.html?tpl=event-match'},
-    {n:'חיפוש AI', t:'AI', d:'שיחת AI — כרטיסים מבוססי מלאי, מחירים כולל-הכל, המשך בוואטסאפ.', h:'../flow.html?tpl=ai'},
+    {n:'חיפוש AI', t:'AI', d:'שיחת AI — כרטיסים מבוססי מלאי, מחירים כולל עמלות, המשך בוואטסאפ.', h:'../flow.html?tpl=ai'},
   ];
   document.getElementById('templates').innerHTML = templates.map(tplCard).join('');
   const flowTemplates = [
