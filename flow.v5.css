@@ -1661,6 +1661,21 @@ svg.stadium{width:100%;height:100%;}
 .addon .ao-flag{color:var(--pink);font-size:9.5px;font-weight:700;margin-inline-start:4px;}
 .addon .ao-s{font-size:11px;color:var(--muted);margin-top:2px;unicode-bidi:plaintext;}
 .ao-note{font-size:10.5px;color:var(--muted);text-align:center;margin-top:8px;}
+.chk-h.chk-h2{margin-top:18px;}
+/* refined add-on / seat-option cards (Figma 336:3990/4002/4102) */
+.opt-card{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 9px 12px;margin-top:8px;}
+.opt-card.on{border-color:var(--pink);box-shadow:0 0 0 1px var(--pink);}
+.opt-left{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.opt-btn{background:#fff;border:1px solid var(--ink);border-radius:8px;padding:7px 11px;font:600 14px 'Rubik',sans-serif;color:var(--ink);cursor:pointer;white-space:nowrap;}
+.opt-btn.on{background:var(--pink);color:#fff;border-color:var(--pink);}
+.opt-price{color:var(--pink);font-weight:600;font-size:12px;line-height:1.05;text-align:center;white-space:nowrap;}
+.opt-body{flex:1;min-width:0;text-align:right;}
+.opt-t{font-size:13px;font-weight:600;color:var(--ink);}
+.opt-t .ao-flag{color:var(--pink);font-size:9.5px;font-weight:700;margin-inline-start:4px;}
+.opt-s{font-size:11px;color:var(--muted);margin-top:2px;unicode-bidi:plaintext;}
+.opt-s .pc-link{color:var(--pink);text-decoration:underline;cursor:pointer;}
+.opt-ic{flex-shrink:0;color:#8a8f9c;display:flex;align-items:center;}
+.opt-ic .oi{width:22px;height:22px;}
 
 /* --- friend-pay invite header (H1) --- */
 .fp-invite{font-size:20px;font-weight:700;color:var(--ink);text-align:right;line-height:1.35;margin-top:2px;}

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=51" />
+<link rel="stylesheet" href="flow.v5.css?v=52" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2693,20 +2693,26 @@ function chkCoupon(){
   </div>`;
 }
 /* paid add-ons — checkout only · ישיבה יחד is opt-in (NOT pre-checked / not auto-charged) */
+/* refined add-on / seat-option cards (Figma 336:3990/4002/4102) — button+price left · title/sub · icon right */
+const SEAT_IC='<svg class="oi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v5"/><path d="M4 11h16a1 1 0 0 1 1 1v4H3v-4a1 1 0 0 1 1-1z"/><path d="M6 16v3M18 16v3"/></svg>';
+const SHIELD_IC='<svg class="oi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.5v5.5c0 4.6-3.1 7.9-7 9.2-3.9-1.3-7-4.6-7-9.2V5.5L12 3z"/><path d="M9 12l2 2 4-4.2"/></svg>';
+function optCard(o){
+  return `<div class="opt-card${o.sel?' on':''}${o.want?' want':''}">
+    <div class="opt-left"><button class="opt-btn${o.sel?' on':''}" data-act="${o.act}"${o.arg!=null?` data-o="${o.arg}"`:''}>${o.sel?'נבחר':'בחר'}</button>${o.price?`<span class="opt-price">${o.price}<br>לכרטיס</span>`:''}</div>
+    <div class="opt-body"><div class="opt-t">${o.title}${o.want?` <span class="ao-flag">ביקשתם ✦</span>`:''}</div><div class="opt-s">${o.sub}</div></div>
+    <span class="opt-ic">${o.ic}</span>
+  </div>`;
+}
 function chkAddons(){
   const want=state.wantTogether;
-  const cov=Math.round(buyTicketsTotal()*0.10);
+  const perCov=Math.round((state.buy&&state.buy.unit||0)*0.10);
   return `<div class="chk-sec">
-    <div class="chk-h">תוספות</div>
-    <div class="addon${state.buyAdjacent?' on':''}${want?' want':''}">
-      <button class="add-btn${state.buyAdjacent?' on':''}" data-act="toggle-adjacent">${state.buyAdjacent?'נוסף ✓':'הוסף'}</button>
-      <div class="ao-g"><div class="ao-t">ישיבה יחד${want?` <span class="ao-flag">ביקשתם ✦</span>`:''}</div><div class="ao-s">המקומות שיוקצו יהיו באותה שורה · +${nis(90*state.buyQty)}</div></div>
-    </div>
-    <div class="addon${state.buyCoverage?' on':''}">
-      <button class="add-btn${state.buyCoverage?' on':''}" data-act="toggle-coverage">${state.buyCoverage?'נוסף ✓':`+${nis(cov)}`}</button>
-      <div class="ao-g"><div class="ao-t">כיסוי ביטול (ביטוח)</div><div class="ao-s">80% החזר עד 4 ימים לפני · אופציונלי · <a class="pc-link" data-act="soon" data-title="כיסוי ביטול">לפרטים</a></div></div>
-    </div>
-    <div class="ao-note">${want?'סימנתם ״ישיבה יחד״ באירוע · ':''}הוספה בנגיעה — לא מחויב אוטומטית</div>
+    <div class="chk-h">בחירת מושבים</div>
+    ${optCard({sel:!state.buyAdjacent, act:'seat-opt', arg:'best', title:'המשתלמת ביותר', sub:'ללא תוספת תשלום · ייתכן שלא תשבו יחד', ic:SEAT_IC})}
+    ${optCard({sel:state.buyAdjacent, act:'seat-opt', arg:'together', price:nis(90), title:'ישיבה יחד', sub:'המקומות שיוקצו יהיו באותה השורה', ic:SEAT_IC, want:want})}
+    <div class="chk-h chk-h2">תוספות</div>
+    ${optCard({sel:state.buyCoverage, act:'toggle-coverage', price:nis(perCov), title:'כיסוי למקרה ביטול', sub:`80% החזר עד 4 ימים לפני · <a class="pc-link" data-act="soon" data-title="כיסוי ביטול">לפרטים</a>`, ic:SHIELD_IC})}
+    <div class="ao-note">${want?'סימנתם ״ישיבה יחד״ באירוע · ':''}״המשתלמת ביותר״ היא ברירת המחדל · ישיבה יחד בתוספת תשלום (אופציונלי).</div>
   </div>`;
 }
 /* payment/security badges (Figma 332:3357) — checkout footer */
@@ -3420,6 +3426,7 @@ function wire(){
       case act==='qty-dec': set({buyQty:Math.max(1,state.buyQty-1)}); break;
       case act==='toggle-coverage': set({buyCoverage:!state.buyCoverage}); break;
       case act==='toggle-adjacent': set({buyAdjacent:!state.buyAdjacent}); break;
+      case act==='seat-opt': set({buyAdjacent: a.getAttribute('data-o')==='together'}); break;   // radio: המשתלמת ביותר (free) vs ישיבה יחד (paid)
       case act==='apply-coupon': { const v=(state.buyCoupon||'').trim(); if(!v){ toast('הזינו קוד הנחה'); break; } set({buyCouponApplied:true}); toast('הקוד הוחל · ההנחה תופיע בתשלום'); break; }
       case act==='proceed-checkout': set({showHoldModal:true}); break;               // desktop seat screen → 10-min popup
       case act==='close-hold-modal': set({showHoldModal:false}); break;
