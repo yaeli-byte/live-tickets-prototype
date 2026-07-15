@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=47" />
+<link rel="stylesheet" href="flow.v5.css?v=48" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2567,8 +2567,9 @@ function pageOrder(){
     ${seatRichBody(b)}
   </div>
   <div class="pur-foot seat-foot">
-    <button class="btn btn-pink pf-cta" data-act="to-checkout">המשך לתשלום</button>
     <div class="seat-addnote">כיסוי ביטול ותוספות בתשלום → בשלב הצ׳ק-אאוט</div>
+    <button class="btn btn-pink pf-cta" data-act="to-checkout">המשך לתשלום</button>
+    ${payBadges()}
   </div>`;
 }
 
