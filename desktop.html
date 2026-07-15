@@ -31,6 +31,24 @@
   .cas-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 24px;text-decoration:none;color:#313131;font-size:15px;cursor:pointer;border:none;background:none;width:100%;text-align:right;font-family:inherit;}
   .cas-item:hover,.cas-item.on{background:#FAFAFB;color:#ED1860;}
   .cas-item svg{opacity:.5;}
+  .cas-item .leaf-arrow{font-size:13px;color:#A4A4A4;}
+  .cas-item.see-all{color:#216CA5;font-weight:500;}
+  .cas-item.see-all svg{opacity:.9;}
+  .cas-item.see-all:hover{background:#F4F8FB;color:#216CA5;}
+  /* cascade shell (football + sport): rail (right) · middle · left, or rail + hot-topics */
+  .cas-wrap{max-width:1280px;margin:0 auto;padding:24px 40px 32px;}
+  .cas-shell{display:flex;border:1px solid #EBEBEB;border-radius:12px;overflow:hidden;min-height:320px;background:#fff;}
+  .cas-rail{flex:0 0 34%;border-left:1px solid #EBEBEB;padding:12px 0;}
+  .cas-body{flex:1;display:flex;min-width:0;}
+  .cas-hot{flex:1;padding:20px 26px 24px;min-width:0;}
+  .cas-mid{flex:1;border-left:1px solid #EBEBEB;padding:12px 0;min-width:0;}
+  .cas-left{flex:1;padding:12px 0;min-width:0;}
+  .cas-h{padding:12px 24px 16px;font-size:11px;font-weight:500;letter-spacing:2px;color:#999;}
+  .cas-hot>.cas-h{padding:0 4px 18px;}
+  .cas-sep{margin-top:6px;padding-top:6px;border-top:1px solid #EBEBEB;}
+  .hot-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .hot-list{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px;}
+  .hot-list .cas-item{padding:11px 14px;border-radius:8px;}
   .team-item{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;text-decoration:none;color:#313131;font-size:15px;cursor:pointer;}
   .team-item:hover{background:#FAFAFB;color:#ED1860;}
   .mtype{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:none;border:1px solid #EBEBEB;border-radius:8px;cursor:pointer;font-size:14.5px;color:#313131;text-align:right;font-family:inherit;}
@@ -87,6 +105,7 @@
       </a>
       <!-- Primary nav -->
       <nav class="lt-navscroll" style="display:flex;align-items:stretch;height:100%;min-width:0;flex-shrink:1;overflow-x:auto;">
+        <button class="navbtn" data-menu="football">כדורגל <span style="font-size:9px;opacity:.6;">▼</span></button>
         <button class="navbtn" data-menu="sports">ספורט <span style="font-size:9px;opacity:.6;">▼</span></button>
         <button class="navbtn" data-menu="music">מוזיקה והופעות <span style="font-size:9px;opacity:.6;">▼</span></button>
         <button class="navbtn" data-menu="dest">יעדים <span style="font-size:9px;opacity:.6;">▼</span></button>
@@ -96,7 +115,7 @@
           </span>
           <span style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;line-height:1.05;">
             <span style="font-size:9px;font-weight:700;letter-spacing:.4px;color:#F57E20;">מומלץ · מתחלף</span>
-            <span style="font-size:15px;font-weight:700;color:#ED1860;">מונדיאל 2026</span>
+            <span style="font-size:15px;font-weight:700;color:#ED1860;">ראש השנה 2026</span>
           </span>
           <span style="font-size:9px;opacity:.55;color:#ED1860;">▼</span>
         </button>
@@ -137,22 +156,13 @@
     </div>
 
     <!-- ===== MEGA-MENUS ===== -->
+    <!-- Football cascade (top-level) -->
+    <div class="mega" id="mega-football">
+      <div class="cas-wrap"><div class="cas-shell" id="shell-football"></div></div>
+    </div>
     <!-- Sports cascade -->
     <div class="mega" id="mega-sports">
-      <div style="max-width:1280px;margin:0 auto;padding:24px 40px 32px;">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid #EBEBEB;border-radius:12px;overflow:hidden;min-height:260px;">
-          <div style="border-left:1px solid #EBEBEB;padding:12px 0;">
-            <div style="padding:12px 24px 14px;font-size:11px;font-weight:500;letter-spacing:2px;color:#999;">ענף</div>
-            <div id="sportCol"></div>
-          </div>
-          <div style="border-left:1px solid #EBEBEB;padding:12px 0;" id="compCol">
-            <div style="height:100%;display:flex;align-items:center;justify-content:center;padding:24px;color:#CFCFCF;font-size:14px;text-align:center;">רחפו על ענף כדי לראות מפעלים וליגות</div>
-          </div>
-          <div style="padding:12px 0;" id="teamCol">
-            <div style="height:100%;display:flex;align-items:center;justify-content:center;padding:24px;color:#CFCFCF;font-size:14px;text-align:center;">רחפו על מפעל / ליגה כדי לראות קבוצות</div>
-          </div>
-        </div>
-      </div>
+      <div class="cas-wrap"><div class="cas-shell" id="shell-sports"></div></div>
     </div>
     <!-- Music -->
     <div class="mega" id="mega-music">
@@ -254,7 +264,7 @@
 
 <!-- Light desktop page body (context for the nav) -->
 <div class="pagewrap">
-  <div class="demo-note">🖥️ <b>Desktop navigation</b> — standalone demo, separate from the mobile prototype (<a href="flow.html">flow.html</a>). Hover the category tabs for the mega-menus; the sports menu cascades ענף → ליגה → קבוצות.</div>
+  <div class="demo-note">🖥️ <b>Desktop navigation</b> — standalone demo, separate from the mobile prototype (<a href="flow.html">flow.html</a>). Hover the category tabs for the mega-menus; כדורגל / ספורט open with categories + hot topics, then cascade on hover (ליגה/ענף → קבוצה / אירוע).</div>
   <div class="hero">
     <h1>החוויות הכי גדולות בעולם — במרחק טיסה אחת</h1>
     <p>כל המשחקים, התחרויות וההופעות בחו״ל, במקום אחד. מחירים all-in כולל עמלות · אחריות 100%.</p>
@@ -263,13 +273,6 @@
 
 <script>
 const DATA = {
-  sports:[
-    {n:'כדורגל',comps:[{n:'ליגת האלופות',teams:['ריאל מדריד','מנצ׳סטר סיטי','באיירן מינכן','אינטר']},{n:'ליגה אנגלית',teams:['ארסנל','ליברפול','מנצ׳סטר יונייטד','צ׳לסי']},{n:'ליגה ספרדית',teams:['ריאל מדריד','ברצלונה','אתלטיקו מדריד','סביליה']},{n:'מונדיאל 2026',teams:['משחק הפתיחה','שלב הבתים','שמינית גמר','הגמר']}]},
-    {n:'כדורסל',comps:[{n:'יורוליג',teams:['מכבי ת״א','פאניתנייקוס','ריאל מדריד','פנרבחצ׳ה']},{n:'NBA',teams:['בוסטון סלטיקס','לייקרס','גולדן סטייט','ניקס']}]},
-    {n:'טניס',comps:[{n:'ווימבלדון',teams:['גמר גברים','גמר נשים','חצי גמר','כרטיס יומי']},{n:'US Open',teams:['גמר גברים','גמר נשים','חצי גמר','כרטיס יומי']}]},
-    {n:'פורמולה 1',comps:[{n:'גרנד פרי בריטניה',teams:['מירוץ ראשי','ספרינט','גרנדסטנד','פאדוק קלאב']},{n:'מונזה',teams:['מירוץ ראשי','דירוג','גרנדסטנד','פאדוק קלאב']}]},
-    {n:'אגרוף / MMA',comps:[{n:'UFC',teams:['Main Event','Co-Main','Prelims','כרטיס ערב']}]},
-  ],
   musicTypes:['קונצרטים / הופעות','פסטיבלים','קלאסי ואופרה'],
   musicGenres:[{i:'🎤',n:'פופ'},{i:'🎸',n:'רוק'},{i:'🎧',n:'היפ-הופ'},{i:'💃',n:'לטין'},{i:'🎻',n:'קלאסי'},{i:'✨',n:'כל ההופעות'}],
   musicArtists:['BTS','אריאנה גרנדה','קולדפליי','דה וויקנד','ברונו מארס','שאקירה'],
@@ -280,14 +283,62 @@ const DATA = {
   searchChips:['מונדיאל 2026','טיילור סוויפט','קולדפליי','ריאל מדריד','אל קלאסיקו'],
   cardGrad:['linear-gradient(135deg,#ED1860,#7a1030)','linear-gradient(135deg,#216CA5,#0d2f4a)','linear-gradient(135deg,#F57E20,#8a3d05)','linear-gradient(135deg,#3a2f5a,#1a1030)','linear-gradient(135deg,#1c7a46,#0c3320)','linear-gradient(135deg,#8a2b6a,#3a0f2c)','linear-gradient(135deg,#245a8a,#0f2c45)','linear-gradient(135deg,#a04010,#4a1c05)'],
 };
+// ---- Football + Sport cascade model (rail → middle → left) ----
+const NAV = {
+  football:{
+    railHeader:'לפי ליגה',
+    rail:[
+      {n:'ליגת האלופות', mid:{header:'קבוצה / אירוע', items:[
+        {n:'ריאל מדריד'},{n:'מנצ׳סטר סיטי'},{n:'באיירן מינכן'},{n:'אינטר'},
+        {n:'כל הליגת האלופות',seeAll:true},{n:'כל הכדורגל',seeAll:true}]}},
+      {n:'ליגה אנגלית', mid:{header:'קבוצה / אירוע', items:[
+        {n:'ארסנל'},{n:'ליברפול'},{n:'מנצ׳סטר יונייטד'},{n:'צ׳לסי'},
+        {n:'כל הליגה האנגלית',seeAll:true},{n:'כל הכדורגל',seeAll:true}]}},
+      {n:'ליגה איטלקית', mid:{header:'קבוצה / אירוע', items:[
+        {n:'אינטר'},{n:'מילאן'},{n:'יובנטוס'},{n:'נאפולי'},
+        {n:'כל הליגה האיטלקית',seeAll:true},{n:'כל הכדורגל',seeAll:true}]}},
+      {n:'ליגה ספרדית', mid:{header:'קבוצה / אירוע', items:[
+        {n:'ריאל מדריד'},{n:'ברצלונה'},{n:'אתלטיקו מדריד'},{n:'סביליה'},
+        {n:'כל הליגה הספרדית',seeAll:true},{n:'כל הכדורגל',seeAll:true}]}},
+      {n:'כל הכדורגל', seeAll:true},
+    ],
+    hot:{header:'קבוצות ומשחקים חמים', kind:'tiles', items:[
+      {n:'ברצלונה',img:'team-barcelona.jpg'},{n:'ריאל מדריד',img:'team-realmadrid.jpg'},{n:'סופר קלאסיקו',img:'rm-highlights.jpg'},
+      {n:'מנצ׳סטר יונייטד',img:'sport1.jpg'},{n:'מנצ׳סטר סיטי',img:'laliga.jpg'},{n:'ליגת האלופות',img:'ucl.jpg'}]},
+  },
+  sports:{
+    railHeader:'לפי ענף',
+    rail:[
+      {n:'כדורסל', mid:{header:'קבוצה / אירוע', items:[
+        {n:'NBA', sub:{header:'קבוצות', items:['בוסטון סלטיקס','לוס אנג׳לס לייקרס','גולדן סטייט','ניו יורק ניקס']}},
+        {n:'יורוליג', sub:{header:'קבוצות', items:['מכבי תל אביב','פאניתנייקוס','ריאל מדריד','פנרבחצ׳ה']}},
+        {n:'בוסטון סלטיקס'},{n:'לוס אנג׳לס לייקרס'},
+        {n:'כל הכדורסל',seeAll:true}]}},
+      {n:'טניס', mid:{header:'מפעל / אירוע', items:[
+        {n:'ווימבלדון', sub:{header:'כרטיסים', items:['גמר גברים','גמר נשים','חצי גמר','כרטיס יומי']}},
+        {n:'US Open', sub:{header:'כרטיסים', items:['גמר גברים','גמר נשים','חצי גמר','כרטיס יומי']}},
+        {n:'רולאן גארוס'},{n:'כל הטניס',seeAll:true}]}},
+      {n:'פורמולה 1', mid:{header:'מקצה / אירוע', items:[
+        {n:'גרנד פרי בריטניה', sub:{header:'כרטיסים', items:['מירוץ ראשי','ספרינט','גרנדסטנד','פאדוק קלאב']}},
+        {n:'מונזה', sub:{header:'כרטיסים', items:['מירוץ ראשי','דירוג','גרנדסטנד','פאדוק קלאב']}},
+        {n:'כל הפורמולה 1',seeAll:true}]}},
+      {n:'אגרוף / MMA', mid:{header:'אירוע', items:[
+        {n:'UFC', sub:{header:'כרטיסים', items:['Main Event','Co-Main','Prelims','כרטיס ערב']}},
+        {n:'כל האגרוף / MMA',seeAll:true}]}},
+      {n:'כל הענפים', seeAll:true},
+    ],
+    hot:{header:'אירועי ספורט פופולאריים', kind:'list', items:[
+      {n:'ליגת האלופות'},{n:'ליגה אנגלית'},{n:'ליגה ספרדית'},
+      {n:'ליגה איטלקית'},{n:'מונדיאל 2026'},{n:'NBA / יורוליג'}]},
+  },
+};
 const $ = s => document.querySelector(s);
+const IMG_DESK = 'assets/cards/';
 const chev = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>';
 
 // ---- build data-driven lists ----
 function card(name, i){ return `<button class="imgcard" style="background:${DATA.cardGrad[i%DATA.cardGrad.length]};"><span class="ov"></span><span class="nm">${name}</span></button>`; }
 
-// sports col1
-$('#sportCol').innerHTML = DATA.sports.map((s,i)=>`<button class="cas-item" data-sport="${i}"><span>${s.n}</span>${chev}</button>`).join('');
 // music
 $('#musicTypes').innerHTML = DATA.musicTypes.map(t=>`<button class="mtype">${t}<span style="font-size:11px;color:#A4A4A4;">▸</span></button>`).join('');
 $('#musicGenres').innerHTML = DATA.musicGenres.map(g=>`<button class="genre">${g.i} ${g.n}</button>`).join('');
@@ -304,20 +355,61 @@ $('#acctList').innerHTML = DATA.account.map(g=>`<button class="acct-item"><span 
 // search chips
 $('#searchChips').innerHTML = DATA.searchChips.map(c=>`<button class="schip">${c}</button>`).join('');
 
-// ---- sports cascade ----
-function revealComps(si){
-  const s = DATA.sports[si];
-  document.querySelectorAll('#sportCol .cas-item').forEach((el,i)=>el.classList.toggle('on', i===si));
-  $('#compCol').innerHTML = `<div style="padding:12px 24px 14px;font-size:11px;font-weight:500;letter-spacing:2px;color:#999;">${s.n} · מפעלים</div>` +
-    s.comps.map((c,i)=>`<button class="cas-item" data-sport="${si}" data-comp="${i}"><span>${c.n}</span>${chev}</button>`).join('');
-  $('#teamCol').innerHTML = `<div style="height:100%;display:flex;align-items:center;justify-content:center;padding:24px;color:#CFCFCF;font-size:14px;text-align:center;">רחפו על מפעל / ליגה כדי לראות קבוצות</div>`;
+// ---- Football + Sport cascade (rail → middle → left; default = rail + hot topics) ----
+const teamRow = name => `<a class="team-item"><span>${name}</span><span style="font-size:11px;color:#A4A4A4;">כרטיסים ›</span></a>`;
+function railRow(item,i){
+  return item.seeAll
+    ? `<button class="cas-item see-all"><span>${item.n}</span>${chev}</button>`
+    : `<button class="cas-item" data-cat="${i}"><span>${item.n}</span>${chev}</button>`;
 }
-function revealTeams(si,ci){
-  const c = DATA.sports[si].comps[ci];
-  $('#compCol').querySelectorAll('.cas-item').forEach((el,i)=>el.classList.toggle('on', i===ci));
-  $('#teamCol').innerHTML = `<div style="padding:12px 24px 14px;font-size:11px;font-weight:500;letter-spacing:2px;color:#999;">${c.n} · קבוצות</div>` +
-    c.teams.map(t=>`<a class="team-item"><span>${t}</span><span style="font-size:11px;color:#A4A4A4;">כרטיסים ›</span></a>`).join('');
+function midRow(item,ci,mi){
+  if(item.seeAll) return `<button class="cas-item see-all${item.top?' cas-sep':''}"><span>${item.n}</span>${chev}</button>`;
+  if(item.sub)    return `<button class="cas-item" data-cat="${ci}" data-mid="${mi}"><span>${item.n}</span>${chev}</button>`;
+  return `<button class="cas-item"><span>${item.n}</span><span class="leaf-arrow">›</span></button>`;
 }
+function buildShell(tab){
+  const d = NAV[tab];
+  const rail = `<div class="cas-rail"><div class="cas-h">${d.railHeader}</div>${d.rail.map(railRow).join('')}</div>`;
+  const hot  = `<div class="cas-hot" data-role="hot"><div class="cas-h">${d.hot.header}</div>${
+    d.hot.kind==='tiles'
+      ? `<div class="hot-grid">${d.hot.items.map(t=>`<button class="imgcard" style="background:#20242c url('${IMG_DESK}${t.img}') center/cover;"><span class="ov"></span><span class="nm">${t.n}</span></button>`).join('')}</div>`
+      : `<div class="hot-list">${d.hot.items.map(t=>`<button class="cas-item"><span>${t.n}</span><span class="leaf-arrow">›</span></button>`).join('')}</div>`}</div>`;
+  const cols = `<div class="cas-mid" data-role="mid" style="display:none;"></div><div class="cas-left" data-role="left" style="display:none;"></div>`;
+  document.getElementById('shell-'+tab).innerHTML = rail + `<div class="cas-body">${hot}${cols}</div>`;
+}
+function casReset(tab){
+  const sh = document.getElementById('shell-'+tab);
+  sh.querySelector('[data-role=hot]').style.display='';
+  sh.querySelector('[data-role=mid]').style.display='none';
+  sh.querySelector('[data-role=left]').style.display='none';
+  sh.querySelectorAll('.cas-item.on').forEach(e=>e.classList.remove('on'));
+}
+function casCat(tab,ci){
+  const cat = NAV[tab].rail[ci]; if(!cat || !cat.mid) return;
+  const sh = document.getElementById('shell-'+tab);
+  sh.querySelector('[data-role=hot]').style.display='none';
+  const mid = sh.querySelector('[data-role=mid]'), left = sh.querySelector('[data-role=left]');
+  mid.style.display=''; left.style.display='';
+  sh.querySelectorAll('.cas-rail .cas-item').forEach(e=>e.classList.toggle('on', e.getAttribute('data-cat')===String(ci)));
+  mid.innerHTML = `<div class="cas-h">${cat.mid.header}</div>` + cat.mid.items.map((it,mi)=>midRow(it,ci,mi)).join('');
+  left.innerHTML = '';
+}
+function casMid(tab,ci,mi){
+  const item = NAV[tab].rail[ci].mid.items[mi]; if(!item || !item.sub) return;
+  const sh = document.getElementById('shell-'+tab), left = sh.querySelector('[data-role=left]');
+  sh.querySelectorAll('[data-role=mid] .cas-item').forEach(e=>e.classList.toggle('on', e.getAttribute('data-mid')===String(mi)));
+  left.innerHTML = `<div class="cas-h">${item.sub.header}</div>` + item.sub.items.map(teamRow).join('');
+}
+['football','sports'].forEach(tab=>{
+  buildShell(tab);
+  const sh = document.getElementById('shell-'+tab);
+  sh.addEventListener('mouseover', e=>{
+    const el = e.target.closest('[data-cat]'); if(!el) return;
+    if(el.hasAttribute('data-mid')) casMid(tab, +el.getAttribute('data-cat'), +el.getAttribute('data-mid'));
+    else casCat(tab, +el.getAttribute('data-cat'));
+  });
+  sh.addEventListener('mouseleave', ()=>casReset(tab));
+});
 
 // ---- menu open/close ----
 let openName = null;
@@ -325,7 +417,7 @@ function openMenu(name){
   openName = name;
   document.querySelectorAll('.mega').forEach(m=>m.classList.toggle('open', m.id==='mega-'+name));
   document.querySelectorAll('.navbtn[data-menu]').forEach(b=>b.classList.toggle('active', b.getAttribute('data-menu')===name));
-  if(name==='sports'){ revealComps(0); revealTeams(0,0); document.querySelector('#sportCol .cas-item').classList.add('on'); }
+  if(name==='football'||name==='sports') casReset(name);   // default: categories + hot topics, empty middle (no pre-selected cascade)
 }
 function closeMenu(){ openName=null; document.querySelectorAll('.mega').forEach(m=>m.classList.remove('open')); document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active')); }
 
@@ -336,14 +428,6 @@ document.querySelectorAll('.navbtn[data-menu]').forEach(btn=>{
 });
 $('#searchTrigger').addEventListener('click', ()=> openName==='search' ? closeMenu() : openMenu('search'));
 $('#navRegion').addEventListener('mouseleave', closeMenu);
-
-// cascade hover (delegated)
-$('#mega-sports').addEventListener('mouseover', e=>{
-  const el = e.target.closest('[data-sport]'); if(!el) return;
-  const si = +el.getAttribute('data-sport');
-  if(el.hasAttribute('data-comp')) revealTeams(si, +el.getAttribute('data-comp'));
-  else revealComps(si);
-});
 
 // account dropdown
 const acctBtn=$('#acctBtn'), acctDD=$('#acctDD');
