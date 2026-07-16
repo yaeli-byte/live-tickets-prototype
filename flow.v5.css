@@ -1042,13 +1042,14 @@ img{display:block;}
   align-items:center;justify-content:center;font-size:12px;flex:none;}
 /* AI follow-up questions in the live search dropdown (active state) */
 .sr-aifup{margin:6px 0 4px;padding-top:12px;border-top:1px solid var(--line);}
-.sr-aifup-h{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--muted);
-  letter-spacing:.01em;margin:0 2px 8px;}
+/* .ov-body is LTR, so the flex header is pushed right to match the rest of the list */
+.sr-aifup-h{display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:11.5px;font-weight:600;
+  color:var(--muted);letter-spacing:.01em;margin:0 2px 8px;}
 .sr-aifup-h .dot{color:var(--ai);}
-.sr-aiq{width:100%;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--ai-line);
-  border-radius:11px;padding:10px 11px;margin-bottom:7px;font-family:inherit;font-size:12.5px;color:#41485c;
+.sr-aiq{width:100%;display:flex;align-items:center;gap:9px;background:none;border:none;
+  border-radius:11px;padding:10px 11px;margin-bottom:2px;font-family:inherit;font-size:12.5px;color:#41485c;
   text-align:right;cursor:pointer;transition:.15s;}
-.sr-aiq:hover{background:#faf9ff;border-color:#f0d5e0;}
+.sr-aiq:hover{background:#faf9ff;}
 .sr-aiq .sp{width:22px;height:22px;border-radius:50%;background:var(--ai-grad);color:#fff;display:flex;
   align-items:center;justify-content:center;font-size:11px;flex:none;}
 .sr-aiq .tx{flex:1;min-width:0;line-height:1.35;}
