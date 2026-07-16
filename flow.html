@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=60" />
+<link rel="stylesheet" href="flow.v5.css?v=61" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -3009,9 +3009,12 @@ function deskSections(){
 /* desktop top bar — behaves like the mobile header: step title (left) · logo · back arrow (right); no menu */
 function deskTop(title, backAct, sub){
   return `<div class="dtop">
+    <div class="dtop-side"></div>
     <div class="dtop-ev"><div class="t">${title}</div>${sub?`<div class="d">${sub}</div>`:''}</div>
-    <a class="dtop-logo" data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
-    <button class="circle-btn" data-act="${backAct||'home'}" aria-label="חזרה">→</button>
+    <div class="dtop-side dtop-side-r">
+      <a class="dtop-logo" data-act="home"><img class="nav-logo" src="assets/logo.png" alt="Live Tickets"></a>
+      <button class="circle-btn" data-act="${backAct||'home'}" aria-label="חזרה">→</button>
+    </div>
   </div>`;
 }
 /* seat-selection trust strip (top) — same wording on desktop + mobile · no "ביטול כולל מילואים" (cancellation is a paid add-on) */
