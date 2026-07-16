@@ -1528,8 +1528,8 @@ svg.stadium{width:100%;height:100%;}
   overflow-y:auto;padding:22px 20px 30px;}
 .dchk-sum-in{position:sticky;top:0;}
 .dchk-sum .chk-tw2{margin-bottom:14px;}
-.dchk-form{order:1;flex:1;min-width:0;overflow-y:auto;background:#fff;padding:22px 26px 48px;}
-.dchk-form-in{max-width:640px;}
+.dchk-form{order:1;flex:1;min-width:0;overflow-y:auto;background:#fff;padding:22px 100px 48px 26px;}
+.dchk-form-in{max-width:none;}
 .dchk-form .chk-sec:first-child{margin-top:0;}
 .dchk-terms{margin-top:16px;}
 .dchk-cta{width:100%;margin-top:18px;padding:15px;font-size:15px;border-radius:12px;}
