@@ -18,13 +18,14 @@
   @keyframes lt-pop{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:scale(1);}}
   .lt-navscroll{scrollbar-width:none;} .lt-navscroll::-webkit-scrollbar{display:none;}
   /* nav triggers */
-  .navbtn{display:flex;align-items:center;gap:6px;height:100%;padding:0 16px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:500;color:#313131;white-space:nowrap;border-bottom:3px solid transparent;transition:background .12s;}
+  .navbtn{display:flex;align-items:center;gap:6px;height:100%;padding:0 12px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:400;color:#1A1A1A;white-space:nowrap;border-bottom:2px solid transparent;transition:background .12s;}
   .navbtn:hover{background:#FAFAFB;}
   .navbtn.active{color:#ED1860;border-bottom-color:#ED1860;background:#fff;}
-  .support-btn{gap:8px;padding:0 14px;font-size:14px;color:#5B5B5B;flex-shrink:0;}
-  .season-btn{gap:10px;padding:6px 14px;border-radius:10px;border:1px solid #F6D9E4;background:linear-gradient(180deg,#fff,#FFF4F8);height:auto;align-self:center;border-bottom:1px solid #F6D9E4;transition:box-shadow .14s;}
-  .season-btn:hover{box-shadow:0 2px 10px rgba(237,24,96,.18);}
-  .acctbtn{display:flex;align-items:center;gap:7px;height:40px;padding:0 16px;border-radius:999px;border:none;cursor:pointer;background:#1A1A1A;color:#fff;font-family:inherit;font-size:14px;font-weight:600;white-space:nowrap;}
+  /* inline AI search pill inside the search field — outlined gradient-brand */
+  .nav-ai-pill{display:flex;align-items:center;gap:5px;background:#fff;border:1.5px solid #ED1860;border-radius:999px;padding:7px 12px;color:#ED1860;font-family:inherit;font-size:13px;font-weight:500;line-height:1;white-space:nowrap;flex-shrink:0;cursor:pointer;}
+  .nav-ai-pill:hover{background:#FFF0F5;}
+  .acctbtn{display:flex;align-items:center;gap:7px;height:42px;padding:0 20px;border-radius:999px;border:none;cursor:pointer;background:#ED1860;color:#fff;font-family:inherit;font-size:14px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+  .acctbtn:hover{background:#d51555;}
   /* mega panels */
   .mega{display:none;position:absolute;top:100%;right:0;left:0;background:#fff;border-top:1px solid #EBEBEB;box-shadow:0 8px 32px rgba(0,0,0,.06);animation:lt-fade .16s ease;z-index:40;}
   .mega.open{display:block;}
@@ -77,19 +78,24 @@
 </head>
 <body>
 
-<header style="position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(0,0,0,.08);">
+<header id="siteHeader" style="position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(0,0,0,.08);">
   <!-- Utility bar -->
   <div style="background:#1A1A1A;color:#A0A3AB;font-size:12px;letter-spacing:.01em;">
     <div style="max-width:1280px;margin:0 auto;padding:9px 40px;display:flex;align-items:center;justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:24px;">
-        <a href="tel:035223050" style="display:flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font-weight:500;"><span style="font-size:14px;">📞</span> שירות 03-5223050</a>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <button data-menu="support" style="background:none;border:none;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;font-size:14px;font-weight:500;padding:0;">
+          עזרה ותמיכה
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 0 1 4.5 1.5c0 1.7-2 2-2 3.5"></path><path d="M12 17h.01"></path></svg>
+        </button>
         <span style="color:#5a5d68;">·</span>
         <span>₪ ILS</span>
         <span style="color:#5a5d68;">·</span>
-        <button style="background:none;border:none;color:#B9BCC4;cursor:pointer;display:flex;align-items:center;gap:4px;font-size:13px;">עברית <span style="font-size:9px;">▼</span></button>
+        <button style="background:none;border:none;color:#B9BCC4;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;font-size:13px;">עברית <span style="font-size:9px;">▼</span></button>
       </div>
-      <div style="display:flex;align-items:center;gap:20px;color:#9a9da6;">
+      <div style="display:flex;align-items:center;gap:16px;color:#9a9da6;">
         <span style="display:flex;align-items:center;gap:5px;"><span style="color:#F57E20;">★</span> אחריות 100%</span>
+        <span style="color:#5a5d68;">·</span>
+        <span>מחירים כולל עמלות</span>
         <span style="color:#5a5d68;">·</span>
         <span>תשלום מאובטח</span>
       </div>
@@ -98,48 +104,41 @@
 
   <!-- Main bar + nav region -->
   <div id="navRegion" style="background:#fff;position:relative;">
-    <div style="max-width:1280px;margin:0 auto;padding:0 40px;display:flex;align-items:center;gap:24px;height:72px;">
-      <!-- Logo -->
-      <a href="#" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0;">
-        <img src="assets/logo.png" alt="Live Tickets" style="height:30px;width:auto;display:block;">
-      </a>
-      <!-- Primary nav -->
-      <nav class="lt-navscroll" style="display:flex;align-items:stretch;height:100%;min-width:0;flex-shrink:1;overflow-x:auto;">
-        <button class="navbtn" data-menu="football">כדורגל <span style="font-size:9px;opacity:.6;">▼</span></button>
-        <button class="navbtn" data-menu="sports">ספורט <span style="font-size:9px;opacity:.6;">▼</span></button>
-        <button class="navbtn" data-menu="music">מוזיקה והופעות <span style="font-size:9px;opacity:.6;">▼</span></button>
-        <button class="navbtn" data-menu="dest">יעדים <span style="font-size:9px;opacity:.6;">▼</span></button>
-        <button class="navbtn season-btn" data-menu="holidays">
-          <span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#ED1860,#F57E20);flex-shrink:0;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l1.6 4.9a3 3 0 0 0 1.9 1.9L20.4 10.4 15.5 12a3 3 0 0 0-1.9 1.9L12 18.8l-1.6-4.9A3 3 0 0 0 8.5 12L3.6 10.4 8.5 8.8a3 3 0 0 0 1.9-1.9z"></path></svg>
-          </span>
-          <span style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;line-height:1.05;">
-            <span style="font-size:9px;font-weight:700;letter-spacing:.4px;color:#F57E20;">מומלץ · מתחלף</span>
-            <span style="font-size:15px;font-weight:700;color:#ED1860;">ראש השנה 2026</span>
-          </span>
-          <span style="font-size:9px;opacity:.55;color:#ED1860;">▼</span>
-        </button>
-      </nav>
-      <!-- Search field -->
-      <button id="searchTrigger" style="flex:1 1 0;min-width:56px;height:44px;display:flex;align-items:center;gap:10px;padding:0 16px;background:#F5F5F5;border:1px solid #E8E8E8;border-radius:999px;cursor:text;color:#8A8A8A;font-size:14px;text-align:right;overflow:hidden;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">חפשו אמן, קבוצה, מופע או עיר…</span>
-      </button>
-      <!-- Help -->
-      <button class="navbtn support-btn" data-menu="support">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 0 1 4.5 1.5c0 1.7-2 2-2 3.5"></path><path d="M12 17h.01"></path></svg>
-        עזרה ותמיכה <span style="font-size:9px;opacity:.55;">▼</span>
-      </button>
-      <!-- Personal area -->
-      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;position:relative;">
-        <button title="מועדפים" aria-label="מועדפים" style="position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;background:none;border:none;cursor:pointer;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ED1860" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.6a5 5 0 0 0-8.8-3.2A5 5 0 0 0 3.2 8.6c0 4.4 8.8 10.4 8.8 10.4s8.8-6 8.8-10.4z"></path></svg>
-          <span style="position:absolute;top:-6px;left:-6px;min-width:18px;height:18px;padding:0 4px;background:#F57E20;color:#fff;border-radius:9px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">3</span>
-        </button>
-        <button id="acctBtn" class="acctbtn">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
-          האזור האישי <span style="font-size:9px;opacity:.75;">▼</span>
-        </button>
+    <div style="max-width:1280px;margin:0 auto;padding:0 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;height:66px;">
+      <!-- RIGHT group: primary nav + logo -->
+      <div style="display:flex;align-items:center;gap:22px;height:100%;min-width:0;">
+        <nav class="lt-navscroll" style="display:flex;align-items:stretch;height:100%;min-width:0;overflow-x:auto;">
+          <button class="navbtn" data-menu="football">כדורגל</button>
+          <button class="navbtn" data-menu="sports">ספורט</button>
+          <button class="navbtn" data-menu="music">מוזיקה והופעות</button>
+          <button class="navbtn" data-menu="dest">יעדים</button>
+          <button class="navbtn" data-menu="holidays">ראש השנה 2026</button>
+        </nav>
+        <a href="#" style="display:flex;align-items:center;text-decoration:none;flex-shrink:0;">
+          <img src="assets/logo.png" alt="Live Tickets" style="height:30px;width:auto;display:block;">
+        </a>
+      </div>
+      <!-- LEFT group: search + favorites + account -->
+      <div style="display:flex;align-items:center;gap:18px;flex-shrink:1;min-width:0;">
+        <!-- Search field (with inline AI pill) -->
+        <div id="searchTrigger" style="flex:0 1 399px;min-width:150px;height:44px;display:flex;align-items:center;gap:10px;padding:0 8px 0 14px;background:#FAFAFA;border:1px solid #CCC;border-radius:999px;cursor:text;overflow:hidden;">
+          <button class="nav-ai-pill" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 4.9a3 3 0 0 0 1.9 1.9L20.4 10.4 15.5 12a3 3 0 0 0-1.9 1.9L12 18.8l-1.6-4.9A3 3 0 0 0 8.5 12L3.6 10.4 8.5 8.8a3 3 0 0 0 1.9-1.9z"></path></svg>
+            חיפוש בAI
+          </button>
+          <span style="flex:1;min-width:0;text-align:right;color:#8A8A8A;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">חפשו אמן, קבוצה, מופע או עיר…</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+        </div>
+        <!-- Personal area -->
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;position:relative;">
+          <button title="מועדפים" aria-label="מועדפים" style="position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;background:none;border:none;cursor:pointer;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ED1860" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.6a5 5 0 0 0-8.8-3.2A5 5 0 0 0 3.2 8.6c0 4.4 8.8 10.4 8.8 10.4s8.8-6 8.8-10.4z"></path></svg>
+            <span style="position:absolute;top:-6px;left:-6px;min-width:18px;height:18px;padding:0 4px;background:#F57E20;color:#fff;border-radius:9px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">3</span>
+          </button>
+          <button id="acctBtn" class="acctbtn">
+            האזור האישי
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+          </button>
         <!-- Account dropdown -->
         <div id="acctDD" style="display:none;position:absolute;top:calc(100% + 10px);left:0;width:320px;background:#fff;border:1px solid #EBEBEB;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.16);z-index:55;overflow:hidden;animation:lt-pop .14s ease;">
           <div style="display:flex;align-items:center;gap:11px;padding:16px;background:#F8F8F9;border-bottom:1px solid #EBEBEB;">
@@ -152,8 +151,12 @@
             <button style="flex:1;height:42px;background:#fff;border:1px solid #E6E6E6;border-radius:8px;color:#313131;font-size:14px;font-weight:600;cursor:pointer;">הרשמה</button>
           </div>
         </div>
+        <!-- /personal area -->
+        </div>
+      <!-- /LEFT group -->
       </div>
     </div>
+    <!-- /main bar -->
 
     <!-- ===== MEGA-MENUS ===== -->
     <!-- Football cascade (top-level) -->
@@ -421,13 +424,13 @@ function openMenu(name){
 }
 function closeMenu(){ openName=null; document.querySelectorAll('.mega').forEach(m=>m.classList.remove('open')); document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active')); }
 
-document.querySelectorAll('.navbtn[data-menu]').forEach(btn=>{
+document.querySelectorAll('[data-menu]').forEach(btn=>{   // nav buttons + the utility-bar help trigger
   const n = btn.getAttribute('data-menu');
   btn.addEventListener('mouseenter', ()=>openMenu(n));
   btn.addEventListener('click', ()=> openName===n ? closeMenu() : openMenu(n));
 });
 $('#searchTrigger').addEventListener('click', ()=> openName==='search' ? closeMenu() : openMenu('search'));
-$('#navRegion').addEventListener('mouseleave', closeMenu);
+$('#siteHeader').addEventListener('mouseleave', closeMenu);   // close when leaving the whole header (help lives in the utility bar)
 
 // account dropdown
 const acctBtn=$('#acctBtn'), acctDD=$('#acctDD');
