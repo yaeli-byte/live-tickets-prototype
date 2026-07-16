@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=57" />
+<link rel="stylesheet" href="flow.v5.css?v=58" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2326,7 +2326,7 @@ function startHold(step){
 function tickHold(){
   if(!state.holdActive) return;
   state.holdSec--;
-  document.querySelectorAll('.aob-clk,.obar2 .clk,.ot-clk').forEach(el=>el.textContent=fmtClock(state.holdSec));
+  document.querySelectorAll('[data-clk="hold"]').forEach(el=>el.textContent=fmtClock(state.holdSec));
   const warn=state.holdSec<=120 && state.holdSec>0, exp=state.holdSec<=0;
   if(warn!==state.holdWarn || exp!==state.holdExpired){
     state.holdWarn=warn; state.holdExpired=exp;
@@ -2340,16 +2340,16 @@ function stopHold(){ state.holdActive=false; state.holdWarn=false; state.holdExp
 let hold24Timer=null;
 function fmt24(s){ s=Math.max(0,s|0); const p=n=>String(n).padStart(2,'0'); return `${p(Math.floor(s/3600))}:${p(Math.floor((s%3600)/60))}:${p(s%60)}`; }
 function startHold24(){ state.h24Active=true; state.h24Sec=86400; state.aobDismissed=false; clearInterval(hold24Timer); hold24Timer=setInterval(tickHold24,1000); }
-function tickHold24(){ if(!state.h24Active) return; state.h24Sec=Math.max(0,state.h24Sec-1); document.querySelectorAll('.h24-clk').forEach(el=>el.textContent=fmt24(state.h24Sec)); if(state.h24Sec<=0) clearInterval(hold24Timer); }
+function tickHold24(){ if(!state.h24Active) return; state.h24Sec=Math.max(0,state.h24Sec-1); document.querySelectorAll('[data-clk="h24"]').forEach(el=>el.textContent=fmt24(state.h24Sec)); if(state.h24Sec<=0) clearInterval(hold24Timer); }
 function stopHold24(){ state.h24Active=false; clearInterval(hold24Timer); }
-function hold24Bar(){ return `<div class="otimer hold h24"><div class="ot-txt"><div class="ot-row"><span class="ot-clk h24-clk">${fmt24(state.h24Sec)}</span><span class="ot-main">המקומות שמורים · חלון תשלום</span></div><div class="ot-sub">השלימו את התשלום מכל המשתתפים בזמן — אחרת החזר אוטומטי למי ששילם.</div></div>${LOCK_SVG}</div>`; }
+function hold24Bar(){ return `<div class="otimer hold h24"><div class="ot-txt"><div class="ot-row"><span class="ot-clk" data-clk="h24">${fmt24(state.h24Sec)}</span><span class="ot-main">המקומות שמורים · חלון תשלום</span></div><div class="ot-sub">השלימו את התשלום מכל המשתתפים בזמן — אחרת החזר אוטומטי למי ששילם.</div></div>${LOCK_SVG}</div>`; }
 
 /* ---- sitewide active-order bar (browse pages only; hidden on the purchase screens) ---- */
 function activeOrderBar(){
   if(state.h24Active && !state.holdActive){   // 24h payment window — deposit paid (split) or offline pending
     return `<div class="aob warn" data-act="${state.cashPending?'to-confirm':'to-split-status'}">
       <span class="aob-go"><span class="aob-arr">→</span><span>לפרטים</span></span>
-      <div class="aob-main"><span class="aob-txt">המקומות שמורים · חלון תשלום</span><span class="aob-clk h24-clk">${fmt24(state.h24Sec)}</span></div>
+      <div class="aob-main"><span class="aob-txt">המקומות שמורים · חלון תשלום</span><span class="aob-clk" data-clk="h24">${fmt24(state.h24Sec)}</span></div>
       <button class="aob-x" data-act="aob-close" aria-label="סגירה">✕</button>
     </div>`;
   }
@@ -2360,7 +2360,7 @@ function activeOrderBar(){
   const act=state.holdExpired?'edge-expired':'hold-back';
   return `<div class="aob ${cls}" data-act="${act}">
     <span class="aob-go"><span class="aob-arr">→</span><span>${cta}</span></span>
-    <div class="aob-main"><span class="aob-txt">${txt}</span><span class="aob-clk">${fmtClock(state.holdSec)}</span></div>
+    <div class="aob-main"><span class="aob-txt">${txt}</span><span class="aob-clk" data-clk="hold">${fmtClock(state.holdSec)}</span></div>
     <button class="aob-x" data-act="aob-close" aria-label="סגירה">✕</button>
   </div>`;
 }
@@ -2368,7 +2368,7 @@ function activeOrderBar(){
 function orderBar2(){
   const cls=state.holdExpired?'exp':(state.holdWarn?'warn':'hold');
   const txt=state.holdExpired?'ההחזקה פגה':(state.holdWarn?'נותר זמן קצר להשלמה':'ההזמנה שלך שמורה');
-  return `<div class="obar2 ${cls}"><span class="clk">${fmtClock(state.holdSec)}</span><span>${txt}</span></div>`;
+  return `<div class="obar2 ${cls}"><span class="clk" data-clk="hold">${fmtClock(state.holdSec)}</span><span>${txt}</span></div>`;
 }
 function purHead(title,backAct){
   return `<div class="pur-head">
@@ -2387,7 +2387,7 @@ function orderTimer(){
   const main=state.holdExpired?'ההחזקה פגה':(state.holdWarn?'נותר זמן קצר להשלמה':'המחיר שלך נעול');
   const sub=state.holdExpired?'בדקו זמינות מחדש · באותו מחיר כולל עמלות':'הכרטיסים שמורים עבורך — השלימו כדי לא לאבד אותם.';
   return `<div class="otimer ${cls}">
-    <div class="ot-txt"><div class="ot-row"><span class="ot-clk">${fmtClock(state.holdSec)}</span><span class="ot-main">${main}</span></div><div class="ot-sub">${sub}</div></div>
+    <div class="ot-txt"><div class="ot-row"><span class="ot-clk" data-clk="hold">${fmtClock(state.holdSec)}</span><span class="ot-main">${main}</span></div><div class="ot-sub">${sub}</div></div>
     ${LOCK_SVG}
   </div>`;
 }
@@ -2623,7 +2623,7 @@ const ALARM_SVG='<svg class="nh-clk-ic" viewBox="0 0 24 24" fill="none" stroke="
 function collapsingHead(b, backAct){
   const sub=[b.date,b.venue].filter(Boolean).join(' · ');
   return `<div class="mhdr"><span class="mh-sp"></span><img class="mh-logo nav-logo" src="assets/logo.png" alt="Live Tickets"><button class="circle-btn" data-act="${backAct}" aria-label="חזרה">→</button></div>
-    <div class="nhero"><span class="nh-clk">${ALARM_SVG}<b class="ot-clk">${fmtClock(state.holdSec)}</b></span><div class="nh-g"><div class="nh-t">${[b.title,b.sec].filter(Boolean).join(' · ')}</div><div class="nh-m">${sub}</div></div><span class="nh-th" style="background-image:url(${IMG}${b.img||'team-realmadrid.jpg'})"></span></div>`;
+    <div class="nhero"><span class="nh-clk">${ALARM_SVG}<b class="ot-clk" data-clk="hold">${fmtClock(state.holdSec)}</b></span><div class="nh-g"><div class="nh-t">${[b.title,b.sec].filter(Boolean).join(' · ')}</div><div class="nh-m">${sub}</div></div><span class="nh-th" style="background-image:url(${IMG}${b.img||'team-realmadrid.jpg'})"></span></div>`;
 }
 function seatMiniHead(b, backAct){
   return `<div class="seat-stk">${collapsingHead(b, backAct||'back-event')}</div>`;
@@ -3526,7 +3526,7 @@ function wire(){
       case act==='split-inc': { state.splitN=Math.min(10,state.splitN+1); if(state.splitMode==='custom') splitInitAmounts(); set({}); break; }
       case act==='split-dec': { state.splitN=Math.max(2,state.splitN-1); if(state.splitMode==='custom') splitInitAmounts(); set({}); break; }
       case act==='split-mode': { const m=a.getAttribute('data-m'); if(m==='custom' && (Object.keys(state.splitAmounts).length===0 || splitSum()===0)) splitInitAmounts(); set({splitMode:m}); break; }
-      case act==='split-pay': if(state.splitMode==='custom' && !splitBalanced()) break; startHold24(); set({splitAllPaid:false, linkCopied:false}); go(14); break;   // deposit paid → 24h window opens
+      case act==='split-pay': if(state.splitMode==='custom' && !splitBalanced()) break; stopHold(); startHold24(); set({splitAllPaid:false, linkCopied:false}); go(14); break;   // deposit paid → 10-min price lock ends, 24h window takes over
       case act==='to-split-status': go(16); break;
       case act==='copy-link': { try{navigator.clipboard&&navigator.clipboard.writeText('https://livetickets.co.il/split/xR4k');}catch(_){}; state.linkCopied=true; toast('הלינק הועתק ✓'); render(); break; }
       case act==='to-organizer': go(16); break;
