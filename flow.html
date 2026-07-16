@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="flow.v5.css?v=56" />
+<link rel="stylesheet" href="flow.v5.css?v=57" />
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -2771,7 +2771,10 @@ function chkCoupon(){
 }
 /* paid add-ons — checkout only · ישיבה יחד is opt-in (NOT pre-checked / not auto-charged) */
 /* refined add-on / seat-option cards (Figma 336:3990/4002/4102) — button+price left · title/sub · icon right */
-const SEAT_IC='<svg class="oi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v5"/><path d="M4 11h16a1 1 0 0 1 1 1v4H3v-4a1 1 0 0 1 1-1z"/><path d="M6 16v3M18 16v3"/></svg>';
+// two seats split by a dashed gap — separate rows/areas ("ייתכן שלא תשבו יחד")
+const SEAT_APART_IC='<svg class="oi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5V9.4A1.4 1.4 0 0 1 5.4 8h1.2A1.4 1.4 0 0 1 8 9.4v3.1"/><path d="M3 12.5h6a1 1 0 0 1 1 1V16H2v-2.5a1 1 0 0 1 1-1z"/><path d="M3.2 16v2.5M8.8 16v2.5"/><path d="M16 12.5V9.4A1.4 1.4 0 0 1 17.4 8h1.2A1.4 1.4 0 0 1 20 9.4v3.1"/><path d="M15 12.5h6a1 1 0 0 1 1 1V16h-8v-2.5a1 1 0 0 1 1-1z"/><path d="M15.2 16v2.5M20.8 16v2.5"/><path d="M12 5.5v13" stroke-dasharray="2.4 2.4" opacity=".75"/></svg>';
+// two seats side by side on one shared row ("המקומות שיוקצו יהיו באותה השורה")
+const SEAT_TOGETHER_IC='<svg class="oi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5V9.4A1.4 1.4 0 0 1 5.9 8h3.2a1.4 1.4 0 0 1 1.4 1.4v3.1"/><path d="M13.5 12.5V9.4A1.4 1.4 0 0 1 14.9 8h3.2a1.4 1.4 0 0 1 1.4 1.4v3.1"/><path d="M3 12.5h18a1 1 0 0 1 1 1V16H2v-2.5a1 1 0 0 1 1-1z"/><path d="M4 16v2.5M20 16v2.5"/></svg>';
 const SHIELD_IC='<svg class="oi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.5v5.5c0 4.6-3.1 7.9-7 9.2-3.9-1.3-7-4.6-7-9.2V5.5L12 3z"/><path d="M9 12l2 2 4-4.2"/></svg>';
 function optCard(o){
   return `<div class="opt-card${o.sel?' on':''}${o.want?' want':''}">
@@ -2785,8 +2788,8 @@ function chkAddons(){
   const perCov=Math.round((state.buy&&state.buy.unit||0)*0.10);
   return `<div class="chk-sec">
     <div class="chk-h">בחירת מושבים</div>
-    ${optCard({sel:!state.buyAdjacent, act:'seat-opt', arg:'best', title:'המשתלמת ביותר', sub:'ללא תוספת תשלום · ייתכן שלא תשבו יחד', ic:SEAT_IC})}
-    ${optCard({sel:state.buyAdjacent, act:'seat-opt', arg:'together', price:nis(90), title:'ישיבה יחד', sub:'המקומות שיוקצו יהיו באותה השורה', ic:SEAT_IC, want:want})}
+    ${optCard({sel:!state.buyAdjacent, act:'seat-opt', arg:'best', title:'המשתלמת ביותר', sub:'ללא תוספת תשלום · ייתכן שלא תשבו יחד', ic:SEAT_APART_IC})}
+    ${optCard({sel:state.buyAdjacent, act:'seat-opt', arg:'together', price:nis(90), title:'ישיבה יחד', sub:'המקומות שיוקצו יהיו באותה השורה', ic:SEAT_TOGETHER_IC, want:want})}
     <div class="chk-h chk-h2">תוספות</div>
     ${optCard({sel:state.buyCoverage, act:'toggle-coverage', price:nis(perCov), title:'כיסוי למקרה ביטול', sub:`80% החזר עד 4 ימים לפני · <a class="pc-link" data-act="soon" data-title="כיסוי ביטול">לפרטים</a>`, ic:SHIELD_IC})}
     <div class="ao-note">${want?'סימנתם ״ישיבה יחד״ באירוע · ':''}״המשתלמת ביותר״ היא ברירת המחדל · ישיבה יחד בתוספת תשלום (אופציונלי).</div>
