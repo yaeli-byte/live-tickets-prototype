@@ -64,9 +64,31 @@ pages **3 / 10 / 11**. Below 640px the app fills the screen; otherwise it's a 37
 - "Change missing on the live site" is almost always browser cache → verify with `curl`, check in incognito.
 
 ## Current status (2026-07)
-- **Deployed:** pass A/B/B-mod + the "הצג עוד"/FAQ-merge/legal-strip updates are pushed and live at **`?v=39`**.
-  `desktop.html` (standalone desktop nav) is also deployed (separate link).
+- **`flow.html` live at `?v=62`** (mobile prototype); `desktop.html` live at commit `23d058a` (separate link,
+  no `?v=` — hard-refresh to bust its cache). Both on GitHub Pages.
 - Next deploy: bump `?v=` in `flow.html` + `index.html` to the same new N, then push (see cache-bust rule above).
 - Placeholder copy awaiting finals: `[[LEGAL HEADER — נוסח סופי יתקבל]]` (site header) and
   `[[18+ LEGAL — נוסח סופי]]` (event page). Replace when final legal copy arrives.
-- Deeper context: personal memory files `live-tickets-*`, and the PRD / feature-spec artifacts.
+- Deeper context: personal memory files `live-tickets-*`, the `live-tickets-project` skill, and the PRD / feature-spec artifacts.
+
+### Built since `?v=39` (mid–late July 2026)
+- **Checkout seat choice = two-option radio** (`chkAddons`, shared mobile+desktop): `המשתלמת ביותר`
+  (default · free · may not sit together) vs `ישיבה יחד` (paid opt-in, `buyAdjacent`). Refined `.opt-card`
+  design; **two distinct seat icons** (`SEAT_APART_IC` dashed-gap vs `SEAT_TOGETHER_IC` shared-row) + shield
+  for coverage. Add-ons: seat radio + cancellation coverage.
+- **Split-payment sub-flow** (pages 13–16): equal/unequal amounts editor (disabled CTA until 100% balanced),
+  invite/friend-pay/organizer status ("who paid", no names), **cash / bank-transfer 24h hold**.
+- **Two purchase timers, kept separate** (they used to overwrite each other): the **10-min price lock**
+  (`startHold`, `data-clk="hold"`) and the **24h payment window** (`startHold24`, `data-clk="h24"`, opens when
+  a deposit/offline payment is made). Never target a clock by its style class — use the `data-clk` hook.
+- **AI follow-up questions in the live search dropdown** (`srFollowBlock`/`srFollowups`): 2–4 contextual
+  questions below "כל התוצאות…", canned per demo topic else query-filled templates; tapping opens the AI chat
+  (`ai-open`) seeded with the question. `aiRespond` summary **echoes the query** (`לגבי ״…״ —`).
+- **Nav (desktop + mobile), promoted `כדורגל` to top-level.** See the `desktop.html` bullet in Architecture
+  for the model. Desktop top-nav restyled to Figma `353:819` (v2): help moved into the dark **utility bar**;
+  trust items left; **pink** account button; **outlined inline AI pill** (`חיפוש בAI`, sparkle left, search icon
+  right) inside the search field; `ראש השנה 2026` is now a **plain nav item** (dropped the promoted מומלץ·מתחלף
+  pill — deliberate, matches Figma); logo pinned to the right edge. Hot topics render as **image cards** on both.
+- **Desktop layout polish:** `pageCheckoutDesk` form right gutter capped at 100px; the desktop step-title bar
+  (`deskTop`, pages 3/10/11) is **centered on screen** with equal side gutters (long titles ellipsize).
+- **AI-search dropdown:** follow-up header right-aligned; question rows are borderless.
